@@ -24,13 +24,15 @@ export const myProvider = isTestEnvironment
 		})
 	: customProvider({
 			languageModels: {
-				"chat-model": anthropic("claude-3-7-sonnet-20250219"),
+				"chat-model": anthropic("claude-3-haiku-20240307"),
 				"chat-model-reasoning": wrapLanguageModel({
-					model: anthropic("claude-3-7-sonnet-20250219"),
-					middleware: extractReasoningMiddleware({ tagName: "think" })
+					model: anthropic("claude-sonnet-4-20250514"),
+					middleware: extractReasoningMiddleware({
+						tagName: "antml:thinking"
+					})
 				}),
-				"title-model": anthropic("claude-3-7-sonnet-20250219"),
-				"artifact-model": anthropic("claude-3-7-sonnet-20250219")
+				"title-model": anthropic("claude-3-haiku-20240307"),
+				"artifact-model": anthropic("claude-4-sonnet-20250514")
 			},
 			imageModels: {
 				"small-model": fal.image("fal-ai/flux-pro/kontext")

@@ -232,9 +232,13 @@ export async function POST(request: Request) {
 		const streamContext = getStreamContext()
 
 		if (streamContext) {
-			return new Response(
-				await streamContext.resumableStream(streamId, () => stream)
+			const resumableStream = await streamContext.resumableStream(
+				streamId,
+				() => stream
 			)
+			if (resumableStream) {
+				return new Response(resumableStream)
+			}
 		}
 		return new Response(stream)
 	} catch (error) {
