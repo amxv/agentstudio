@@ -21,6 +21,8 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "^1.2.12",
+		"@ai-sdk/fal": "^0.1.11",
 		"@ai-sdk/react": "^1.2.12",
 		"@ai-sdk/xai": "^1.2.16",
 		"@codemirror/lang-javascript": "^6.2.4",
