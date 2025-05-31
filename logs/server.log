@@ -1,0 +1,41 @@
+[2025-06-01 00:13:26] 
+[2025-06-01 00:13:26] ✘ next.js v15.3.2 is not yet supported in the Community edition of Console Ninja.
+[2025-06-01 00:13:26] We are working hard on it for you https://tinyurl.com/3h9mtwra.
+[2025-06-01 00:13:26] 
+[2025-06-01 00:13:26] Estimated release dates:
+[2025-06-01 00:13:26]   - Community users: around 6th July, 2025 (subject to team availability)
+[2025-06-01 00:13:26]   - PRO users:       priority access is available now
+[2025-06-01 00:13:26] 
+[2025-06-01 00:13:27] 
+[2025-06-01 00:13:27] ✘ next.js v15.3.2 is not yet supported in the Community edition of Console Ninja.
+[2025-06-01 00:13:27] We are working hard on it for you https://tinyurl.com/3h9mtwra.
+[2025-06-01 00:13:27] 
+[2025-06-01 00:13:27] Estimated release dates:
+[2025-06-01 00:13:27]   - Community users: around 6th July, 2025 (subject to team availability)
+[2025-06-01 00:13:27]   - PRO users:       priority access is available now
+[2025-06-01 00:13:27] 
+[2025-06-01 00:13:27]    ▲ Next.js 15.3.2 (Turbopack)
+[2025-06-01 00:13:27]    - Local:        http://localhost:3000
+[2025-06-01 00:13:27]    - Network:      http://192.168.1.246:3000
+[2025-06-01 00:13:27]    - Experiments (use with caution):
+[2025-06-01 00:13:27]      ✓ reactCompiler
+[2025-06-01 00:13:27] 
+[2025-06-01 00:13:27]  ✓ Starting...
+[2025-06-01 00:13:28]  ✓ Compiled instrumentation Node.js in 141ms
+[2025-06-01 00:13:28]  ✓ Compiled instrumentation Edge in 115ms
+[2025-06-01 00:13:28]  ✓ Compiled middleware in 183ms
+[2025-06-01 00:13:28]  ✓ Ready in 1402ms
+[2025-06-01 00:13:56]  ⨯ MissingSecret: Must pass `secret` if not set to JWT getToken(). Read more at https://errors.authjs.dev#missingsecret
+[2025-06-01 00:13:56]     at middleware (middleware.ts:20:30)
+[2025-06-01 00:13:56]   18 | 	}
+[2025-06-01 00:13:56]   19 |
+[2025-06-01 00:13:56] > 20 | 	const token = await getToken({
+[2025-06-01 00:13:56]      | 	                            ^
+[2025-06-01 00:13:56]   21 | 		req: request,
+[2025-06-01 00:13:56]   22 | 		secret: process.env.AUTH_SECRET,
+[2025-06-01 00:13:56]   23 | 		secureCookie: !isDevelopmentEnvironment
+[2025-06-01 00:13:56]  ○ Compiling /_error ...
+[2025-06-01 00:13:57]  ✓ Compiled /_error in 1181ms
+[2025-06-01 00:13:57]  GET / 404 in 2ms
+[2025-06-01 00:13:58]  ○ Compiling /_not-found/page ...
+[2025-06-01 00:14:00]  ✓ Compiled /_not-found/page in 2.7s

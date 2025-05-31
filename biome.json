@@ -1,0 +1,98 @@
+{
+	"files": {
+		"ignore": [
+			"dist/**/*",
+			"node_modules/**/*",
+			"public/**/*",
+			"**/*.css",
+			".next/**/*",
+			".vercel/**/*"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"noArrayIndexKey": {
+					"level": "off"
+				},
+				"noDoubleEquals": {
+					"level": "off"
+				}
+			},
+			"a11y": {
+				"useSemanticElements": {
+					"level": "off"
+				}
+			},
+			"style": {
+				"useTemplate": {
+					"level": "off"
+				},
+				"noUnusedTemplateLiteral": {
+					"level": "off"
+				},
+				"useNumberNamespace": {
+					"level": "off"
+				},
+				"useConst": {
+					"level": "off"
+				},
+				"useSingleVarDeclarator": {
+					"level": "off"
+				},
+				"useCollapsedElseIf": {
+					"level": "off"
+				},
+				"useExponentiationOperator": {
+					"level": "off"
+				},
+				"useExportType": {
+					"level": "off"
+				},
+				"useImportType": {
+					"level": "off"
+				},
+				"noInferrableTypes": {
+					"level": "off"
+				},
+				"useSelfClosingElements": {
+					"level": "off"
+				}
+			},
+			"complexity": {
+				"useOptionalChain": {
+					"level": "off"
+				}
+			}
+		},
+		"ignore": [
+			"**/*.md",
+			"**/*.css",
+			".wrangler/**/*",
+			".next/**/*",
+			".open-next/**/*",
+			"cloudflare-env.d.ts"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 4
+	},
+	"organizeImports": {
+		"enabled": false
+	},
+	"javascript": {
+		"formatter": {
+			"semicolons": "asNeeded",
+			"trailingCommas": "none"
+		}
+	},
+	"json": {
+		"parser": {
+			"allowComments": true
+		}
+	}
+}
