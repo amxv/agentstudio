@@ -39,7 +39,7 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 					.imageModel("first-img-model")
 					.modelId.includes("flux") && {
 					// Flux-specific parameters
-					guidance_scale: 3.5,
+					guidance_scale: 10,
 					num_inference_steps: 50,
 					sync_mode: true
 				})
@@ -76,7 +76,7 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 					fal: {
 						image_url: `data:image/png;base64,${document.content}`,
 						// Additional Flux Kontext parameters for better editing
-						guidance_scale: 3.5,
+						guidance_scale: 10,
 						num_inference_steps: 50,
 						sync_mode: true
 					}

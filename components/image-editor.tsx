@@ -1,6 +1,6 @@
 import cn from "classnames"
 import { useState } from "react"
-import { ZoomIn, ZoomOut, RotateCw, Maximize2 } from "lucide-react"
+import { ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2 } from "lucide-react"
 import { LoaderIcon } from "./icons"
 
 interface ImageEditorProps {
@@ -146,7 +146,7 @@ export function ImageEditor({
 					onClick={handleFullscreen}
 					className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-md transition-colors"
 				>
-					<Maximize2 size={16} />
+					<Minimize2 size={16} />
 				</button>
 			)}
 		</div>
