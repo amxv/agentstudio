@@ -35,6 +35,8 @@ export const myProvider = isTestEnvironment
 				"artifact-model": anthropic("claude-4-sonnet-20250514")
 			},
 			imageModels: {
-				"small-model": fal.image("fal-ai/flux-pro/kontext")
+				"small-model": fal.image(
+					"fal-ai/flux-pro/kontext/text-to-image"
+				)
 			}
 		})

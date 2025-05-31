@@ -19,24 +19,24 @@ function PureSuggestedActions({
 }: SuggestedActionsProps) {
 	const suggestedActions = [
 		{
-			title: "What are the advantages",
-			label: "of using Next.js?",
-			action: "What are the advantages of using Next.js?"
+			title: "Create a professional",
+			label: "headshot photo",
+			action: "Generate a professional business headshot with clean background and professional lighting"
 		},
 		{
-			title: "Write code to",
-			label: `demonstrate djikstra's algorithm`,
-			action: `Write code to demonstrate djikstra's algorithm`
+			title: "Design a company",
+			label: "presentation slide",
+			action: "Create a clean, modern presentation slide template with professional graphics"
 		},
 		{
-			title: "Help me write an essay",
-			label: "about silicon valley",
-			action: "Help me write an essay about silicon valley"
+			title: "Generate a business",
+			label: "infographic design",
+			action: "Design a professional infographic for business data visualization with charts and icons"
 		},
 		{
-			title: "What is the weather",
-			label: "in San Francisco?",
-			action: "What is the weather in San Francisco?"
+			title: "Create a corporate",
+			label: "event banner",
+			action: "Design a professional corporate event banner with elegant typography and branding elements"
 		}
 	]
 

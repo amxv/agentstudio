@@ -89,10 +89,19 @@ const Tool = ({
 		<Tooltip open={isHovered && !isAnimating}>
 			<TooltipTrigger asChild>
 				<motion.div
-					className={cx("p-3 rounded-full", {
-						"bg-primary text-primary-foreground!":
-							selectedTool === description
-					})}
+					className={cx(
+						"p-3 rounded-full transition-all duration-200 cursor-pointer",
+						"bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm",
+						"border border-zinc-200/50 dark:border-zinc-700/50",
+						"shadow-lg shadow-black/5 dark:shadow-black/20",
+						"hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-black/30",
+						{
+							"bg-gradient-to-r from-blue-500 to-purple-600 text-white border-transparent shadow-blue-500/25":
+								selectedTool === description,
+							"hover:bg-zinc-50 dark:hover:bg-zinc-700/70":
+								selectedTool !== description
+						}
+					)}
 					onHoverStart={() => {
 						setIsHovered(true)
 					}}
@@ -106,7 +115,7 @@ const Tool = ({
 					}}
 					initial={{ scale: 1, opacity: 0 }}
 					animate={{ opacity: 1, transition: { delay: 0.1 } }}
-					whileHover={{ scale: 1.1 }}
+					whileHover={{ scale: 1.05 }}
 					whileTap={{ scale: 0.95 }}
 					exit={{
 						scale: 0.9,
@@ -117,13 +126,15 @@ const Tool = ({
 						handleSelect()
 					}}
 				>
-					{selectedTool === description ? <ArrowUpIcon /> : icon}
+					<div className="w-5 h-5 flex items-center justify-center">
+						{selectedTool === description ? <ArrowUpIcon /> : icon}
+					</div>
 				</motion.div>
 			</TooltipTrigger>
 			<TooltipContent
 				side="left"
 				sideOffset={16}
-				className="bg-foreground text-background rounded-2xl p-3 px-4"
+				className="bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 rounded-xl p-3 px-4 border-0 shadow-xl"
 			>
 				{description}
 			</TooltipContent>
@@ -328,9 +339,6 @@ const PureToolbar = ({
 	const [toolbarElement, setToolbarElement] = useState<HTMLDivElement | null>(
 		null
 	)
-	const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-		undefined
-	)
 
 	const [selectedTool, setSelectedTool] = useState<string | null>(null)
 	const [isAnimating, setIsAnimating] = useState(false)
@@ -360,31 +368,6 @@ const PureToolbar = ({
 		}
 	}, [status, setIsToolbarVisible])
 
-	useEffect(() => {
-		return () => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current)
-			}
-		}
-	}, [])
-
-	const startCloseTimer = () => {
-		if (timeoutRef.current) {
-			clearTimeout(timeoutRef.current)
-		}
-
-		timeoutRef.current = setTimeout(() => {
-			setSelectedTool(null)
-			setIsToolbarVisible(false)
-		}, 2000)
-	}
-
-	const cancelCloseTimer = () => {
-		if (timeoutRef.current) {
-			clearTimeout(timeoutRef.current)
-		}
-	}
-
 	const artifactDefinition = artifactDefinitions.find(
 		(definition) => definition.kind === artifactKind
 	)
@@ -402,7 +385,7 @@ const PureToolbar = ({
 	return (
 		<TooltipProvider delayDuration={0}>
 			<motion.div
-				className="cursor-pointer absolute right-6 bottom-6 p-1.5 border rounded-full shadow-lg bg-background flex flex-col justify-end"
+				className="cursor-pointer absolute right-6 bottom-6 flex flex-col justify-end"
 				initial={{ opacity: 0, y: -20, scale: 1 }}
 				animate={
 					isToolbarVisible
@@ -432,14 +415,12 @@ const PureToolbar = ({
 				transition={{ type: "spring", stiffness: 300, damping: 25 }}
 				onHoverStart={() => {
 					if (status === "streaming") return
-
-					cancelCloseTimer()
 					setIsToolbarVisible(true)
 				}}
 				onHoverEnd={() => {
 					if (status === "streaming") return
-
-					startCloseTimer()
+					setIsToolbarVisible(false)
+					setSelectedTool(null)
 				}}
 				onAnimationStart={() => {
 					setIsAnimating(true)
@@ -453,9 +434,9 @@ const PureToolbar = ({
 					<motion.div
 						key="stop-icon"
 						initial={{ scale: 1 }}
-						animate={{ scale: 1.4 }}
+						animate={{ scale: 1.2 }}
 						exit={{ scale: 1 }}
-						className="p-3"
+						className="p-3 rounded-full bg-red-500 text-white"
 						onClick={() => {
 							stop()
 							setMessages((messages) => messages)
