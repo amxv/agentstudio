@@ -30,17 +30,18 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			const enhancedPrompt = enhanceImagePrompt(title)
 
 			const { image } = await experimental_generateImage({
-				model: myProvider.imageModel("small-model"),
+				model: myProvider.imageModel("first-img-model"),
 				prompt: enhancedPrompt,
 				n: 1,
 				size: "1024x1024", // Default to square format
 				// Add additional parameters if supported by the model
 				...(myProvider
-					.imageModel("small-model")
+					.imageModel("first-img-model")
 					.modelId.includes("flux") && {
 					// Flux-specific parameters
-					guidance_scale: 7.5,
-					num_inference_steps: 50
+					guidance_scale: 3.5,
+					num_inference_steps: 50,
+					sync_mode: true
 				})
 			})
 
@@ -58,23 +59,28 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 
 		return draftContent
 	},
-	onUpdateDocument: async ({ description, dataStream }) => {
+	onUpdateDocument: async ({ document, description, dataStream }) => {
 		let draftContent = ""
 
 		try {
 			const enhancedPrompt = enhanceImagePrompt(description)
 
+			// Use the context-aware editing model for updates
 			const { image } = await experimental_generateImage({
-				model: myProvider.imageModel("small-model"),
+				model: myProvider.imageModel("edit-img-model"),
 				prompt: enhancedPrompt,
 				n: 1,
 				size: "1024x1024",
-				...(myProvider
-					.imageModel("small-model")
-					.modelId.includes("flux") && {
-					guidance_scale: 7.5,
-					num_inference_steps: 50
-				})
+				// Pass the existing image as reference for context-aware editing
+				providerOptions: {
+					fal: {
+						image_url: `data:image/png;base64,${document.content}`,
+						// Additional Flux Kontext parameters for better editing
+						guidance_scale: 3.5,
+						num_inference_steps: 50,
+						sync_mode: true
+					}
+				}
 			})
 
 			draftContent = image.base64

@@ -20,6 +20,12 @@ export const myProvider = isTestEnvironment
 				"chat-model-reasoning": reasoningModel,
 				"title-model": titleModel,
 				"artifact-model": artifactModel
+			},
+			imageModels: {
+				"first-img-model": fal.image(
+					"fal-ai/flux-pro/kontext/text-to-image"
+				),
+				"edit-img-model": fal.image("fal-ai/flux-pro/kontext")
 			}
 		})
 	: customProvider({
@@ -35,8 +41,9 @@ export const myProvider = isTestEnvironment
 				"artifact-model": anthropic("claude-4-sonnet-20250514")
 			},
 			imageModels: {
-				"small-model": fal.image(
+				"first-img-model": fal.image(
 					"fal-ai/flux-pro/kontext/text-to-image"
-				)
+				),
+				"edit-img-model": fal.image("fal-ai/flux-pro/kontext")
 			}
 		})
