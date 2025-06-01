@@ -248,7 +248,7 @@ function PureMultimodalInput({
 				attachments.length === 0 &&
 				uploadQueue.length === 0 && (
 					<SuggestedActions
-						append={append}
+						setInput={setInput}
 						chatId={chatId}
 						selectedVisibilityType={selectedVisibilityType}
 					/>
@@ -292,7 +292,6 @@ function PureMultimodalInput({
 			<Textarea
 				data-testid="multimodal-input"
 				ref={textareaRef}
-				placeholder="Send a message..."
 				value={input}
 				onChange={handleInput}
 				className={cx(

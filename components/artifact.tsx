@@ -264,14 +264,14 @@ function PureArtifact({
 			{artifact.isVisible && (
 				<motion.div
 					data-testid="artifact"
-					className="flex flex-row h-dvh w-dvw fixed top-0 left-0 z-50 bg-transparent"
+					className="flex flex-row h-[calc(100dvh-72px)] w-dvw fixed top-[72px] left-0 z-30 bg-transparent"
 					initial={{ opacity: 1 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0, transition: { delay: 0.4 } }}
 				>
 					{!isMobile && (
 						<motion.div
-							className="fixed bg-background h-dvh"
+							className="fixed bg-background h-[calc(100dvh-72px)]"
 							initial={{
 								width: isSidebarOpen
 									? windowWidth - 256
@@ -290,7 +290,7 @@ function PureArtifact({
 
 					{!isMobile && (
 						<motion.div
-							className="relative w-[400px] bg-muted dark:bg-background h-dvh shrink-0"
+							className="relative w-[400px] bg-background h-[calc(100dvh-72px)] shrink-0"
 							initial={{ opacity: 0, x: 10, scale: 1 }}
 							animate={{
 								opacity: 1,
@@ -313,7 +313,7 @@ function PureArtifact({
 							<AnimatePresence>
 								{!isCurrentVersion && (
 									<motion.div
-										className="left-0 absolute h-dvh w-[400px] top-0 bg-zinc-900/50 z-50"
+										className="left-0 absolute h-[calc(100dvh-72px)] w-[400px] top-0 bg-zinc-900/50 z-40"
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
 										exit={{ opacity: 0 }}
@@ -345,7 +345,7 @@ function PureArtifact({
 										setAttachments={setAttachments}
 										messages={messages}
 										append={append}
-										className="bg-background dark:bg-muted"
+										className="bg-background"
 										setMessages={setMessages}
 										selectedVisibilityType={
 											selectedVisibilityType
@@ -357,7 +357,7 @@ function PureArtifact({
 					)}
 
 					<motion.div
-						className="fixed dark:bg-muted bg-background h-dvh flex flex-col overflow-y-scroll md:border-l dark:border-zinc-700 border-zinc-200"
+						className="fixed bg-background h-[calc(100dvh-72px)] flex flex-col overflow-y-scroll md:border-l dark:border-zinc-700 border-zinc-200"
 						initial={
 							isMobile
 								? {
@@ -383,7 +383,9 @@ function PureArtifact({
 										opacity: 1,
 										x: 0,
 										y: 0,
-										height: windowHeight,
+										height: windowHeight
+											? windowHeight - 72
+											: "calc(100dvh-72px)",
 										width: windowWidth
 											? windowWidth
 											: "calc(100dvw)",
@@ -400,7 +402,9 @@ function PureArtifact({
 										opacity: 1,
 										x: 400,
 										y: 0,
-										height: windowHeight,
+										height: windowHeight
+											? windowHeight - 72
+											: "calc(100dvh-72px)",
 										width: windowWidth
 											? windowWidth - 400
 											: "calc(100dvw-400px)",
@@ -465,7 +469,7 @@ function PureArtifact({
 							/>
 						</div>
 
-						<div className="dark:bg-muted bg-background h-full overflow-y-scroll max-w-full! items-center">
+						<div className="bg-background h-full overflow-y-scroll max-w-full! items-center">
 							<artifactDefinition.content
 								title={artifact.title}
 								content={

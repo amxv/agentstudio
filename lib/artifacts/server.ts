@@ -22,6 +22,7 @@ export interface CreateDocumentCallbackProps {
 	dataStream: DataStreamWriter
 	session: Session
 	messages?: Array<UIMessage>
+	selectedImageModel?: string
 }
 
 export interface UpdateDocumentCallbackProps {
@@ -30,12 +31,13 @@ export interface UpdateDocumentCallbackProps {
 	dataStream: DataStreamWriter
 	session: Session
 	messages?: Array<UIMessage>
+	selectedImageModel?: string
 }
 
-export interface DocumentHandler<T = ArtifactKind> {
+export interface DocumentHandler<T extends ArtifactKind> {
 	kind: T
-	onCreateDocument: (args: CreateDocumentCallbackProps) => Promise<void>
-	onUpdateDocument: (args: UpdateDocumentCallbackProps) => Promise<void>
+	onCreateDocument: (params: CreateDocumentCallbackProps) => Promise<string>
+	onUpdateDocument: (params: UpdateDocumentCallbackProps) => Promise<string>
 }
 
 export function createDocumentHandler<T extends ArtifactKind>(config: {
@@ -51,7 +53,8 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				title: args.title,
 				dataStream: args.dataStream,
 				session: args.session,
-				messages: args.messages
+				messages: args.messages,
+				selectedImageModel: args.selectedImageModel
 			})
 
 			if (args.session?.user?.id) {
@@ -64,7 +67,7 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				})
 			}
 
-			return
+			return draftContent
 		},
 		onUpdateDocument: async (args: UpdateDocumentCallbackProps) => {
 			const draftContent = await config.onUpdateDocument({
@@ -72,7 +75,8 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				description: args.description,
 				dataStream: args.dataStream,
 				session: args.session,
-				messages: args.messages
+				messages: args.messages,
+				selectedImageModel: args.selectedImageModel
 			})
 
 			if (args.session?.user?.id) {
@@ -85,7 +89,7 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				})
 			}
 
-			return
+			return draftContent
 		}
 	}
 }
@@ -93,11 +97,18 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 /*
  * Use this array to define the document handlers for each artifact kind.
  */
-export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
+export const documentHandlersByArtifactKind: Array<
+	DocumentHandler<ArtifactKind>
+> = [
 	textDocumentHandler,
 	codeDocumentHandler,
 	imageDocumentHandler,
 	sheetDocumentHandler
 ]
 
-export const artifactKinds = ["text", "code", "image", "sheet"] as const
+export const artifactKinds: Array<ArtifactKind> = [
+	"text",
+	"code",
+	"image",
+	"sheet"
+]

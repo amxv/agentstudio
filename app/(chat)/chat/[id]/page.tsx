@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@/app/(auth)/auth"
 import { Chat } from "@/components/chat"
 import { DataStreamHandler } from "@/components/data-stream-handler"
-import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models"
+import { DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL } from "@/lib/ai/models"
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries"
 import type { DBMessage } from "@/lib/db/schema"
 import type { Attachment, UIMessage } from "ai"
@@ -53,14 +53,20 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
 	const cookieStore = await cookies()
 	const chatModelFromCookie = cookieStore.get("chat-model")
+	const imageModelFromCookie = cookieStore.get("image-model")
 
-	if (!chatModelFromCookie) {
+	if (!chatModelFromCookie || !imageModelFromCookie) {
 		return (
 			<>
 				<Chat
 					id={chat.id}
 					initialMessages={convertToUIMessages(messagesFromDb)}
-					initialChatModel={DEFAULT_CHAT_MODEL}
+					initialChatModel={
+						chatModelFromCookie?.value || DEFAULT_CHAT_MODEL
+					}
+					initialImageModel={
+						imageModelFromCookie?.value || DEFAULT_IMAGE_MODEL
+					}
 					initialVisibilityType={chat.visibility}
 					isReadonly={session?.user?.id !== chat.userId}
 					session={session}
@@ -77,6 +83,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 				id={chat.id}
 				initialMessages={convertToUIMessages(messagesFromDb)}
 				initialChatModel={chatModelFromCookie.value}
+				initialImageModel={imageModelFromCookie.value}
 				initialVisibilityType={chat.visibility}
 				isReadonly={session?.user?.id !== chat.userId}
 				session={session}

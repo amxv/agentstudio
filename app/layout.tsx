@@ -1,10 +1,15 @@
 import { ThemeProvider } from "@/components/theme-provider"
+import { LayoutWrapper } from "@/components/layout-wrapper"
+import { AppSidebar } from "@/components/app-sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
+import { cookies } from "next/headers"
 
 import "./globals.css"
 import { SessionProvider } from "next-auth/react"
+import { auth } from "./(auth)/auth"
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://chat.vercel.ai"),
@@ -53,6 +58,9 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
+	const [session, cookieStore] = await Promise.all([auth(), cookies()])
+	const isCollapsed = cookieStore.get("sidebar:state")?.value !== "true"
+
 	return (
 		<html
 			lang="en"
@@ -79,7 +87,14 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					<Toaster position="top-center" />
-					<SessionProvider>{children}</SessionProvider>
+					<SessionProvider>
+						<SidebarProvider defaultOpen={!isCollapsed}>
+							<AppSidebar user={session?.user} />
+							<SidebarInset>
+								<LayoutWrapper>{children}</LayoutWrapper>
+							</SidebarInset>
+						</SidebarProvider>
+					</SessionProvider>
 				</ThemeProvider>
 			</body>
 		</html>

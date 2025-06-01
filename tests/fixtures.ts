@@ -1,5 +1,6 @@
 import { expect as baseExpect, test as baseTest } from "@playwright/test"
 import { getUnixTime } from "date-fns"
+import { MODEL_IDS } from "@/lib/ai/models"
 import { type UserContext, createAuthenticatedContext } from "./helpers"
 
 interface Fixtures {
@@ -39,7 +40,7 @@ export const test = baseTest.extend<{}, Fixtures>({
 			const curie = await createAuthenticatedContext({
 				browser,
 				name: `curie-${workerInfo.workerIndex}-${getUnixTime(new Date())}`,
-				chatModel: "chat-model-reasoning"
+				chatModel: MODEL_IDS.CLAUDE_SONNET_4
 			})
 
 			await use(curie)

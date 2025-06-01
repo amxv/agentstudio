@@ -1,6 +1,7 @@
 import cn from "classnames"
 import { useState } from "react"
 import { ZoomIn, ZoomOut, RotateCw, Maximize2, Minimize2 } from "lucide-react"
+import Image from "next/image"
 import { LoaderIcon } from "./icons"
 
 interface ImageEditorProps {
@@ -157,7 +158,7 @@ export function ImageEditor({
 						transform: `scale(${zoom}) rotate(${rotation}deg)`
 					}}
 				>
-					<img
+					<Image
 						className={cn(
 							"max-w-full max-h-full object-contain rounded-2xl shadow-lg",
 							{
@@ -169,6 +170,9 @@ export function ImageEditor({
 						)}
 						src={`data:image/png;base64,${content}`}
 						alt={title}
+						width={800}
+						height={600}
+						unoptimized={true}
 						draggable={false}
 						onError={() => {
 							console.error("Image failed to load:", {

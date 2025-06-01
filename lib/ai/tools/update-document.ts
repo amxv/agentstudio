@@ -9,12 +9,14 @@ interface UpdateDocumentProps {
 	session: Session
 	dataStream: DataStreamWriter
 	messages?: Array<UIMessage>
+	selectedImageModel?: string
 }
 
 export const updateDocument = ({
 	session,
 	dataStream,
-	messages
+	messages,
+	selectedImageModel
 }: UpdateDocumentProps) =>
 	tool({
 		description: "Update a document with the given description.",
@@ -54,7 +56,8 @@ export const updateDocument = ({
 				description,
 				dataStream,
 				session,
-				messages: messages || []
+				messages: messages || [],
+				selectedImageModel
 			})
 
 			dataStream.writeData({ type: "finish", content: "" })

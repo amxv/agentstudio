@@ -9,6 +9,7 @@ import {
 } from "@playwright/test"
 import { generateId } from "ai"
 import { getUnixTime } from "date-fns"
+import { MODEL_IDS, type ModelId } from "@/lib/ai/models"
 import { ChatPage } from "./pages/chat"
 
 export type UserContext = {
@@ -20,11 +21,11 @@ export type UserContext = {
 export async function createAuthenticatedContext({
 	browser,
 	name,
-	chatModel = "chat-model"
+	chatModel = MODEL_IDS.CLAUDE_SONNET_4
 }: {
 	browser: Browser
 	name: string
-	chatModel?: "chat-model" | "chat-model-reasoning"
+	chatModel?: ModelId
 }): Promise<UserContext> {
 	const directory = path.join(__dirname, "../playwright/.sessions")
 
@@ -53,9 +54,9 @@ export async function createAuthenticatedContext({
 
 	const chatPage = new ChatPage(page)
 	await chatPage.createNewChat()
-	await chatPage.chooseModelFromSelector("chat-model-reasoning")
+	await chatPage.chooseModelFromSelector(MODEL_IDS.O4_MINI)
 	await expect(chatPage.getSelectedModel()).resolves.toEqual(
-		"Reasoning model"
+		MODEL_IDS.O4_MINI
 	)
 
 	await page.waitForTimeout(1000)

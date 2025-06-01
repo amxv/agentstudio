@@ -1,5 +1,6 @@
 import { getMessageByErrorCode } from "@/lib/errors"
 import { generateUUID } from "@/lib/utils"
+import { MODEL_IDS } from "@/lib/ai/models"
 import { expect, test } from "../fixtures"
 import { TEST_PROMPTS } from "../prompts/routes"
 

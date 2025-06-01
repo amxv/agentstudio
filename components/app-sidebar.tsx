@@ -6,7 +6,8 @@ import {
 	History,
 	MoreHorizontal,
 	Globe,
-	Lock
+	Lock,
+	SearchIcon
 } from "lucide-react"
 import type { User as NextAuthUser } from "next-auth"
 import { useRouter } from "next/navigation"
@@ -192,7 +193,7 @@ export function AppSidebar({
 		<>
 			<Sidebar {...props}>
 				<SidebarHeader className="gap-3.5 border-b p-4">
-					<SidebarInput placeholder="Search conversations..." />
+					<SidebarInput placeholder="Search" />
 				</SidebarHeader>
 				<SidebarContent>
 					<SidebarGroup className="px-0">
@@ -538,75 +539,83 @@ function ChatItem({
 						: ""
 				}`}
 			>
-				<div className="flex w-full items-center gap-2">
+				<div className="flex w-full items-center gap-3">
 					{visibilityType === "public" ? (
 						<Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
 					) : (
 						<Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
 					)}
-					<span className="truncate font-medium">{chat.title}</span>
-					<span className="ml-auto text-xs text-muted-foreground">
+					<span className="truncate font-medium flex-1 min-w-0">
+						{chat.title}
+					</span>
+					<span className="text-xs text-muted-foreground flex-shrink-0">
 						{new Date(chat.createdAt).toLocaleDateString("en-US", {
 							month: "short",
 							day: "numeric"
 						})}
 					</span>
+					<div className="flex-shrink-0">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									type="button"
+									className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-sidebar-accent"
+								>
+									<MoreHorizontal className="h-4 w-4" />
+								</button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent side="bottom" align="end">
+								<DropdownMenuSub>
+									<DropdownMenuSubTrigger className="cursor-pointer">
+										<ShareIcon />
+										<span>Share</span>
+									</DropdownMenuSubTrigger>
+									<DropdownMenuPortal>
+										<DropdownMenuSubContent>
+											<DropdownMenuItem
+												className="cursor-pointer flex-row justify-between"
+												onClick={() =>
+													setVisibilityType("private")
+												}
+											>
+												<div className="flex flex-row gap-2 items-center">
+													<LockIcon size={12} />
+													<span>Private</span>
+												</div>
+												{visibilityType ===
+												"private" ? (
+													<CheckCircleFillIcon />
+												) : null}
+											</DropdownMenuItem>
+											<DropdownMenuItem
+												className="cursor-pointer flex-row justify-between"
+												onClick={() =>
+													setVisibilityType("public")
+												}
+											>
+												<div className="flex flex-row gap-2 items-center">
+													<GlobeIcon />
+													<span>Public</span>
+												</div>
+												{visibilityType === "public" ? (
+													<CheckCircleFillIcon />
+												) : null}
+											</DropdownMenuItem>
+										</DropdownMenuSubContent>
+									</DropdownMenuPortal>
+								</DropdownMenuSub>
+								<DropdownMenuItem
+									className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive"
+									onSelect={() => onDelete(chat.id)}
+								>
+									<TrashIcon />
+									<span>Delete</span>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				</div>
 			</a>
-
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<button
-						type="button"
-						className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-sidebar-accent"
-					>
-						<MoreHorizontal className="h-4 w-4" />
-					</button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent side="bottom" align="end">
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger className="cursor-pointer">
-							<ShareIcon />
-							<span>Share</span>
-						</DropdownMenuSubTrigger>
-						<DropdownMenuPortal>
-							<DropdownMenuSubContent>
-								<DropdownMenuItem
-									className="cursor-pointer flex-row justify-between"
-									onClick={() => setVisibilityType("private")}
-								>
-									<div className="flex flex-row gap-2 items-center">
-										<LockIcon size={12} />
-										<span>Private</span>
-									</div>
-									{visibilityType === "private" ? (
-										<CheckCircleFillIcon />
-									) : null}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									className="cursor-pointer flex-row justify-between"
-									onClick={() => setVisibilityType("public")}
-								>
-									<div className="flex flex-row gap-2 items-center">
-										<GlobeIcon />
-										<span>Public</span>
-									</div>
-									{visibilityType === "public" ? (
-										<CheckCircleFillIcon />
-									) : null}
-								</DropdownMenuItem>
-							</DropdownMenuSubContent>
-						</DropdownMenuPortal>
-					</DropdownMenuSub>
-					<DropdownMenuItem
-						className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive"
-						onSelect={() => onDelete(chat.id)}
-					>
-						<TrashIcon />
-						<span>Delete</span>
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
 		</div>
 	)
 }

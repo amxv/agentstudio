@@ -75,8 +75,14 @@ export function VisibilitySelector({
 					className="hidden md:flex md:px-2 md:h-[34px]"
 				>
 					{selectedVisibility?.icon}
-					{selectedVisibility?.label}
-					<ChevronDownIcon />
+					<div
+						className={cn(
+							"transition-transform duration-200",
+							open && "rotate-180"
+						)}
+					>
+						<ChevronDownIcon />
+					</div>
 				</Button>
 			</DropdownMenuTrigger>
 

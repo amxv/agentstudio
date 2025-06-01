@@ -8,13 +8,13 @@ import type { VisibilityType } from "./visibility-selector"
 
 interface SuggestedActionsProps {
 	chatId: string
-	append: UseChatHelpers["append"]
+	setInput: UseChatHelpers["setInput"]
 	selectedVisibilityType: VisibilityType
 }
 
 function PureSuggestedActions({
 	chatId,
-	append,
+	setInput,
 	selectedVisibilityType
 }: SuggestedActionsProps) {
 	const suggestedActions = [
@@ -57,23 +57,14 @@ function PureSuggestedActions({
 					<Button
 						variant="ghost"
 						onClick={async () => {
-							window.history.replaceState(
-								{},
-								"",
-								`/chat/${chatId}`
-							)
-
-							append({
-								role: "user",
-								content: suggestedAction.action
-							})
+							setInput(suggestedAction.action)
 						}}
-						className="text-left border rounded-3xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+						className="text-center border rounded-3xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-center items-center"
 					>
 						<span className="font-medium">
 							{suggestedAction.title}
 						</span>
-						<span className="text-muted-foreground">
+						<span className="font-medium">
 							{suggestedAction.label}
 						</span>
 					</Button>

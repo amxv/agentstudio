@@ -5,6 +5,7 @@ import type { User } from "next-auth"
 import { signOut, useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,16 +19,18 @@ import { guestRegex } from "@/lib/constants"
 import { useRouter } from "next/navigation"
 import { LoaderIcon } from "./icons"
 import { toast } from "./toast"
+import { cn } from "@/lib/utils"
 
 export function SidebarUserNav({ user }: { user: User }) {
 	const router = useRouter()
 	const { data, status } = useSession()
 	const { setTheme, theme } = useTheme()
+	const [open, setOpen] = useState(false)
 
 	const isGuest = guestRegex.test(data?.user?.email ?? "")
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
 				{status === "loading" ? (
 					<Button
@@ -35,9 +38,6 @@ export function SidebarUserNav({ user }: { user: User }) {
 						className="md:px-2 md:h-[34px] gap-2"
 					>
 						<div className="size-4 bg-zinc-500/30 rounded-full animate-pulse" />
-						<span className="bg-zinc-500/30 text-transparent rounded-3xl animate-pulse">
-							Loading...
-						</span>
 						<div className="animate-spin text-zinc-500">
 							<LoaderIcon size={12} />
 						</div>
@@ -55,13 +55,14 @@ export function SidebarUserNav({ user }: { user: User }) {
 							height={16}
 							className="rounded-full"
 						/>
-						<span
-							data-testid="user-email"
-							className="truncate max-w-20"
+						<div
+							className={cn(
+								"transition-transform duration-200",
+								!open && "rotate-180"
+							)}
 						>
-							{isGuest ? "Guest" : user?.email}
-						</span>
-						<ChevronUp className="h-3 w-3" />
+							<ChevronUp className="h-3 w-3" />
+						</div>
 					</Button>
 				)}
 			</DropdownMenuTrigger>

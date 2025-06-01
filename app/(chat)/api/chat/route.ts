@@ -73,8 +73,13 @@ export async function POST(request: Request) {
 	}
 
 	try {
-		const { id, message, selectedChatModel, selectedVisibilityType } =
-			requestBody
+		const {
+			id,
+			message,
+			selectedChatModel,
+			selectedImageModel,
+			selectedVisibilityType
+		} = requestBody
 
 		const session = await auth()
 
@@ -165,12 +170,14 @@ export async function POST(request: Request) {
 						createDocument: createDocument({
 							session,
 							dataStream,
-							messages: messages as UIMessage[]
+							messages: messages as UIMessage[],
+							selectedImageModel
 						}),
 						updateDocument: updateDocument({
 							session,
 							dataStream,
-							messages: messages as UIMessage[]
+							messages: messages as UIMessage[],
+							selectedImageModel
 						}),
 						requestSuggestions: requestSuggestions({
 							session,

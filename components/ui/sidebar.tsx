@@ -2,9 +2,8 @@
 
 import { Slot } from "@radix-ui/react-slot"
 import { type VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, SearchIcon } from "lucide-react"
 import * as React from "react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -21,7 +20,7 @@ import { cn } from "@/lib/utils"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH = "25rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -241,7 +240,7 @@ const Sidebar = React.forwardRef<
 				/>
 				<div
 					className={cn(
-						"duration-100 fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] ease-linear md:flex",
+						"duration-100 fixed inset-y-0 z-50 hidden h-svh w-(--sidebar-width) transition-[left,right,width] ease-linear md:flex",
 						side === "left"
 							? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
 							: "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -344,15 +343,18 @@ const SidebarInput = React.forwardRef<
 	React.ComponentProps<typeof Input>
 >(({ className, ...props }, ref) => {
 	return (
-		<Input
-			ref={ref}
-			data-sidebar="input"
-			className={cn(
-				"h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-				className
-			)}
-			{...props}
-		/>
+		<div className="flex items-center gap-2">
+			<SearchIcon className="h-4 w-4" />
+			<Input
+				ref={ref}
+				data-sidebar="input"
+				className={cn(
+					"h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+					className
+				)}
+				{...props}
+			/>
+		</div>
 	)
 })
 SidebarInput.displayName = "SidebarInput"

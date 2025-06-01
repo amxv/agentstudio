@@ -12,19 +12,21 @@ interface CreateDocumentProps {
 	session: Session
 	dataStream: DataStreamWriter
 	messages?: Array<UIMessage>
+	selectedImageModel?: string
 }
 
 export const createDocument = ({
 	session,
 	dataStream,
-	messages
+	messages,
+	selectedImageModel
 }: CreateDocumentProps) =>
 	tool({
 		description:
 			"Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.",
 		parameters: z.object({
 			title: z.string(),
-			kind: z.enum(artifactKinds)
+			kind: z.enum(artifactKinds as [string, ...string[]])
 		}),
 		execute: async ({ title, kind }) => {
 			const id = generateUUID()
@@ -63,7 +65,8 @@ export const createDocument = ({
 				title,
 				dataStream,
 				session,
-				messages: messages || []
+				messages: messages || [],
+				selectedImageModel
 			})
 
 			dataStream.writeData({ type: "finish", content: "" })

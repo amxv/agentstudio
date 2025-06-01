@@ -1,8 +1,8 @@
 "use client"
 
-import { ChatHeader } from "@/components/chat-header"
 import { useArtifactSelector } from "@/hooks/use-artifact"
 import { useAutoResume } from "@/hooks/use-auto-resume"
+import { useChatHeader } from "@/components/chat-header-context"
 import { useChatVisibility } from "@/hooks/use-chat-visibility"
 import type { Vote } from "@/lib/db/schema"
 import { ChatSDKError } from "@/lib/errors"
@@ -25,6 +25,7 @@ export function Chat({
 	id,
 	initialMessages,
 	initialChatModel,
+	initialImageModel,
 	initialVisibilityType,
 	isReadonly,
 	session,
@@ -33,6 +34,7 @@ export function Chat({
 	id: string
 	initialMessages: Array<UIMessage>
 	initialChatModel: string
+	initialImageModel: string
 	initialVisibilityType: VisibilityType
 	isReadonly: boolean
 	session: Session
@@ -44,6 +46,7 @@ export function Chat({
 		chatId: id,
 		initialVisibilityType
 	})
+	const { updateHeaderState, clearHeaderState } = useChatHeader()
 
 	const {
 		messages,
@@ -68,6 +71,7 @@ export function Chat({
 			id,
 			message: body.messages.at(-1),
 			selectedChatModel: initialChatModel,
+			selectedImageModel: initialImageModel,
 			selectedVisibilityType: visibilityType
 		}),
 		onFinish: () => {
@@ -116,17 +120,33 @@ export function Chat({
 		setMessages
 	})
 
+	// Update header state when component mounts or props change
+	useEffect(() => {
+		updateHeaderState({
+			chatId: id,
+			selectedModelId: initialChatModel,
+			selectedImageModelId: initialImageModel,
+			selectedVisibilityType: visibilityType,
+			isReadonly
+		})
+
+		// Clear header state when component unmounts
+		return () => {
+			clearHeaderState()
+		}
+	}, [
+		id,
+		initialChatModel,
+		initialImageModel,
+		visibilityType,
+		isReadonly,
+		updateHeaderState,
+		clearHeaderState
+	])
+
 	return (
 		<>
-			<div className="flex flex-col min-w-0 h-dvh bg-background">
-				<ChatHeader
-					chatId={id}
-					selectedModelId={initialChatModel}
-					selectedVisibilityType={initialVisibilityType}
-					isReadonly={isReadonly}
-					session={session}
-				/>
-
+			<div className="flex flex-col min-w-0 h-full bg-background">
 				<Messages
 					chatId={id}
 					status={status}
