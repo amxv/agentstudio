@@ -13,13 +13,17 @@ interface CreateDocumentProps {
 	dataStream: DataStreamWriter
 	messages?: Array<UIMessage>
 	selectedImageModel?: string
+	selectedAspectRatio?: string
+	selectedGuidanceScale?: number
 }
 
 export const createDocument = ({
 	session,
 	dataStream,
 	messages,
-	selectedImageModel
+	selectedImageModel,
+	selectedAspectRatio,
+	selectedGuidanceScale
 }: CreateDocumentProps) =>
 	tool({
 		description:
@@ -66,7 +70,9 @@ export const createDocument = ({
 				dataStream,
 				session,
 				messages: messages || [],
-				selectedImageModel
+				selectedImageModel,
+				selectedAspectRatio,
+				selectedGuidanceScale
 			})
 
 			dataStream.writeData({ type: "finish", content: "" })

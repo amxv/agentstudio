@@ -21,7 +21,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 	const session = await auth()
 
 	if (!session) {
-		redirect("/api/auth/guest")
+		redirect("/login")
 	}
 
 	if (chat.visibility === "private") {
@@ -54,11 +54,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 	const cookieStore = await cookies()
 	const chatModelFromCookie = cookieStore.get("chat-model")
 	const imageModelFromCookie = cookieStore.get("image-model")
+	const aspectRatioFromCookie = cookieStore.get("aspect-ratio")
+	const guidanceScaleFromCookie = cookieStore.get("guidance-scale")
 
 	if (!chatModelFromCookie || !imageModelFromCookie) {
 		return (
 			<>
 				<Chat
+					key={chat.id}
 					id={chat.id}
 					initialMessages={convertToUIMessages(messagesFromDb)}
 					initialChatModel={
@@ -67,12 +70,16 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 					initialImageModel={
 						imageModelFromCookie?.value || DEFAULT_IMAGE_MODEL
 					}
+					initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
+					initialGuidanceScale={
+						guidanceScaleFromCookie?.value || "10"
+					}
 					initialVisibilityType={chat.visibility}
-					isReadonly={session?.user?.id !== chat.userId}
+					isReadonly={false}
 					session={session}
-					autoResume={true}
+					autoResume={false}
 				/>
-				<DataStreamHandler id={id} />
+				<DataStreamHandler id={chat.id} />
 			</>
 		)
 	}
@@ -80,16 +87,19 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 	return (
 		<>
 			<Chat
+				key={chat.id}
 				id={chat.id}
 				initialMessages={convertToUIMessages(messagesFromDb)}
 				initialChatModel={chatModelFromCookie.value}
 				initialImageModel={imageModelFromCookie.value}
+				initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
+				initialGuidanceScale={guidanceScaleFromCookie?.value || "10"}
 				initialVisibilityType={chat.visibility}
-				isReadonly={session?.user?.id !== chat.userId}
+				isReadonly={false}
 				session={session}
-				autoResume={true}
+				autoResume={false}
 			/>
-			<DataStreamHandler id={id} />
+			<DataStreamHandler id={chat.id} />
 		</>
 	)
 }

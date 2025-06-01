@@ -32,7 +32,6 @@ const imageModelMapping = {
 	[IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I]: "fal-ai/flux-pro/kontext",
 	[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I]: "fal-ai/flux-pro/kontext/max",
 	[IMAGE_MODEL_IDS.RECRAFT_V3_I2I]: "fal-ai/recraft/v3/image-to-image",
-	[IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT]: "fal-ai/ideogram/v3/edit",
 	[IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX]: "fal-ai/ideogram/v3/remix",
 
 	// Legacy backend models
@@ -93,9 +92,7 @@ export const myProvider = isTestEnvironment
 				[IMAGE_MODEL_IDS.RECRAFT_V3_I2I]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.RECRAFT_V3_I2I]
 				),
-				[IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT]: fal.image(
-					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT]
-				),
+
 				[IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX]
 				),
@@ -194,9 +191,7 @@ export const myProvider = isTestEnvironment
 				[IMAGE_MODEL_IDS.RECRAFT_V3_I2I]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.RECRAFT_V3_I2I]
 				),
-				[IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT]: fal.image(
-					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT]
-				),
+
 				[IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX]
 				),

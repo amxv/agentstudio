@@ -20,6 +20,16 @@ export async function saveImageModelAsCookie(model: string) {
 	cookieStore.set("image-model", model)
 }
 
+export async function saveAspectRatioAsCookie(aspectRatio: string) {
+	const cookieStore = await cookies()
+	cookieStore.set("aspect-ratio", aspectRatio)
+}
+
+export async function saveGuidanceScaleAsCookie(guidanceScale: string) {
+	const cookieStore = await cookies()
+	cookieStore.set("guidance-scale", guidanceScale)
+}
+
 export async function generateTitleFromUserMessage({
 	message
 }: {

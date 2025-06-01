@@ -559,7 +559,7 @@ function ChatItem({
 							<DropdownMenuTrigger asChild>
 								<button
 									type="button"
-									className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-sidebar-accent"
+									className="opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 transition-opacity p-1 rounded hover:bg-sidebar-accent"
 								>
 									<MoreHorizontal className="h-4 w-4" />
 								</button>

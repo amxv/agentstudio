@@ -19,6 +19,8 @@ function PureChatHeader({
 	chatId,
 	selectedModelId,
 	selectedImageModelId,
+	selectedAspectRatio,
+	selectedGuidanceScale,
 	selectedVisibilityType,
 	isReadonly,
 	session
@@ -26,6 +28,8 @@ function PureChatHeader({
 	chatId: string
 	selectedModelId: string
 	selectedImageModelId: string
+	selectedAspectRatio: string
+	selectedGuidanceScale: string
 	selectedVisibilityType: VisibilityType
 	isReadonly: boolean
 	session: Session
@@ -34,7 +38,7 @@ function PureChatHeader({
 	const { open } = useSidebar()
 
 	return (
-		<header className="flex sticky top-0 bg-background my-4 items-center px-2 md:px-4 gap-2 z-60">
+		<header className="flex sticky top-0 bg-background my-5 items-center px-2 md:px-4 gap-2 z-60">
 			{/* Left section */}
 			<div className="flex items-center gap-2">
 				<SidebarToggle />
@@ -70,6 +74,8 @@ function PureChatHeader({
 					<ImageModelSelector
 						session={session}
 						selectedImageModelId={selectedImageModelId}
+						selectedAspectRatio={selectedAspectRatio}
+						selectedGuidanceScale={selectedGuidanceScale}
 					/>
 				)}
 			</div>
@@ -92,6 +98,8 @@ function PureChatHeader({
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
 	return (
 		prevProps.selectedModelId === nextProps.selectedModelId &&
-		prevProps.selectedImageModelId === nextProps.selectedImageModelId
+		prevProps.selectedImageModelId === nextProps.selectedImageModelId &&
+		prevProps.selectedAspectRatio === nextProps.selectedAspectRatio &&
+		prevProps.selectedGuidanceScale === nextProps.selectedGuidanceScale
 	)
 })

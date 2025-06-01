@@ -11,7 +11,7 @@ export default async function Page() {
 	const session = await auth()
 
 	if (!session) {
-		redirect("/api/auth/guest")
+		redirect("/login")
 	}
 
 	const id = generateUUID()
@@ -19,6 +19,8 @@ export default async function Page() {
 	const cookieStore = await cookies()
 	const modelIdFromCookie = cookieStore.get("chat-model")
 	const imageModelIdFromCookie = cookieStore.get("image-model")
+	const aspectRatioFromCookie = cookieStore.get("aspect-ratio")
+	const guidanceScaleFromCookie = cookieStore.get("guidance-scale")
 
 	if (!modelIdFromCookie || !imageModelIdFromCookie) {
 		return (
@@ -32,6 +34,10 @@ export default async function Page() {
 					}
 					initialImageModel={
 						imageModelIdFromCookie?.value || DEFAULT_IMAGE_MODEL
+					}
+					initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
+					initialGuidanceScale={
+						guidanceScaleFromCookie?.value || "10"
 					}
 					initialVisibilityType="private"
 					isReadonly={false}
@@ -51,6 +57,8 @@ export default async function Page() {
 				initialMessages={[]}
 				initialChatModel={modelIdFromCookie.value}
 				initialImageModel={imageModelIdFromCookie.value}
+				initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
+				initialGuidanceScale={guidanceScaleFromCookie?.value || "10"}
 				initialVisibilityType="private"
 				isReadonly={false}
 				session={session}

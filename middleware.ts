@@ -23,12 +23,14 @@ export async function middleware(request: NextRequest) {
 		secureCookie: !isDevelopmentEnvironment
 	})
 
+	// Redirect all unauthenticated users to login page
 	if (!token) {
-		const redirectUrl = encodeURIComponent(request.url)
+		// Allow access to login and register pages for unauthenticated users
+		if (["/login", "/register"].includes(pathname)) {
+			return NextResponse.next()
+		}
 
-		return NextResponse.redirect(
-			new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url)
-		)
+		return NextResponse.redirect(new URL("/login", request.url))
 	}
 
 	const isGuest = guestRegex.test(token?.email ?? "")

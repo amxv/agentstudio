@@ -78,7 +78,9 @@ export async function POST(request: Request) {
 			message,
 			selectedChatModel,
 			selectedImageModel,
-			selectedVisibilityType
+			selectedVisibilityType,
+			selectedAspectRatio,
+			selectedGuidanceScale
 		} = requestBody
 
 		const session = await auth()
@@ -171,13 +173,17 @@ export async function POST(request: Request) {
 							session,
 							dataStream,
 							messages: messages as UIMessage[],
-							selectedImageModel
+							selectedImageModel,
+							selectedAspectRatio,
+							selectedGuidanceScale
 						}),
 						updateDocument: updateDocument({
 							session,
 							dataStream,
 							messages: messages as UIMessage[],
-							selectedImageModel
+							selectedImageModel,
+							selectedAspectRatio,
+							selectedGuidanceScale
 						}),
 						requestSuggestions: requestSuggestions({
 							session,

@@ -23,6 +23,8 @@ export interface CreateDocumentCallbackProps {
 	session: Session
 	messages?: Array<UIMessage>
 	selectedImageModel?: string
+	selectedAspectRatio?: string
+	selectedGuidanceScale?: number
 }
 
 export interface UpdateDocumentCallbackProps {
@@ -32,6 +34,8 @@ export interface UpdateDocumentCallbackProps {
 	session: Session
 	messages?: Array<UIMessage>
 	selectedImageModel?: string
+	selectedAspectRatio?: string
+	selectedGuidanceScale?: number
 }
 
 export interface DocumentHandler<T extends ArtifactKind> {
@@ -54,7 +58,9 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				dataStream: args.dataStream,
 				session: args.session,
 				messages: args.messages,
-				selectedImageModel: args.selectedImageModel
+				selectedImageModel: args.selectedImageModel,
+				selectedAspectRatio: args.selectedAspectRatio,
+				selectedGuidanceScale: args.selectedGuidanceScale
 			})
 
 			if (args.session?.user?.id) {
@@ -76,7 +82,9 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
 				dataStream: args.dataStream,
 				session: args.session,
 				messages: args.messages,
-				selectedImageModel: args.selectedImageModel
+				selectedImageModel: args.selectedImageModel,
+				selectedAspectRatio: args.selectedAspectRatio,
+				selectedGuidanceScale: args.selectedGuidanceScale
 			})
 
 			if (args.session?.user?.id) {

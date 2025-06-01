@@ -6,6 +6,7 @@ import { useActionState, useEffect, useState } from "react"
 
 import { AuthForm } from "@/components/auth-form"
 import { SubmitButton } from "@/components/submit-button"
+import { isSignupDisabled } from "@/lib/constants"
 
 import { toast } from "@/components/toast"
 import { useSession } from "next-auth/react"
@@ -13,6 +14,14 @@ import { type RegisterActionState, register } from "../actions"
 
 export default function Page() {
 	const router = useRouter()
+
+	// Redirect to login if signups are disabled
+	useEffect(() => {
+		if (isSignupDisabled) {
+			router.replace("/login")
+			return
+		}
+	}, [router])
 
 	const [email, setEmail] = useState("")
 	const [isSuccessful, setIsSuccessful] = useState(false)
@@ -36,6 +45,12 @@ export default function Page() {
 				type: "error",
 				description: "Failed validating your submission!"
 			})
+		} else if (state.status === "signup_disabled") {
+			toast({
+				type: "error",
+				description: "New user registrations are currently disabled!"
+			})
+			router.replace("/login")
 		} else if (state.status === "success") {
 			toast({
 				type: "success",
@@ -51,6 +66,11 @@ export default function Page() {
 	const handleSubmit = (formData: FormData) => {
 		setEmail(formData.get("email") as string)
 		formAction(formData)
+	}
+
+	// Don't render the form if signups are disabled
+	if (isSignupDisabled) {
+		return null
 	}
 
 	return (

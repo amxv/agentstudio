@@ -32,7 +32,12 @@ export const postRequestBodySchema = z.object({
 	selectedImageModel: z.enum(
 		USER_SELECTABLE_IMAGE_MODEL_IDS as [string, ...string[]]
 	),
-	selectedVisibilityType: z.enum(["public", "private"])
+	selectedVisibilityType: z.enum(["public", "private"]),
+	selectedAspectRatio: z
+		.enum(["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"])
+		.optional()
+		.default("1:1"),
+	selectedGuidanceScale: z.number().min(1).max(20).optional().default(10)
 })
 
 export type PostRequestBody = z.infer<typeof postRequestBodySchema>

@@ -7,6 +7,7 @@ import { useActionState, useEffect, useState } from "react"
 
 import { AuthForm } from "@/components/auth-form"
 import { SubmitButton } from "@/components/submit-button"
+import { isSignupDisabled } from "@/lib/constants"
 
 import { useSession } from "next-auth/react"
 import { type LoginActionState, login } from "../actions"
@@ -64,16 +65,18 @@ export default function Page() {
 					<SubmitButton isSuccessful={isSuccessful}>
 						Sign in
 					</SubmitButton>
-					<p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-						{"Don't have an account? "}
-						<Link
-							href="/register"
-							className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-						>
-							Sign up
-						</Link>
-						{" for free."}
-					</p>
+					{!isSignupDisabled && (
+						<p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
+							{"Don't have an account? "}
+							<Link
+								href="/register"
+								className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+							>
+								Sign up
+							</Link>
+							{" for free."}
+						</p>
+					)}
 				</AuthForm>
 			</div>
 		</div>

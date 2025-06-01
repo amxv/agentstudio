@@ -7,6 +7,8 @@ interface ChatHeaderState {
 	chatId: string
 	selectedModelId: string
 	selectedImageModelId: string
+	selectedAspectRatio: string
+	selectedGuidanceScale: string
 	selectedVisibilityType: VisibilityType
 	isReadonly: boolean
 }

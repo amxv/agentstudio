@@ -27,7 +27,6 @@ export const IMAGE_MODEL_IDS = {
 	FLUX_KONTEXT_I2I: "flux-kontext-i2i",
 	FLUX_KONTEXT_MAX_I2I: "flux-kontext-max-i2i",
 	RECRAFT_V3_I2I: "recraft-v3-i2i",
-	IDEOGRAM_V3_EDIT: "ideogram-v3-edit",
 	IDEOGRAM_V3_REMIX: "ideogram-v3-remix",
 
 	// Backend models - these are used internally for automatic selection (legacy)
@@ -41,6 +40,32 @@ export const IMAGE_MODEL_IDS = {
 export type ModelId = (typeof MODEL_IDS)[keyof typeof MODEL_IDS]
 export type ImageModelId =
 	(typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS]
+
+// Universal aspect ratio format used in UI
+export type UniversalAspectRatio =
+	| "1:1"
+	| "16:9"
+	| "9:16"
+	| "4:3"
+	| "3:4"
+	| "21:9"
+
+// Model-specific aspect ratio formats
+export type FluxAspectRatio = "1:1" | "16:9" | "9:16" | "4:3" | "3:4" | "21:9"
+export type RecraftIdeogramAspectRatio =
+	| "square_hd"
+	| "square"
+	| "portrait_4_3"
+	| "portrait_16_9"
+	| "landscape_4_3"
+	| "landscape_16_9"
+
+export interface AspectRatioConfig {
+	parameterName: string // The parameter name used by the model API
+	supportedRatios: UniversalAspectRatio[]
+	defaultRatio: UniversalAspectRatio
+	formatType: "flux" | "recraft-ideogram"
+}
 
 export interface ChatModel {
 	id: ModelId
@@ -63,6 +88,7 @@ export interface ImageModel {
 		guidanceScale: number
 		inferenceSteps: number
 	}
+	aspectRatio?: AspectRatioConfig // Optional - only for T2I models
 }
 
 export const chatModels: Array<ChatModel> = [
@@ -131,6 +157,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -147,6 +179,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -163,6 +201,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 8,
 			inferenceSteps: 40
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -178,6 +222,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 7,
 			inferenceSteps: 35
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "recraft-ideogram"
 		}
 	},
 	{
@@ -194,6 +244,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "2048x2048",
 			guidanceScale: 12,
 			inferenceSteps: 60
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -209,6 +265,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -225,6 +287,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 9,
 			inferenceSteps: 45
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "recraft-ideogram"
 		}
 	},
 
@@ -276,21 +344,6 @@ export const imageModels: Array<ImageModel> = [
 		}
 	},
 	{
-		id: IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT,
-		name: "Ideogram V3 Edit",
-		description: "Precise image editing with typography preservation",
-		provider: "fal",
-		capabilities: {
-			textToImage: false,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 9,
-			inferenceSteps: 45
-		}
-	},
-	{
 		id: IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
 		name: "Ideogram V3 Remix",
 		description: "Creative image remixing and style transfer",
@@ -320,6 +373,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -335,6 +394,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -350,6 +415,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 10,
 			inferenceSteps: 50
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -365,6 +436,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 7,
 			inferenceSteps: 25
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	},
 	{
@@ -380,6 +457,12 @@ export const imageModels: Array<ImageModel> = [
 			maxSize: "1024x1024",
 			guidanceScale: 8,
 			inferenceSteps: 35
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
+			defaultRatio: "1:1",
+			formatType: "flux"
 		}
 	}
 ]
@@ -402,9 +485,56 @@ export const USER_SELECTABLE_IMAGE_MODEL_IDS = [
 	IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I,
 	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I,
 	IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
-	IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT,
 	IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
 ]
 
 export const DEFAULT_CHAT_MODEL: string = MODEL_IDS.CLAUDE_SONNET_4
 export const DEFAULT_IMAGE_MODEL: string = IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
+
+// Aspect ratio conversion utilities
+export const convertUniversalToModelAspectRatio = (
+	universalRatio: UniversalAspectRatio,
+	formatType: "flux" | "recraft-ideogram"
+): string => {
+	if (formatType === "flux") {
+		// FLUX models use the same format as universal
+		return universalRatio
+	}
+
+	// Recraft and Ideogram models use different format
+	const recraftIdeogramMapping: Record<
+		UniversalAspectRatio,
+		RecraftIdeogramAspectRatio
+	> = {
+		"1:1": "square_hd",
+		"4:3": "landscape_4_3",
+		"3:4": "portrait_4_3",
+		"16:9": "landscape_16_9",
+		"9:16": "portrait_16_9",
+		"21:9": "landscape_16_9" // Fallback to 16:9 for ultrawide
+	}
+
+	return recraftIdeogramMapping[universalRatio] || "square_hd"
+}
+
+export const getAspectRatioParameterForModel = (
+	modelId: ImageModelId,
+	universalRatio: UniversalAspectRatio
+): { parameterName: string; value: string } | null => {
+	const model = imageModels.find((m) => m.id === modelId)
+	if (!model || !model.aspectRatio) {
+		// I2I models don't have aspect ratio parameters
+		return null
+	}
+
+	const { aspectRatio } = model
+	const convertedValue = convertUniversalToModelAspectRatio(
+		universalRatio,
+		aspectRatio.formatType
+	)
+
+	return {
+		parameterName: aspectRatio.parameterName,
+		value: convertedValue
+	}
+}

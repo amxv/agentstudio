@@ -10,7 +10,11 @@ import {
 	Edit,
 	Sparkles,
 	Upload,
-	Link
+	Link,
+	ZoomIn,
+	ZoomOut,
+	RotateCw,
+	Maximize2
 } from "lucide-react"
 import { ImageEditor } from "@/components/image-editor"
 import { toast } from "sonner"
@@ -22,6 +26,9 @@ interface ImageArtifactMetadata {
 	generationType?: "text-to-image" | "image-to-image"
 	hasInputImage?: boolean
 	inputImageUrl?: string
+	zoom?: number
+	rotation?: number
+	isFullscreen?: boolean
 }
 
 export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
@@ -34,7 +41,10 @@ export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
 			aspectRatio: "1:1",
 			style: "realistic",
 			generationType: "text-to-image",
-			hasInputImage: false
+			hasInputImage: false,
+			zoom: 1,
+			rotation: 0,
+			isFullscreen: false
 		})
 	},
 	onStreamPart: ({ streamPart, setArtifact }) => {
@@ -56,6 +66,53 @@ export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
 	},
 	content: ImageEditor,
 	actions: [
+		{
+			icon: <ZoomOut size={18} />,
+			description: "Zoom out",
+			onClick: ({ metadata, setMetadata }) => {
+				setMetadata((prev) => ({
+					...prev,
+					zoom: Math.max((prev.zoom || 1) - 0.25, 0.25)
+				}))
+			},
+			isDisabled: ({ metadata }) => {
+				return (metadata?.zoom || 1) <= 0.25
+			}
+		},
+
+		{
+			icon: <ZoomIn size={18} />,
+			description: "Zoom in",
+			onClick: ({ metadata, setMetadata }) => {
+				setMetadata((prev) => ({
+					...prev,
+					zoom: Math.min((prev.zoom || 1) + 0.25, 3)
+				}))
+			},
+			isDisabled: ({ metadata }) => {
+				return (metadata?.zoom || 1) >= 3
+			}
+		},
+		{
+			icon: <RotateCw size={18} />,
+			description: "Rotate image",
+			onClick: ({ metadata, setMetadata }) => {
+				setMetadata((prev) => ({
+					...prev,
+					rotation: ((prev.rotation || 0) + 90) % 360
+				}))
+			}
+		},
+		{
+			icon: <Maximize2 size={18} />,
+			description: "Toggle fullscreen",
+			onClick: ({ metadata, setMetadata }) => {
+				setMetadata((prev) => ({
+					...prev,
+					isFullscreen: !prev.isFullscreen
+				}))
+			}
+		},
 		{
 			icon: <RotateCcw size={18} />,
 			description: "Regenerate image",

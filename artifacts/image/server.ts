@@ -4,7 +4,9 @@ import { createDocumentHandler } from "@/lib/artifacts/server"
 import {
 	imageModels,
 	DEFAULT_IMAGE_MODEL,
-	IMAGE_MODEL_IDS
+	IMAGE_MODEL_IDS,
+	getAspectRatioParameterForModel,
+	type UniversalAspectRatio
 } from "@/lib/ai/models"
 import { experimental_generateImage } from "ai"
 import type { Attachment, UIMessage } from "ai"
@@ -119,7 +121,7 @@ const getOptimalImageModel = (
 			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
 		}
 		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT
+			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
 		}
 		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
 		if (
@@ -145,7 +147,7 @@ const getOptimalImageModel = (
 			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
 		}
 		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT
+			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
 		}
 		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
 		if (
@@ -175,10 +177,7 @@ const getOptimalImageModel = (
 		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_I2I) {
 			return IMAGE_MODEL_IDS.RECRAFT_V3_T2I
 		}
-		if (
-			selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT ||
-			selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
-		) {
+		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX) {
 			return IMAGE_MODEL_IDS.IDEOGRAM_V3
 		}
 
@@ -268,8 +267,8 @@ const getFalModelName = (modelId: string, hasInputImage: boolean): string => {
 	if (modelId === IMAGE_MODEL_IDS.RECRAFT_V3_I2I) {
 		return "fal-ai/recraft/v3/image-to-image"
 	}
-	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_EDIT) {
-		return "fal-ai/ideogram/v3/edit"
+	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX) {
+		return "fal-ai/ideogram/v3/remix"
 	}
 	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX) {
 		return "fal-ai/ideogram/v3/remix"
@@ -334,7 +333,9 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 		title,
 		dataStream,
 		messages,
-		selectedImageModel
+		selectedImageModel,
+		selectedAspectRatio,
+		selectedGuidanceScale
 	}) => {
 		let draftContent = ""
 
@@ -384,6 +385,18 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			)
 			const modelParams = getModelParameters(optimalModelId)
 
+			// Use user-selected parameters with fallback to model defaults
+			const guidanceScale =
+				selectedGuidanceScale || modelParams.guidanceScale
+			const aspectRatio =
+				(selectedAspectRatio as UniversalAspectRatio) || "1:1"
+
+			// Get the model-specific aspect ratio parameter (only for T2I models)
+			const aspectRatioConfig = getAspectRatioParameterForModel(
+				optimalModelId as (typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS],
+				aspectRatio
+			)
+
 			const generateParams: Parameters<
 				typeof experimental_generateImage
 			>[0] = {
@@ -396,27 +409,38 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			// Add image-to-image specific parameters if we have an input image or base image for editing
 			const imageToUse = inputImage || baseImageForEditing
 			if (imageToUse) {
-				generateParams.providerOptions = {
-					fal: {
-						image_url: imageToUse,
-						guidance_scale: modelParams.guidanceScale,
-						num_inference_steps: modelParams.inferenceSteps,
-						sync_mode: true,
-						// Strength controls how much the input image influences the output
-						// Lower values preserve more of the original image
-						// Use lower strength for editing existing artifacts vs new input images
-						strength: inputImage ? 0.8 : 0.6
-					}
+				const falOptions: Record<string, string | number | boolean> = {
+					image_url: imageToUse,
+					guidance_scale: guidanceScale,
+					num_inference_steps: modelParams.inferenceSteps,
+					sync_mode: true,
+					// Strength controls how much the input image influences the output
+					// Lower values preserve more of the original image
+					// Use lower strength for editing existing artifacts vs new input images
+					strength: inputImage ? 0.8 : 0.6
 				}
+
+				// Only add aspect ratio for T2I models
+				if (aspectRatioConfig) {
+					falOptions[aspectRatioConfig.parameterName] =
+						aspectRatioConfig.value
+				}
+
+				generateParams.providerOptions = { fal: falOptions }
 			} else {
-				// Text-to-image specific parameters
-				generateParams.providerOptions = {
-					fal: {
-						guidance_scale: modelParams.guidanceScale,
-						num_inference_steps: modelParams.inferenceSteps,
-						sync_mode: true
-					}
+				const falOptions: Record<string, string | number | boolean> = {
+					guidance_scale: guidanceScale,
+					num_inference_steps: modelParams.inferenceSteps,
+					sync_mode: true
 				}
+
+				// Only add aspect ratio for T2I models
+				if (aspectRatioConfig) {
+					falOptions[aspectRatioConfig.parameterName] =
+						aspectRatioConfig.value
+				}
+
+				generateParams.providerOptions = { fal: falOptions }
 			}
 
 			const { image } = await experimental_generateImage(generateParams)
@@ -440,7 +464,9 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 		description,
 		dataStream,
 		messages,
-		selectedImageModel
+		selectedImageModel,
+		selectedAspectRatio,
+		selectedGuidanceScale
 	}) => {
 		let draftContent = ""
 
@@ -474,22 +500,40 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			)
 			const modelParams = getModelParameters(optimalModelId)
 
+			// Use user-selected parameters with fallback to model defaults
+			const guidanceScale =
+				selectedGuidanceScale || modelParams.guidanceScale
+			const aspectRatio =
+				(selectedAspectRatio as UniversalAspectRatio) || "1:1"
+
+			// Get the model-specific aspect ratio parameter (only for T2I models)
+			const aspectRatioConfig = getAspectRatioParameterForModel(
+				optimalModelId as (typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS],
+				aspectRatio
+			)
+
+			const falOptions: Record<string, string | number | boolean> = {
+				image_url: baseImage,
+				guidance_scale: guidanceScale,
+				num_inference_steps: modelParams.inferenceSteps,
+				sync_mode: true,
+				// Adjust strength based on whether we have a new input image
+				// Higher strength for new images, lower for modifications
+				strength: newInputImage ? 0.8 : 0.6
+			}
+
+			// Only add aspect ratio for T2I models
+			if (aspectRatioConfig) {
+				falOptions[aspectRatioConfig.parameterName] =
+					aspectRatioConfig.value
+			}
+
 			const { image } = await experimental_generateImage({
 				model: myProvider.imageModel(optimalModelId),
 				prompt: enhancedPrompt,
 				n: 1,
 				size: modelParams.maxSize as "1024x1024",
-				providerOptions: {
-					fal: {
-						image_url: baseImage,
-						guidance_scale: modelParams.guidanceScale,
-						num_inference_steps: modelParams.inferenceSteps,
-						sync_mode: true,
-						// Adjust strength based on whether we have a new input image
-						// Higher strength for new images, lower for modifications
-						strength: newInputImage ? 0.8 : 0.6
-					}
-				}
+				providerOptions: { fal: falOptions }
 			})
 
 			draftContent = image.base64

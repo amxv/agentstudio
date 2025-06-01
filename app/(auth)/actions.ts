@@ -3,6 +3,7 @@
 import { z } from "zod"
 
 import { createUser, getUser } from "@/lib/db/queries"
+import { isSignupDisabled } from "@/lib/constants"
 
 import { signIn } from "./auth"
 
@@ -49,12 +50,18 @@ export interface RegisterActionState {
 		| "failed"
 		| "user_exists"
 		| "invalid_data"
+		| "signup_disabled"
 }
 
 export const register = async (
 	_: RegisterActionState,
 	formData: FormData
 ): Promise<RegisterActionState> => {
+	// Check if signups are disabled
+	if (isSignupDisabled) {
+		return { status: "signup_disabled" }
+	}
+
 	try {
 		const validatedData = authFormSchema.parse({
 			email: formData.get("email"),

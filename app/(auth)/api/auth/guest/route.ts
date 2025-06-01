@@ -17,14 +17,7 @@ export async function GET(request: Request) {
 		return NextResponse.redirect(new URL("/", request.url))
 	}
 
-	try {
-		// For credentials providers, use signIn without redirect and handle redirect manually
-		await signIn("guest")
-		return NextResponse.redirect(new URL(redirectUrl, request.url))
-	} catch (error) {
-		console.error("Guest sign-in error:", error)
-		return NextResponse.redirect(
-			new URL("/login?error=Configuration", request.url)
-		)
-	}
+	// Redirect to login instead of creating guest sessions
+	// since the site now only works for logged in users
+	return NextResponse.redirect(new URL("/login", request.url))
 }

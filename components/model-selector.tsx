@@ -8,6 +8,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuLabel,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { chatModels } from "@/lib/ai/models"
@@ -61,46 +62,65 @@ export function ModelSelector({
 				>
 					<BrainIcon size={12} />
 					{selectedChatModel?.name}
-					<ChevronDownIcon />
+					<div
+						className={cn(
+							"transition-transform duration-200",
+							open && "rotate-180"
+						)}
+					>
+						<ChevronDownIcon />
+					</div>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="min-w-[300px]">
-				{availableChatModels.map((chatModel) => {
-					const { id } = chatModel
+			<DropdownMenuContent align="start" className="min-w-[350px] p-4">
+				<DropdownMenuLabel className="text-xs font-medium text-muted-foreground mb-2">
+					Chat Models
+				</DropdownMenuLabel>
+				<div className="flex flex-col gap-2">
+					{availableChatModels.map((chatModel) => {
+						const { id } = chatModel
+						const isSelected = id === optimisticModelId
 
-					return (
-						<DropdownMenuItem
-							data-testid={`model-selector-item-${id}`}
-							key={id}
-							onSelect={() => {
-								setOpen(false)
-
-								startTransition(() => {
-									setOptimisticModelId(id)
-									saveChatModelAsCookie(id)
-								})
-							}}
-							data-active={id === optimisticModelId}
-							asChild
-						>
+						return (
 							<button
+								key={id}
+								data-testid={`model-selector-item-${id}`}
 								type="button"
-								className="gap-4 group/item flex flex-row justify-between items-center w-full"
+								onClick={() => {
+									setOpen(false)
+									startTransition(() => {
+										setOptimisticModelId(id)
+										saveChatModelAsCookie(id)
+									})
+								}}
+								className={cn(
+									"p-3 rounded-lg border text-left transition-colors group",
+									isSelected
+										? "border-primary bg-primary/5"
+										: "border-border hover:border-primary/50 hover:bg-accent/50"
+								)}
 							>
-								<div className="flex flex-col gap-1 items-start">
-									<div>{chatModel.name}</div>
-									<div className="text-xs text-muted-foreground">
-										{chatModel.description}
+								<div className="flex items-start justify-between">
+									<div className="flex-1 min-w-0">
+										<div className="flex items-center gap-2 mb-1">
+											<span className="font-medium text-sm truncate">
+												{chatModel.name}
+											</span>
+											{isSelected && (
+												<div className="text-primary flex-shrink-0">
+													<CheckCircleFillIcon />
+												</div>
+											)}
+										</div>
+										<div className="text-xs text-muted-foreground line-clamp-2">
+											{chatModel.description}
+										</div>
 									</div>
 								</div>
-
-								<div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
-									<CheckCircleFillIcon />
-								</div>
 							</button>
-						</DropdownMenuItem>
-					)
-				})}
+						)
+					})}
+				</div>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)

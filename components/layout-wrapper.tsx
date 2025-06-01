@@ -32,6 +32,8 @@ function LayoutContent({ children }: LayoutWrapperProps) {
 					chatId={headerState.chatId}
 					selectedModelId={headerState.selectedModelId}
 					selectedImageModelId={headerState.selectedImageModelId}
+					selectedAspectRatio={headerState.selectedAspectRatio}
+					selectedGuidanceScale={headerState.selectedGuidanceScale}
 					selectedVisibilityType={headerState.selectedVisibilityType}
 					isReadonly={headerState.isReadonly}
 					session={session}

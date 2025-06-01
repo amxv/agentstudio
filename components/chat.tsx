@@ -26,6 +26,8 @@ export function Chat({
 	initialMessages,
 	initialChatModel,
 	initialImageModel,
+	initialAspectRatio = "1:1",
+	initialGuidanceScale = "10",
 	initialVisibilityType,
 	isReadonly,
 	session,
@@ -35,6 +37,8 @@ export function Chat({
 	initialMessages: Array<UIMessage>
 	initialChatModel: string
 	initialImageModel: string
+	initialAspectRatio?: string
+	initialGuidanceScale?: string
 	initialVisibilityType: VisibilityType
 	isReadonly: boolean
 	session: Session
@@ -126,6 +130,8 @@ export function Chat({
 			chatId: id,
 			selectedModelId: initialChatModel,
 			selectedImageModelId: initialImageModel,
+			selectedAspectRatio: initialAspectRatio,
+			selectedGuidanceScale: initialGuidanceScale,
 			selectedVisibilityType: visibilityType,
 			isReadonly
 		})
@@ -138,6 +144,8 @@ export function Chat({
 		id,
 		initialChatModel,
 		initialImageModel,
+		initialAspectRatio,
+		initialGuidanceScale,
 		visibilityType,
 		isReadonly,
 		updateHeaderState,

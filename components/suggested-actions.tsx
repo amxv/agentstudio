@@ -56,17 +56,15 @@ function PureSuggestedActions({
 				>
 					<Button
 						variant="ghost"
-						onClick={async () => {
+						onClick={(e) => {
+							e.preventDefault()
+							e.stopPropagation()
 							setInput(suggestedAction.action)
 						}}
 						className="text-center border rounded-3xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-center items-center"
 					>
-						<span className="font-medium">
-							{suggestedAction.title}
-						</span>
-						<span className="font-medium">
-							{suggestedAction.label}
-						</span>
+						<span className="text-md">{suggestedAction.title}</span>
+						<span className="text-md">{suggestedAction.label}</span>
 					</Button>
 				</motion.div>
 			))}
