@@ -1,6 +1,10 @@
 "use client"
 
-import { useArtifactSelector } from "@/hooks/use-artifact"
+import {
+	useArtifactSelector,
+	useArtifact,
+	initialArtifactData
+} from "@/hooks/use-artifact"
 import { useAutoResume } from "@/hooks/use-auto-resume"
 import { useChatHeader } from "@/components/chat-header-context"
 import { useChatVisibility } from "@/hooks/use-chat-visibility"
@@ -11,7 +15,7 @@ import { useChat } from "@ai-sdk/react"
 import type { Attachment, UIMessage } from "ai"
 import type { Session } from "next-auth"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import useSWR, { useSWRConfig } from "swr"
 import { unstable_serialize } from "swr/infinite"
 import { useLocalStorage } from "usehooks-ts"
@@ -52,6 +56,8 @@ export function Chat({
 		initialVisibilityType
 	})
 	const { updateHeaderState, clearHeaderState } = useChatHeader()
+	const { setArtifact } = useArtifact()
+	const previousChatIdRef = useRef<string | null>(null)
 
 	const {
 		messages,
@@ -171,6 +177,20 @@ export function Chat({
 		updateHeaderState,
 		clearHeaderState
 	])
+
+	// Close artifact when navigating to a different chat
+	useEffect(() => {
+		if (
+			previousChatIdRef.current !== null &&
+			previousChatIdRef.current !== id
+		) {
+			setArtifact((currentArtifact) => ({
+				...initialArtifactData,
+				status: "idle"
+			}))
+		}
+		previousChatIdRef.current = id
+	}, [id, setArtifact])
 
 	return (
 		<>

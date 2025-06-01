@@ -32,6 +32,7 @@ export const IMAGE_MODEL_IDS = {
 	// Multi-Image Models
 	// Note: Automatically selected when multiple images are detected in the chat context
 	FLUX_KONTEXT_MAX_MULTI: "flux-kontext-max-multi",
+	IDEOGRAM_V3_MULTI: "ideogram-v3-multi",
 
 	// Backend models - these are used internally for automatic selection (legacy)
 	FLUX_PRO_FIRST_TIME: "flux-pro-first-time",
@@ -361,7 +362,7 @@ export const imageModels: Array<ImageModel> = [
 	// Multi-Image Models
 	{
 		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI,
-		name: "FLUX Kontext Max Multi",
+		name: "FLUX Kontext Max",
 		description:
 			"Advanced multi-image processing with enhanced context understanding",
 		provider: "fal",
@@ -380,6 +381,29 @@ export const imageModels: Array<ImageModel> = [
 			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
 			defaultRatio: "1:1",
 			formatType: "flux"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI,
+		name: "Ideogram V3",
+		description:
+			"Multi-image processing with exceptional typography and poster generation (up to 4 images)",
+		provider: "fal",
+		capabilities: {
+			textToImage: true,
+			imageToImage: true,
+			multiImage: true
+		},
+		parameters: {
+			maxSize: "1024x1024",
+			guidanceScale: 9,
+			inferenceSteps: 45
+		},
+		aspectRatio: {
+			parameterName: "aspect_ratio",
+			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
+			defaultRatio: "1:1",
+			formatType: "recraft-ideogram"
 		}
 	},
 
@@ -511,7 +535,8 @@ export const USER_SELECTABLE_IMAGE_MODEL_IDS = [
 	IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
 	IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
 	// Multi-Image Models
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI
+	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI,
+	IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
 ]
 
 export const DEFAULT_CHAT_MODEL: string = MODEL_IDS.CLAUDE_SONNET_4
@@ -572,6 +597,7 @@ export const modelSupportsGuidanceScale = (modelId: ImageModelId): boolean => {
 		IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
 		IMAGE_MODEL_IDS.IDEOGRAM_V3,
 		IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
+		IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI,
 		IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
 	]
 

@@ -14,6 +14,7 @@ import { PlusIcon, VercelIcon } from "./icons"
 import { useSidebar } from "./ui/sidebar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { VisibilitySelector, type VisibilityType } from "./visibility-selector"
+import { useArtifact, initialArtifactData } from "@/hooks/use-artifact"
 
 function PureChatHeader({
 	chatId,
@@ -36,6 +37,22 @@ function PureChatHeader({
 }) {
 	const router = useRouter()
 	const { open } = useSidebar()
+	const { setArtifact } = useArtifact()
+
+	const handleNewChat = () => {
+		// Close any open artifacts before navigating to new chat
+		setArtifact((currentArtifact) =>
+			currentArtifact.status === "streaming"
+				? {
+						...currentArtifact,
+						isVisible: false
+					}
+				: { ...initialArtifactData, status: "idle" }
+		)
+
+		router.push("/")
+		router.refresh()
+	}
 
 	return (
 		<header className="flex sticky top-0 bg-background/95 backdrop-blur-sm pt-4 pb-3 md:pt-5 md:pb-4 items-center px-2 md:px-4 gap-1 md:gap-2 z-50">
@@ -48,10 +65,7 @@ function PureChatHeader({
 						<Button
 							variant="outline"
 							className="px-2 h-8 md:h-fit"
-							onClick={() => {
-								router.push("/")
-								router.refresh()
-							}}
+							onClick={handleNewChat}
 						>
 							<PlusIcon />
 							<span className="sr-only">New Chat</span>

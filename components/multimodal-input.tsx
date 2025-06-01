@@ -129,8 +129,15 @@ function PureMultimodalInput({
 		} else {
 			setAttachments([])
 		}
+
+		// Clear input and localStorage first
+		setInput("")
 		setLocalStorageInput("")
-		resetHeight()
+
+		// Reset height after clearing input to ensure proper sizing
+		setTimeout(() => {
+			resetHeight()
+		}, 0)
 
 		if (width && width > 768) {
 			textareaRef.current?.focus()
@@ -140,6 +147,7 @@ function PureMultimodalInput({
 		handleSubmit,
 		onClearAttachments,
 		setAttachments,
+		setInput,
 		setLocalStorageInput,
 		width,
 		chatId,

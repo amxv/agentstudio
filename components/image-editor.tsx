@@ -14,6 +14,24 @@ interface ImageArtifactMetadata {
 	zoom?: number
 	rotation?: number
 	isFullscreen?: boolean
+	generationDetails?: {
+		originalPrompt: string
+		enhancedPrompt: string
+		modelUsed: string
+		modelName: string
+		modelDescription: string
+		parameters: {
+			guidanceScale: number
+			inferenceSteps: number
+			aspectRatio: string
+			size: string
+			strength?: number
+			hasInputImages: boolean
+			inputImageCount: number
+		}
+		generationType: string
+		timestamp: string
+	}
 }
 
 interface ImageEditorProps {

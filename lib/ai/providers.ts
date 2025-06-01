@@ -37,6 +37,7 @@ const imageModelMapping = {
 	// Multi-Image Models
 	[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI]:
 		"fal-ai/flux-pro/kontext/max/multi",
+	[IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI]: "fal-ai/ideogram/v3",
 
 	// Legacy backend models
 	[IMAGE_MODEL_IDS.FLUX_PRO_FIRST_TIME]: "fal-ai/flux-pro/kontext",
@@ -104,6 +105,9 @@ export const myProvider = isTestEnvironment
 				// Multi-Image Models
 				[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI]
+				),
+				[IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI]: fal.image(
+					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI]
 				),
 
 				// Legacy backend models
@@ -208,6 +212,9 @@ export const myProvider = isTestEnvironment
 				// Multi-Image Models
 				[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI]: fal.image(
 					imageModelMapping[IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI]
+				),
+				[IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI]: fal.image(
+					imageModelMapping[IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI]
 				),
 
 				// Legacy backend models

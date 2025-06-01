@@ -6,6 +6,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
 import { cookies } from "next/headers"
+import { GenerationDetailsDialogProvider } from "@/components/generation-details-dialog"
 
 import "./globals.css"
 import { SessionProvider } from "next-auth/react"
@@ -87,14 +88,16 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					<Toaster position="top-center" />
-					<SessionProvider>
-						<SidebarProvider defaultOpen={!isCollapsed}>
-							<AppSidebar user={session?.user} />
-							<SidebarInset>
-								<LayoutWrapper>{children}</LayoutWrapper>
-							</SidebarInset>
-						</SidebarProvider>
-					</SessionProvider>
+					<GenerationDetailsDialogProvider>
+						<SessionProvider>
+							<SidebarProvider defaultOpen={!isCollapsed}>
+								<AppSidebar user={session?.user} />
+								<SidebarInset>
+									<LayoutWrapper>{children}</LayoutWrapper>
+								</SidebarInset>
+							</SidebarProvider>
+						</SessionProvider>
+					</GenerationDetailsDialogProvider>
 				</ThemeProvider>
 			</body>
 		</html>

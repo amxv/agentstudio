@@ -14,10 +14,12 @@ import {
 	ZoomIn,
 	ZoomOut,
 	RotateCw,
-	Maximize2
+	Maximize2,
+	Info
 } from "lucide-react"
 import { ImageEditor } from "@/components/image-editor"
 import { toast } from "sonner"
+import { showGenerationDetailsDialog } from "@/components/generation-details-dialog"
 
 interface ImageArtifactMetadata {
 	originalPrompt: string
@@ -29,6 +31,24 @@ interface ImageArtifactMetadata {
 	zoom?: number
 	rotation?: number
 	isFullscreen?: boolean
+	generationDetails?: {
+		originalPrompt: string
+		enhancedPrompt: string
+		modelUsed: string
+		modelName: string
+		modelDescription: string
+		parameters: {
+			guidanceScale: number
+			inferenceSteps: number
+			aspectRatio: string
+			size: string
+			strength?: number
+			hasInputImages: boolean
+			inputImageCount: number
+		}
+		generationType: string
+		timestamp: string
+	}
 }
 
 export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
@@ -47,7 +67,7 @@ export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
 			isFullscreen: false
 		})
 	},
-	onStreamPart: ({ streamPart, setArtifact }) => {
+	onStreamPart: ({ streamPart, setArtifact, setMetadata }) => {
 		if (streamPart.type === "image-delta") {
 			console.log("Image stream part received:", {
 				type: streamPart.type,
@@ -63,9 +83,40 @@ export const imageArtifact = new Artifact<"image", ImageArtifactMetadata>({
 				status: "idle"
 			}))
 		}
+
+		if (streamPart.type === "generation-details") {
+			try {
+				const generationDetails = JSON.parse(
+					streamPart.content as string
+				)
+				console.log("Generation details received:", generationDetails)
+
+				setMetadata((prev) => ({
+					...prev,
+					generationDetails: generationDetails
+				}))
+			} catch (error) {
+				console.error("Failed to parse generation details:", error)
+			}
+		}
 	},
 	content: ImageEditor,
 	actions: [
+		{
+			icon: <Info size={18} />,
+			description: "Show generation details",
+			onClick: ({ metadata }) => {
+				if (!metadata?.generationDetails) {
+					toast.error("No generation details available")
+					return
+				}
+
+				showGenerationDetailsDialog(metadata.generationDetails)
+			},
+			isDisabled: ({ metadata }) => {
+				return !metadata?.generationDetails
+			}
+		},
 		{
 			icon: <ZoomOut size={18} />,
 			description: "Zoom out",

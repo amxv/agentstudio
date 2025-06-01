@@ -128,7 +128,8 @@ const getOptimalImageModel = (
 			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
 		}
 		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
+			// For Ideogram V3, prefer the multi-image model for better multi-image support
+			return IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
 		}
 		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
 		if (
@@ -166,7 +167,8 @@ const getOptimalImageModel = (
 			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
 		}
 		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
+			// For editing existing artifacts, use the multi-image model for consistency
+			return IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
 		}
 		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
 		if (
@@ -287,6 +289,9 @@ const getFalModelName = (modelId: string): string => {
 	}
 	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI) {
 		return "fal-ai/flux-pro/kontext/max/multi"
+	}
+	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI) {
+		return "fal-ai/ideogram/v3"
 	}
 
 	// Legacy model handling
@@ -514,6 +519,32 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 
 			draftContent = image.base64
 
+			// Stream the generation details for debugging
+			const generationDetails = {
+				originalPrompt: promptToUse,
+				enhancedPrompt: enhancedPrompt,
+				modelUsed: optimalModelId,
+				modelName: selectedModel?.name || "Unknown",
+				modelDescription: selectedModel?.description || "",
+				parameters: {
+					guidanceScale: guidanceScale,
+					inferenceSteps: modelParams.inferenceSteps,
+					aspectRatio: aspectRatio,
+					size: modelParams.maxSize,
+					...(imagesToUse.length > 0 && { strength: 0.8 }),
+					hasInputImages: imagesToUse.length > 0,
+					inputImageCount: imagesToUse.length
+				},
+				generationType:
+					imagesToUse.length > 0 ? "image-to-image" : "text-to-image",
+				timestamp: new Date().toISOString()
+			}
+
+			dataStream.writeData({
+				type: "generation-details",
+				content: JSON.stringify(generationDetails)
+			})
+
 			// Stream the generated image data
 			dataStream.writeData({
 				type: "image-delta",
@@ -623,6 +654,32 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			})
 
 			draftContent = image.base64
+
+			// Stream the generation details for debugging
+			const generationDetails = {
+				originalPrompt: promptToUse,
+				enhancedPrompt: enhancedPrompt,
+				modelUsed: optimalModelId,
+				modelName: selectedModel?.name || "Unknown",
+				modelDescription: selectedModel?.description || "",
+				parameters: {
+					guidanceScale: guidanceScale,
+					inferenceSteps: modelParams.inferenceSteps,
+					aspectRatio: aspectRatio,
+					size: modelParams.maxSize,
+					...(imagesToUse.length > 0 && { strength: 0.8 }),
+					hasInputImages: imagesToUse.length > 0,
+					inputImageCount: imagesToUse.length
+				},
+				generationType:
+					imagesToUse.length > 0 ? "image-to-image" : "text-to-image",
+				timestamp: new Date().toISOString()
+			}
+
+			dataStream.writeData({
+				type: "generation-details",
+				content: JSON.stringify(generationDetails)
+			})
 
 			// Stream the updated image data
 			dataStream.writeData({
