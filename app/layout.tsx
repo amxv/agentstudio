@@ -12,9 +12,9 @@ import { SessionProvider } from "next-auth/react"
 import { auth } from "./(auth)/auth"
 
 export const metadata: Metadata = {
-	metadataBase: new URL("https://chat.vercel.ai"),
-	title: "Zue Images",
-	description: "Zue Images"
+	metadataBase: new URL("https://mallesh.xyz"),
+	title: "mallesh.xyz",
+	description: "mallesh.xyz"
 }
 
 export const viewport = {

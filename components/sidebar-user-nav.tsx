@@ -79,7 +79,7 @@ export function SidebarUserNav({ user }: { user: User }) {
 						setTheme(theme === "dark" ? "light" : "dark")
 					}
 				>
-					{`Toggle ${theme === "light" ? "dark" : "light"} mode`}
+					{`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild data-testid="user-nav-item-auth">
