@@ -27,7 +27,7 @@ function LayoutContent({ children }: LayoutWrapperProps) {
 
 	return (
 		<div className="flex flex-col h-dvh">
-			{headerState && (
+			{headerState && session && (
 				<ChatHeader
 					chatId={headerState.chatId}
 					selectedModelId={headerState.selectedModelId}

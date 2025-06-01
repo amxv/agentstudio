@@ -16,6 +16,7 @@
 		"db:pull": "drizzle-kit pull",
 		"db:check": "drizzle-kit check",
 		"db:up": "drizzle-kit up",
+		"create-user": "npx tsx scripts/create-user.ts",
 		"test": "export PLAYWRIGHT=True && npm exec playwright test",
 		"check": "npx tsc --noEmit && npx biome check --write . && npm run lint:fix",
 		"prepare": "husky"

@@ -531,3 +531,17 @@ export const getAspectRatioParameterForModel = (
 		value: convertedValue
 	}
 }
+
+// Check if a model supports guidance scale parameter
+export const modelSupportsGuidanceScale = (modelId: ImageModelId): boolean => {
+	// Recraft, Ideogram, and Imagen models don't support guidance scale
+	const unsupportedModels: ImageModelId[] = [
+		IMAGE_MODEL_IDS.RECRAFT_V3_T2I,
+		IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
+		IMAGE_MODEL_IDS.IDEOGRAM_V3,
+		IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
+		IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
+	]
+
+	return !unsupportedModels.includes(modelId)
+}

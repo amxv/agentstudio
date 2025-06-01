@@ -1,6 +1,12 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import {
+	createContext,
+	useContext,
+	useState,
+	useCallback,
+	type ReactNode
+} from "react"
 import type { VisibilityType } from "./visibility-selector"
 
 interface ChatHeaderState {
@@ -38,13 +44,29 @@ interface ChatHeaderProviderProps {
 export function ChatHeaderProvider({ children }: ChatHeaderProviderProps) {
 	const [headerState, setHeaderState] = useState<ChatHeaderState | null>(null)
 
-	const updateHeaderState = (state: ChatHeaderState) => {
-		setHeaderState(state)
-	}
+	const updateHeaderState = useCallback((state: ChatHeaderState) => {
+		setHeaderState((prevState) => {
+			// Only update if the state has actually changed
+			if (!prevState) return state
 
-	const clearHeaderState = () => {
+			const hasChanged =
+				prevState.chatId !== state.chatId ||
+				prevState.selectedModelId !== state.selectedModelId ||
+				prevState.selectedImageModelId !== state.selectedImageModelId ||
+				prevState.selectedAspectRatio !== state.selectedAspectRatio ||
+				prevState.selectedGuidanceScale !==
+					state.selectedGuidanceScale ||
+				prevState.selectedVisibilityType !==
+					state.selectedVisibilityType ||
+				prevState.isReadonly !== state.isReadonly
+
+			return hasChanged ? state : prevState
+		})
+	}, [])
+
+	const clearHeaderState = useCallback(() => {
 		setHeaderState(null)
-	}
+	}, [])
 
 	return (
 		<ChatHeaderContext.Provider

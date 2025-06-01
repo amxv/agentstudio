@@ -97,9 +97,13 @@ function PureChatHeader({
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
 	return (
+		prevProps.chatId === nextProps.chatId &&
 		prevProps.selectedModelId === nextProps.selectedModelId &&
 		prevProps.selectedImageModelId === nextProps.selectedImageModelId &&
 		prevProps.selectedAspectRatio === nextProps.selectedAspectRatio &&
-		prevProps.selectedGuidanceScale === nextProps.selectedGuidanceScale
+		prevProps.selectedGuidanceScale === nextProps.selectedGuidanceScale &&
+		prevProps.selectedVisibilityType === nextProps.selectedVisibilityType &&
+		prevProps.isReadonly === nextProps.isReadonly &&
+		prevProps.session === nextProps.session
 	)
 })

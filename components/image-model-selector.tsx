@@ -23,7 +23,7 @@ import {
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { imageModels } from "@/lib/ai/models"
+import { imageModels, modelSupportsGuidanceScale } from "@/lib/ai/models"
 import { cn } from "@/lib/utils"
 
 import { entitlementsByUserType } from "@/lib/ai/entitlements"
@@ -264,51 +264,59 @@ export function ImageModelSelector({
 
 				{/* Controls Section */}
 				<div className="flex items-center gap-4">
-					{/* Guidance Scale */}
-					<div className="flex items-center gap-2">
-						<span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-							Guidance Scale
-						</span>
-						<div className="flex items-center gap-1">
-							<Button
-								variant="outline"
-								size="sm"
-								className="h-7 w-7 p-0"
-								onClick={() =>
-									handleGuidanceScaleChange(
-										parseInt(localGuidanceScale) - 1
-									)
-								}
-								disabled={parseInt(localGuidanceScale) <= 1}
-							>
-								<Minus size={12} />
-							</Button>
-							<Input
-								type="number"
-								min="1"
-								max="20"
-								value={localGuidanceScale}
-								onChange={(e) => {
-									const value = parseInt(e.target.value) || 1
-									handleGuidanceScaleChange(value)
-								}}
-								className="w-16 h-7 text-center text-xs"
-							/>
-							<Button
-								variant="outline"
-								size="sm"
-								className="h-7 w-7 p-0"
-								onClick={() =>
-									handleGuidanceScaleChange(
-										parseInt(localGuidanceScale) + 1
-									)
-								}
-								disabled={parseInt(localGuidanceScale) >= 20}
-							>
-								<Plus size={12} />
-							</Button>
-						</div>
-					</div>
+					{/* Guidance Scale - only show for models that support it */}
+					{selectedImageModel &&
+						modelSupportsGuidanceScale(selectedImageModel.id) && (
+							<div className="flex items-center gap-2">
+								<span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+									Guidance Scale
+								</span>
+								<div className="flex items-center gap-1">
+									<Button
+										variant="outline"
+										size="sm"
+										className="h-7 w-7 p-0"
+										onClick={() =>
+											handleGuidanceScaleChange(
+												parseInt(localGuidanceScale) - 1
+											)
+										}
+										disabled={
+											parseInt(localGuidanceScale) <= 1
+										}
+									>
+										<Minus size={12} />
+									</Button>
+									<Input
+										type="number"
+										min="1"
+										max="20"
+										value={localGuidanceScale}
+										onChange={(e) => {
+											const value =
+												parseInt(e.target.value) || 1
+											handleGuidanceScaleChange(value)
+										}}
+										className="w-16 h-7 text-center text-xs"
+									/>
+									<Button
+										variant="outline"
+										size="sm"
+										className="h-7 w-7 p-0"
+										onClick={() =>
+											handleGuidanceScaleChange(
+												parseInt(localGuidanceScale) + 1
+											)
+										}
+										disabled={
+											parseInt(localGuidanceScale) >= 20
+										}
+									>
+										<Plus size={12} />
+									</Button>
+								</div>
+							</div>
+						)}
 
 					{/* Aspect Ratio */}
 					<div className="flex items-center gap-2">

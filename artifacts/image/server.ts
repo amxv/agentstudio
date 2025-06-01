@@ -6,7 +6,9 @@ import {
 	DEFAULT_IMAGE_MODEL,
 	IMAGE_MODEL_IDS,
 	getAspectRatioParameterForModel,
-	type UniversalAspectRatio
+	modelSupportsGuidanceScale,
+	type UniversalAspectRatio,
+	type ImageModelId
 } from "@/lib/ai/models"
 import { experimental_generateImage } from "ai"
 import type { Attachment, UIMessage } from "ai"
@@ -102,6 +104,40 @@ const getOptimalImageModel = (
 		return DEFAULT_IMAGE_MODEL
 	}
 
+	// PRIORITY 1: Handle input image cases (including first-time generations with uploaded images)
+	// If user has an input image but selected a T2I-only model, map to I2I equivalent
+	if (hasInputImage && !selectedModel.capabilities.imageToImage) {
+		// User selected a T2I model but has an input image (including first-time with upload)
+		// Map to the corresponding I2I model
+		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I) {
+			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
+		}
+		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I) {
+			return IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I
+		}
+		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_T2I) {
+			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
+		}
+		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
+			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
+		}
+		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
+		if (
+			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_ULTRA ||
+			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_V11 ||
+			selectedImageModelId === IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
+		) {
+			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
+		}
+
+		// Fallback to first available I2I model
+		const imageToImageModel = imageModels.find(
+			(model) => model.capabilities.imageToImage
+		)
+		return imageToImageModel?.id || IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
+	}
+
+	// PRIORITY 2: Handle existing image artifact editing (when no direct input image)
 	// If there's an existing image artifact in the conversation and no direct input image,
 	// but user selected a T2I model, map to the corresponding I2I model for editing
 	if (
@@ -133,38 +169,7 @@ const getOptimalImageModel = (
 		}
 	}
 
-	// Check if the selected model supports the required capability
-	if (hasInputImage && !selectedModel.capabilities.imageToImage) {
-		// User selected a T2I model but has an input image
-		// Find a similar I2I model or fallback to a default I2I model
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_T2I) {
-			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX
-		}
-		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
-		if (
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_ULTRA ||
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_V11 ||
-			selectedImageModelId === IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
-		) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-
-		// Fallback to first available I2I model
-		const imageToImageModel = imageModels.find(
-			(model) => model.capabilities.imageToImage
-		)
-		return imageToImageModel?.id || IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-	}
-
+	// PRIORITY 3: Handle I2I model selected but no input image
 	if (!hasInputImage && !selectedModel.capabilities.textToImage) {
 		// User selected an I2I model but has no input image
 		// Find a similar T2I model or fallback to a default T2I model
@@ -195,6 +200,7 @@ const getOptimalImageModel = (
 			: IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
 	}
 
+	// If we reach here, the selected model is compatible with the input type
 	return selectedImageModelId
 }
 
@@ -374,7 +380,10 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			const enhancedPrompt = enhanceImagePrompt(promptToUse)
 
 			// Choose optimal model based on selected model and input type
-			// The user selects FLUX_KONTEXT, and we automatically choose the best backend model
+			// Priority order:
+			// 1. If user has uploaded/provided an image (including first-time), use I2I model
+			// 2. If editing existing artifact without new image, use I2I model
+			// 3. If pure text-to-image, use T2I model
 			const modelToUse = selectedImageModel || DEFAULT_IMAGE_MODEL
 
 			const optimalModelId = getOptimalImageModel(
@@ -411,13 +420,19 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 			if (imageToUse) {
 				const falOptions: Record<string, string | number | boolean> = {
 					image_url: imageToUse,
-					guidance_scale: guidanceScale,
 					num_inference_steps: modelParams.inferenceSteps,
 					sync_mode: true,
 					// Strength controls how much the input image influences the output
 					// Lower values preserve more of the original image
 					// Use lower strength for editing existing artifacts vs new input images
-					strength: inputImage ? 0.8 : 0.6
+					strength: 0.8
+				}
+
+				// Only add guidance scale for models that support it
+				if (
+					modelSupportsGuidanceScale(optimalModelId as ImageModelId)
+				) {
+					falOptions.guidance_scale = guidanceScale
 				}
 
 				// Only add aspect ratio for T2I models
@@ -429,9 +444,15 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 				generateParams.providerOptions = { fal: falOptions }
 			} else {
 				const falOptions: Record<string, string | number | boolean> = {
-					guidance_scale: guidanceScale,
 					num_inference_steps: modelParams.inferenceSteps,
 					sync_mode: true
+				}
+
+				// Only add guidance scale for models that support it
+				if (
+					modelSupportsGuidanceScale(optimalModelId as ImageModelId)
+				) {
+					falOptions.guidance_scale = guidanceScale
 				}
 
 				// Only add aspect ratio for T2I models
@@ -514,12 +535,16 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 
 			const falOptions: Record<string, string | number | boolean> = {
 				image_url: baseImage,
-				guidance_scale: guidanceScale,
 				num_inference_steps: modelParams.inferenceSteps,
 				sync_mode: true,
 				// Adjust strength based on whether we have a new input image
 				// Higher strength for new images, lower for modifications
-				strength: newInputImage ? 0.8 : 0.6
+				strength: 0.8
+			}
+
+			// Only add guidance scale for models that support it
+			if (modelSupportsGuidanceScale(optimalModelId as ImageModelId)) {
+				falOptions.guidance_scale = guidanceScale
 			}
 
 			// Only add aspect ratio for T2I models

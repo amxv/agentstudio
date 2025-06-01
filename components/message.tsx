@@ -62,7 +62,7 @@ const PurePreviewMessage = ({
 					)}
 				>
 					{message.role === "assistant" && (
-						<div className="size-8 flex items-center rounded-full justify-center shrink-0 bg-background pb-2">
+						<div className="size-8 flex items-center rounded-full justify-center shrink-0 bg-background">
 							<ZueLogo size="16" variant="black" />
 						</div>
 					)}
