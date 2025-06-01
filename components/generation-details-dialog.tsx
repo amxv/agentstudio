@@ -94,9 +94,6 @@ export function GenerationDetailsDialogProvider({
 			{children}
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
 				<DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-					<DialogHeader>
-						<DialogTitle>Generation Details</DialogTitle>
-					</DialogHeader>
 					{details && <GenerationDetailsContent details={details} />}
 				</DialogContent>
 			</Dialog>

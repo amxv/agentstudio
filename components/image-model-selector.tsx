@@ -185,7 +185,7 @@ export function ImageModelSelector({
 									})
 								}}
 								className={cn(
-									"p-3 rounded-lg border text-left transition-colors group",
+									"p-3 rounded-2xl border text-left transition-colors group",
 									isSelected
 										? "border-primary bg-primary/5"
 										: "border-border hover:border-primary/50 hover:bg-accent/50"
@@ -242,7 +242,7 @@ export function ImageModelSelector({
 											})
 										}}
 										className={cn(
-											"p-3 rounded-lg border text-left transition-colors group",
+											"p-3 rounded-2xl border text-left transition-colors group",
 											isSelected
 												? "border-primary bg-primary/5"
 												: "border-border hover:border-primary/50 hover:bg-accent/50"
@@ -302,7 +302,7 @@ export function ImageModelSelector({
 											})
 										}}
 										className={cn(
-											"p-3 rounded-lg border text-left transition-colors group",
+											"p-3 rounded-2xl border text-left transition-colors group",
 											isSelected
 												? "border-primary bg-primary/5"
 												: "border-border hover:border-primary/50 hover:bg-accent/50"

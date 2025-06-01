@@ -258,7 +258,7 @@ function PureArtifact({
 			{artifact.isVisible && (
 				<motion.div
 					data-testid="artifact"
-					className="flex flex-row h-[calc(100dvh-72px)] w-dvw fixed top-[72px] left-0 z-30 bg-transparent"
+					className="flex flex-row h-[calc(100dvh-72px)] w-dvw fixed top-[70px] left-0 z-30"
 					initial={{ opacity: 1 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0, transition: { delay: 0.4 } }}
@@ -352,7 +352,7 @@ function PureArtifact({
 					)}
 
 					<motion.div
-						className="fixed bg-background h-[calc(100dvh-72px)] flex flex-col overflow-y-scroll md:border-l dark:border-zinc-700 border-zinc-200"
+						className="fixed bg-background h-[calc(100dvh-72px)] flex flex-col overflow-y-scrolldark:border-zinc-700 border-zinc-200"
 						initial={
 							isMobile
 								? {
@@ -461,6 +461,7 @@ function PureArtifact({
 								mode={mode}
 								metadata={metadata}
 								setMetadata={setMetadataCompat}
+								getDocumentContentById={getDocumentContentById}
 							/>
 						</div>
 

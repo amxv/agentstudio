@@ -113,11 +113,27 @@ const PurePreviewMessage = ({
 											className={cn(
 												"flex flex-row gap-2 items-start",
 												{
-													"flex-row-reverse":
+													"justify-end":
 														message.role === "user"
 												}
 											)}
 										>
+											<div
+												data-testid="message-content"
+												className={cn(
+													"flex flex-col gap-4",
+													{
+														"bg-primary text-primary-foreground px-3 py-2 rounded-2xl":
+															message.role ===
+															"user"
+													}
+												)}
+											>
+												<Markdown>
+													{sanitizeText(part.text)}
+												</Markdown>
+											</div>
+
 											{message.role === "user" &&
 												!isReadonly && (
 													<Tooltip>
@@ -140,22 +156,6 @@ const PurePreviewMessage = ({
 														</TooltipContent>
 													</Tooltip>
 												)}
-
-											<div
-												data-testid="message-content"
-												className={cn(
-													"flex flex-col gap-4",
-													{
-														"bg-primary text-primary-foreground px-3 py-2 rounded-2xl":
-															message.role ===
-															"user"
-													}
-												)}
-											>
-												<Markdown>
-													{sanitizeText(part.text)}
-												</Markdown>
-											</div>
 										</div>
 									)
 								}

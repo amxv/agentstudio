@@ -140,7 +140,7 @@ export function ImageEditor({
 	return (
 		<div
 			className={cn("flex flex-col w-full h-full", {
-				"fixed inset-0 z-50 bg-black": isFullscreen
+				"fixed inset-0 z-50": isFullscreen
 			})}
 		>
 			{/* Image Display Area */}

@@ -16,6 +16,7 @@ interface ArtifactActionsProps {
 	metadata: any
 	// biome-ignore lint/suspicious/noExplicitAny: Metadata type varies by artifact kind
 	setMetadata: Dispatch<SetStateAction<any>>
+	getDocumentContentById: (index: number) => string
 }
 
 function PureArtifactActions({
@@ -25,7 +26,8 @@ function PureArtifactActions({
 	isCurrentVersion,
 	mode,
 	metadata,
-	setMetadata
+	setMetadata,
+	getDocumentContentById
 }: ArtifactActionsProps) {
 	const [isLoading, setIsLoading] = useState(false)
 
@@ -38,7 +40,9 @@ function PureArtifactActions({
 	}
 
 	const actionContext: ArtifactActionContext = {
-		content: artifact.content,
+		content: isCurrentVersion
+			? artifact.content
+			: getDocumentContentById(currentVersionIndex),
 		handleVersionChange,
 		currentVersionIndex,
 		isCurrentVersion,
