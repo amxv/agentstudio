@@ -1,7 +1,6 @@
 // Centralized model IDs - define once, use everywhere
 export const MODEL_IDS = {
 	CLAUDE_SONNET_4: "claude-sonnet-4",
-	CLAUDE_OPUS_4: "claude-opus-4",
 	CLAUDE_SONNET_4_REASONING: "claude-sonnet-4-reasoning",
 	GPT_4_1: "gpt-4.1",
 	O4_MINI: "o4-mini",
@@ -104,13 +103,6 @@ export const chatModels: Array<ChatModel> = [
 		name: "Claude Sonnet 4 (Reasoning)",
 		description:
 			"Claude Sonnet 4 with enhanced step-by-step reasoning capabilities",
-		provider: "anthropic"
-	},
-	{
-		id: MODEL_IDS.CLAUDE_OPUS_4,
-		name: "Claude Opus 4",
-		description:
-			"Anthropic's most powerful model for complex tasks and long-form reasoning",
 		provider: "anthropic"
 	},
 	{
@@ -539,8 +531,8 @@ export const USER_SELECTABLE_IMAGE_MODEL_IDS = [
 	IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
 ]
 
-export const DEFAULT_CHAT_MODEL: string = MODEL_IDS.CLAUDE_SONNET_4
-export const DEFAULT_IMAGE_MODEL: string = IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
+export const DEFAULT_CHAT_MODEL: string = MODEL_IDS.GPT_4_1
+export const DEFAULT_IMAGE_MODEL: string = IMAGE_MODEL_IDS.IDEOGRAM_V3
 
 // Aspect ratio conversion utilities
 export const convertUniversalToModelAspectRatio = (

@@ -52,7 +52,6 @@ export const myProvider = isTestEnvironment
 	? customProvider({
 			languageModels: {
 				[MODEL_IDS.CLAUDE_SONNET_4]: chatModel,
-				[MODEL_IDS.CLAUDE_OPUS_4]: chatModel,
 				[MODEL_IDS.CLAUDE_SONNET_4_REASONING]: reasoningModel,
 				[MODEL_IDS.GPT_4_1]: chatModel,
 				[MODEL_IDS.O4_MINI]: chatModel,
@@ -140,7 +139,6 @@ export const myProvider = isTestEnvironment
 				[MODEL_IDS.CLAUDE_SONNET_4]: anthropic(
 					"claude-4-sonnet-20250514"
 				),
-				[MODEL_IDS.CLAUDE_OPUS_4]: anthropic("claude-4-opus-20250514"),
 				[MODEL_IDS.CLAUDE_SONNET_4_REASONING]: wrapLanguageModel({
 					model: anthropic("claude-4-sonnet-20250514"),
 					middleware: extractReasoningMiddleware({

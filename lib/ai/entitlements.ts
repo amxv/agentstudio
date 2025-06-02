@@ -37,8 +37,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 	 *     "claude-sonnet-4",
 	 *     "claude-sonnet-4-reasoning",
 	 *     "gpt-4.1",
-	 *     "gemini-2.5-pro",
-	 *     "claude-opus-4"
+	 *     "gemini-2.5-pro"
 	 *   ],
 	 *   availableImageModelIds: USER_SELECTABLE_IMAGE_MODEL_IDS
 	 * }
