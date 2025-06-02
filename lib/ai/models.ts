@@ -216,7 +216,7 @@ export const imageModels: Array<ImageModel> = [
 			inferenceSteps: 35
 		},
 		aspectRatio: {
-			parameterName: "aspect_ratio",
+			parameterName: "image_size",
 			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
 			defaultRatio: "1:1",
 			formatType: "recraft-ideogram"
