@@ -84,7 +84,11 @@ export default function Page() {
 						Create an account with your email and password
 					</p>
 				</div>
-				<AuthForm action={handleSubmit} defaultEmail={email}>
+				<AuthForm
+					action={handleSubmit}
+					defaultEmail={email}
+					showNameField={true}
+				>
 					<SubmitButton isSuccessful={isSuccessful}>
 						Sign Up
 					</SubmitButton>

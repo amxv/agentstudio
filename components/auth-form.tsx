@@ -6,16 +6,39 @@ import { Label } from "./ui/label"
 export function AuthForm({
 	action,
 	children,
-	defaultEmail = ""
+	defaultEmail = "",
+	showNameField = false
 }: {
 	action: NonNullable<
 		string | ((formData: FormData) => void | Promise<void>) | undefined
 	>
 	children: React.ReactNode
 	defaultEmail?: string
+	showNameField?: boolean
 }) {
 	return (
 		<Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
+			{showNameField && (
+				<div className="flex flex-col gap-2">
+					<Label
+						htmlFor="name"
+						className="text-zinc-600 font-normal dark:text-zinc-400"
+					>
+						Name
+					</Label>
+
+					<Input
+						id="name"
+						name="name"
+						className="bg-muted text-md md:text-sm"
+						type="text"
+						placeholder=""
+						autoComplete="name"
+						autoFocus
+					/>
+				</div>
+			)}
+
 			<div className="flex flex-col gap-2">
 				<Label
 					htmlFor="email"
@@ -32,7 +55,7 @@ export function AuthForm({
 					placeholder=""
 					autoComplete="email"
 					required
-					autoFocus
+					autoFocus={!showNameField}
 					defaultValue={defaultEmail}
 				/>
 			</div>

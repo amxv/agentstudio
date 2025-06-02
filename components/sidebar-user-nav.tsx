@@ -1,7 +1,7 @@
 "use client"
 
-import { ChevronUp } from "lucide-react"
-import type { User } from "next-auth"
+import { ChevronUp, User } from "lucide-react"
+import type { User as AuthUser } from "next-auth"
 import { signOut, useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
@@ -20,8 +20,9 @@ import { useRouter } from "next/navigation"
 import { LoaderIcon } from "./icons"
 import { toast } from "./toast"
 import { cn } from "@/lib/utils"
+import { NameSettingModal } from "./name-setting-modal"
 
-export function SidebarUserNav({ user }: { user: User }) {
+export function SidebarUserNav({ user }: { user: AuthUser }) {
 	const router = useRouter()
 	const { data, status } = useSession()
 	const { setTheme, theme } = useTheme()
@@ -72,6 +73,21 @@ export function SidebarUserNav({ user }: { user: User }) {
 				align="end"
 				className="min-w-[200px]"
 			>
+				{!isGuest && (
+					<>
+						<NameSettingModal>
+							<DropdownMenuItem
+								data-testid="user-nav-item-name"
+								className="cursor-pointer"
+								onSelect={(e) => e.preventDefault()}
+							>
+								<User className="h-4 w-4 mr-2" />
+								Set Name
+							</DropdownMenuItem>
+						</NameSettingModal>
+						<DropdownMenuSeparator />
+					</>
+				)}
 				<DropdownMenuItem
 					data-testid="user-nav-item-theme"
 					className="cursor-pointer"

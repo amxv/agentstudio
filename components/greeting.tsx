@@ -1,6 +1,23 @@
+"use client"
+
 import { motion } from "framer-motion"
+import { useSession } from "next-auth/react"
 
 export const Greeting = () => {
+	const { data: session } = useSession()
+
+	// Get the user's name, fallback to email or "there"
+	const getUserName = () => {
+		if (session?.user?.name) {
+			return session.user.name
+		}
+		if (session?.user?.email) {
+			// Extract first part of email as fallback
+			return session.user.email.split("@")[0]
+		}
+		return "there"
+	}
+
 	return (
 		<div
 			key="overview"
@@ -13,7 +30,7 @@ export const Greeting = () => {
 				transition={{ delay: 0.5 }}
 				className="text-4xl tracking-tight mb-4"
 			>
-				Hi Mallesh,
+				Hi {getUserName()},
 			</motion.div>
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
