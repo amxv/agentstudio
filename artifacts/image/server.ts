@@ -14,21 +14,21 @@ import { experimental_generateImage } from "ai"
 import type { Attachment, UIMessage } from "ai"
 
 const enhanceImagePrompt = (userPrompt: string): string => {
-	// Add quality and style enhancements to the prompt
-	const qualityTerms = "high quality, detailed, professional, 8k resolution"
-	const styleGuidance = "well-composed, good lighting, sharp focus"
+	// Modern text-to-image models work better with natural language descriptions
+	// rather than generic quality modifiers. We'll only enhance if the prompt
+	// is very basic or lacks visual grounding.
 
-	// Check if the prompt already contains quality terms
-	const hasQualityTerms =
-		/\b(high quality|detailed|professional|8k|4k|hd|sharp|crisp)\b/i.test(
-			userPrompt
-		)
+	// Check if the prompt is too short or lacks descriptive elements
+	const wordCount = userPrompt.trim().split(/\s+/).length
 
-	if (hasQualityTerms) {
+	// If the prompt is already descriptive (more than 5 words), return as-is
+	if (wordCount > 5) {
 		return userPrompt
 	}
 
-	return `${userPrompt}, ${qualityTerms}, ${styleGuidance}`
+	// For very short prompts, add some natural language structure
+	// but avoid generic quality terms
+	return `A ${userPrompt}, captured in natural lighting with clear details`
 }
 
 const extractImageUrlFromText = (text: string): string | null => {

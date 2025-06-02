@@ -1,6 +1,11 @@
 import type { UserType } from "@/app/(auth)/auth"
 import type { ChatModel, ImageModel } from "./models"
-import { ALL_MODEL_IDS, USER_SELECTABLE_IMAGE_MODEL_IDS } from "./models"
+import {
+	ALL_MODEL_IDS,
+	USER_SELECTABLE_IMAGE_MODEL_IDS,
+	IMAGE_MODEL_IDS
+} from "./models"
+import type { Session } from "next-auth"
 
 interface Entitlements {
 	maxMessagesPerDay: number
@@ -42,4 +47,42 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
 	 *   availableImageModelIds: USER_SELECTABLE_IMAGE_MODEL_IDS
 	 * }
 	 */
+}
+
+/**
+ * Get available image models for a specific user based on their email and user type
+ * This function applies user-specific restrictions beyond just user type
+ */
+export function getAvailableImageModelsForUser(
+	session: Session | null
+): Array<ImageModel["id"]> {
+	if (!session?.user) {
+		// For non-authenticated users, use guest entitlements
+		return entitlementsByUserType.guest.availableImageModelIds
+	}
+
+	const userType = session.user.type
+	const baseEntitlements =
+		entitlementsByUserType[userType].availableImageModelIds
+
+	// Restricted models that require special access
+	const restrictedModels = [
+		IMAGE_MODEL_IDS.FLUX_PRO_ULTRA,
+		IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I,
+		IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I,
+		IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI
+	] as const
+
+	// Allow access to restricted models only for a@zue.ai
+	const hasRestrictedAccess = session.user.email === "a@zue.ai"
+
+	if (hasRestrictedAccess) {
+		// a@zue.ai gets access to all models
+		return baseEntitlements
+	}
+
+	// All other users get base entitlements minus restricted models
+	return baseEntitlements.filter(
+		(modelId) => !(restrictedModels as readonly string[]).includes(modelId)
+	)
 }

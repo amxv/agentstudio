@@ -1,5 +1,6 @@
 import { type UserType, auth } from "@/app/(auth)/auth"
 import { entitlementsByUserType } from "@/lib/ai/entitlements"
+import { getAvailableImageModelsForUser } from "@/lib/ai/entitlements"
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts"
 import { myProvider } from "@/lib/ai/providers"
 import { createDocument } from "@/lib/ai/tools/create-document"
@@ -37,6 +38,7 @@ import {
 } from "resumable-stream"
 import { generateTitleFromUserMessage } from "../../actions"
 import { type PostRequestBody, postRequestBodySchema } from "./schema"
+import type { ImageModelId } from "@/lib/ai/models"
 
 export const maxDuration = 60
 
@@ -98,6 +100,14 @@ export async function POST(request: Request) {
 
 		if (messageCount > entitlementsByUserType[userType].maxMessagesPerDay) {
 			return new ChatSDKError("rate_limit:chat").toResponse()
+		}
+
+		// Validate that the user has access to the selected image model
+		const availableImageModels = getAvailableImageModelsForUser(session)
+		if (
+			!availableImageModels.includes(selectedImageModel as ImageModelId)
+		) {
+			return new ChatSDKError("forbidden:chat").toResponse()
 		}
 
 		const chat = await getChatById({ id })

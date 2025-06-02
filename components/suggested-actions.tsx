@@ -21,22 +21,22 @@ function PureSuggestedActions({
 		{
 			title: "Create a professional",
 			label: "headshot photo",
-			action: "Generate a professional business headshot with clean background and professional lighting"
+			action: "Generate a professional business headshot portrait. Person in business attire against a neutral gray background, soft studio lighting creating subtle shadows, confident expression looking directly at camera"
 		},
 		{
 			title: "Design a company",
 			label: "presentation slide",
-			action: "Create a clean, modern presentation slide template with professional graphics"
+			action: "Create a modern presentation slide template with clean layout. Title area at top, content sections with placeholder text, company branding elements, using a blue and white color scheme"
 		},
 		{
 			title: "Generate a business",
 			label: "infographic design",
-			action: "Design a professional infographic for business data visualization with charts and icons"
+			action: "Design a business infographic showing data visualization. Include bar charts, pie graphs, and icon-based statistics arranged in a vertical flow, using corporate blue and gray colors with clear typography"
 		},
 		{
 			title: "Create a corporate",
 			label: "event banner",
-			action: "Design a professional corporate event banner with elegant typography and branding elements"
+			action: "Design a corporate event banner with elegant typography. Company logo prominently displayed, event title in modern sans-serif font, date and venue information at bottom, sophisticated color palette"
 		}
 	]
 

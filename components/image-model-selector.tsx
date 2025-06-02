@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input"
 import { imageModels, modelSupportsGuidanceScale } from "@/lib/ai/models"
 import { cn } from "@/lib/utils"
 
-import { entitlementsByUserType } from "@/lib/ai/entitlements"
+import { getAvailableImageModelsForUser } from "@/lib/ai/entitlements"
 import type { Session } from "next-auth"
 import { CheckCircleFillIcon, ChevronDownIcon } from "./icons"
 import { ImageIcon, Minus, Plus } from "lucide-react"
@@ -63,7 +63,7 @@ export function ImageModelSelector({
 	)
 
 	const userType = session.user.type
-	const { availableImageModelIds } = entitlementsByUserType[userType]
+	const availableImageModelIds = getAvailableImageModelsForUser(session)
 
 	const availableImageModels = useMemo(
 		() =>
