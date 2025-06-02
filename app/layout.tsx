@@ -13,9 +13,9 @@ import { SessionProvider } from "next-auth/react"
 import { auth } from "./(auth)/auth"
 
 export const metadata: Metadata = {
-	metadataBase: new URL("https://mallesh.xyz"),
-	title: "mallesh.xyz",
-	description: "mallesh.xyz"
+	metadataBase: new URL("https://design.zue.ai"),
+	title: "zue design",
+	description: "zue design"
 }
 
 export const viewport = {
