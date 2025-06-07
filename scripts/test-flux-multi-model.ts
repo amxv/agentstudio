@@ -168,7 +168,7 @@ async function testFluxMultiModel() {
 		)
 	} catch (error) {
 		console.log("✅ Expected failure with wrong parameter (image_url):")
-		console.log("Error:", error.message)
+		console.log("Error:", (error as Error).message)
 	}
 }
 

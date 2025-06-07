@@ -465,6 +465,10 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 					string | number | boolean | string[]
 				> = {
 					// Special handling for multi-image models that always require image_urls
+					// IMPORTANT: Multi-image models like FLUX Kontext Max Multi and Ideogram V3 Multi
+					// ALWAYS require the 'image_urls' parameter (plural) as an array, even for single images.
+					// This is a requirement of the FAL API for these specific models.
+					// Regular I2I models can use either 'image_url' (single) or 'image_urls' (multiple).
 					...(optimalModelId ===
 						IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI ||
 					optimalModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
@@ -627,6 +631,10 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 				string | number | boolean | string[]
 			> = {
 				// Special handling for multi-image models that always require image_urls
+				// IMPORTANT: Multi-image models like FLUX Kontext Max Multi and Ideogram V3 Multi
+				// ALWAYS require the 'image_urls' parameter (plural) as an array, even for single images.
+				// This is a requirement of the FAL API for these specific models.
+				// Regular I2I models can use either 'image_url' (single) or 'image_urls' (multiple).
 				...(optimalModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI ||
 				optimalModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
 					? { image_urls: imagesToUse }

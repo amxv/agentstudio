@@ -71,6 +71,8 @@ Make this image more vibrant and add dramatic lighting
 - **Image-to-Image**: Uses selected I2I model (e.g., `fal-ai/flux-pro/kontext`) for single image transformation tasks
 - **Multi-Image**: Automatically uses `fal-ai/flux-pro/kontext/max/multi` when multiple images are detected for enhanced context understanding
 
+**Important**: Multi-image models (like FLUX Kontext Max Multi) always require the `image_urls` parameter as an array, even when processing a single image. This is automatically handled by the system.
+
 ## Parameters
 
 ### Text-to-Image Parameters
