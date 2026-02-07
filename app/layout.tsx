@@ -14,8 +14,9 @@ import { auth } from "./(auth)/auth"
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://design.zue.ai"),
-	title: "zue design",
-	description: "zue design"
+	title: "ZUE Images - AI Image Generator",
+	description:
+		"Generate stunning AI images with advanced models and styles. Create, edit, and manage your AI-generated artwork with professional tools."
 }
 
 export const viewport = {

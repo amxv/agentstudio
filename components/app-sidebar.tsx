@@ -2,35 +2,31 @@
 
 import * as React from "react"
 import {
-	MessageSquare,
-	History,
+	Wand2,
+	Images,
+	Heart,
+	FolderOpen,
 	MoreHorizontal,
-	Globe,
-	Lock,
+	Plus,
 	SearchIcon
 } from "lucide-react"
 import type { User as NextAuthUser } from "next-auth"
 import { useRouter } from "next/navigation"
-import { useParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
-import useSWRInfinite from "swr/infinite"
+import useSWR from "swr"
 import { motion } from "framer-motion"
 
 import { ZueLogo } from "@/components/zue-logo"
-import { useChatVisibility } from "@/hooks/use-chat-visibility"
-import type { Chat } from "@/lib/db/schema"
+import { getUserImages } from "@/lib/actions/generate"
+import type { DBImage } from "@/lib/db/schema"
 import { fetcher } from "@/lib/utils"
-import { isToday, isYesterday, subMonths, subWeeks } from "date-fns"
 
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuPortal,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
@@ -47,7 +43,7 @@ import {
 	SidebarMenuItem,
 	useSidebar
 } from "@/components/ui/sidebar"
-import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -58,83 +54,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog"
-import {
-	CheckCircleFillIcon,
-	GlobeIcon,
-	LockIcon,
-	ShareIcon,
-	TrashIcon
-} from "./icons"
-
-type GroupedChats = {
-	today: Chat[]
-	yesterday: Chat[]
-	lastWeek: Chat[]
-	lastMonth: Chat[]
-	older: Chat[]
-}
-
-export interface ChatHistory {
-	chats: Array<Chat>
-	hasMore: boolean
-}
-
-const PAGE_SIZE = 20
-
-const groupChatsByDate = (chats: Chat[]): GroupedChats => {
-	const now = new Date()
-	const oneWeekAgo = subWeeks(now, 1)
-	const oneMonthAgo = subMonths(now, 1)
-
-	return chats.reduce(
-		(groups, chat) => {
-			const chatDate = new Date(chat.createdAt)
-
-			if (isToday(chatDate)) {
-				groups.today.push(chat)
-			} else if (isYesterday(chatDate)) {
-				groups.yesterday.push(chat)
-			} else if (chatDate > oneMonthAgo) {
-				groups.lastMonth.push(chat)
-			} else {
-				groups.older.push(chat)
-			}
-
-			return groups
-		},
-		{
-			today: [],
-			yesterday: [],
-			lastWeek: [],
-			lastMonth: [],
-			older: []
-		} as GroupedChats
-	)
-}
-
-const filterChatsBySearch = (chats: Chat[], searchQuery: string): Chat[] => {
-	if (!searchQuery.trim()) return chats
-
-	const query = searchQuery.toLowerCase().trim()
-	return chats.filter((chat) => chat.title.toLowerCase().includes(query))
-}
-
-export function getChatHistoryPaginationKey(
-	pageIndex: number,
-	previousPageData: ChatHistory
-) {
-	if (previousPageData && previousPageData.hasMore === false) {
-		return null
-	}
-
-	if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`
-
-	const firstChatFromPage = previousPageData.chats.at(-1)
-
-	if (!firstChatFromPage) return null
-
-	return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`
-}
+import { Badge } from "@/components/ui/badge"
 
 export function AppSidebar({
 	user,
@@ -142,557 +62,259 @@ export function AppSidebar({
 }: { user: NextAuthUser | undefined } & React.ComponentProps<typeof Sidebar>) {
 	const { setOpen } = useSidebar()
 	const router = useRouter()
-	const { id } = useParams()
+	const pathname = usePathname()
 
 	const {
-		data: paginatedChatHistories,
-		setSize,
-		isValidating,
+		data: images,
 		isLoading,
 		mutate
-	} = useSWRInfinite<ChatHistory>(getChatHistoryPaginationKey, fetcher, {
+	} = useSWR<DBImage[]>("/api/images", fetcher, {
 		fallbackData: []
 	})
 
-	const [deleteId, setDeleteId] = useState<string | null>(null)
-	const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 	const [searchQuery, setSearchQuery] = useState("")
 
-	const hasReachedEnd = paginatedChatHistories
-		? paginatedChatHistories.some((page) => page.hasMore === false)
-		: false
+	const recentImages = images?.slice(0, 10) || []
+	const filteredImages = recentImages.filter((image) =>
+		image.prompt.toLowerCase().includes(searchQuery.toLowerCase())
+	)
 
-	const hasEmptyChatHistory = paginatedChatHistories
-		? paginatedChatHistories.every((page) => page.chats.length === 0)
-		: false
-
-	const handleDelete = async () => {
-		const deletePromise = fetch(`/api/chat?id=${deleteId}`, {
-			method: "DELETE"
-		})
-
-		toast.promise(deletePromise, {
-			loading: "Deleting chat...",
-			success: () => {
-				mutate((chatHistories) => {
-					if (chatHistories) {
-						return chatHistories.map((chatHistory) => ({
-							...chatHistory,
-							chats: chatHistory.chats.filter(
-								(chat) => chat.id !== deleteId
-							)
-						}))
-					}
-				})
-
-				return "Chat deleted successfully"
-			},
-			error: "Failed to delete chat"
-		})
-
-		setShowDeleteDialog(false)
-
-		if (deleteId === id) {
-			router.push("/")
-		}
+	const handleNewImage = () => {
+		router.push("/generate")
+		setOpen(false)
 	}
 
 	return (
-		<>
-			<Sidebar {...props}>
-				<SidebarHeader className="gap-3.5 pt-4 pb-3 md:pt-5 md:pb-4 px-4">
-					<div className="relative">
-						<SidebarInput
-							placeholder="Search"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="pl-4"
-						/>
+		<Sidebar className="group-data-[side=left]:border-r-0" {...props}>
+			<SidebarHeader>
+				<SidebarMenu>
+					<div className="flex flex-row justify-between items-center">
+						<div
+							onClick={() => {
+								router.push("/")
+								setOpen(false)
+							}}
+							className="flex flex-row gap-3 items-center"
+						>
+							<span className="text-lg font-semibold px-2 hover:bg-muted rounded-2xl cursor-pointer">
+								ZUE Images
+							</span>
+						</div>
+						<Button
+							variant="ghost"
+							type="button"
+							className="p-2 h-fit rounded-full"
+							onClick={handleNewImage}
+						>
+							<Plus className="size-4" />
+						</Button>
 					</div>
-				</SidebarHeader>
-				<SidebarContent>
-					<SidebarGroup className="px-0">
-						<SidebarGroupContent>
-							{!user ? (
-								<div className="p-4 text-center text-sm text-muted-foreground">
-									Login to save and revisit previous chats!
-								</div>
-							) : isLoading ? (
-								<div className="flex flex-col">
-									{[44, 32, 28, 64, 52].map((item, index) => (
+				</SidebarMenu>
+			</SidebarHeader>
+			<SidebarContent>
+				<SidebarGroup>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							{/* Navigation Items */}
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => router.push("/generate")}
+									isActive={pathname === "/generate"}
+								>
+									<Wand2 />
+									Generate Images
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => router.push("/gallery")}
+									isActive={pathname === "/gallery"}
+								>
+									<Images />
+									Gallery
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => router.push("/collections")}
+									isActive={pathname === "/collections"}
+								>
+									<FolderOpen />
+									Collections
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => router.push("/prompts")}
+									isActive={pathname === "/prompts"}
+								>
+									<Heart />
+									Saved Prompts
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+
+				{/* Recent Images */}
+				<SidebarGroup>
+					<div className="flex flex-row justify-between items-center px-2 mb-2">
+						<Label className="text-xs text-muted-foreground font-medium">
+							Recent Images
+						</Label>
+						{recentImages.length > 0 && (
+							<Badge variant="outline" className="text-xs">
+								{recentImages.length}
+							</Badge>
+						)}
+					</div>
+					<SidebarGroupContent>
+						<div className="px-2 mb-2">
+							<SidebarInput
+								placeholder="Search images..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="h-8"
+							/>
+						</div>
+						<SidebarMenu>
+							{isLoading ? (
+								// Loading skeleton
+								[44, 32, 28, 64, 52].map((width, i) => (
+									<div
+										key={i}
+										className="rounded-2xl h-8 flex gap-2 px-2 items-center"
+									>
 										<div
-											key={index}
-											className="flex flex-col gap-2 border-b p-4 last:border-b-0"
-										>
-											<div className="flex items-center gap-2">
-												<div
-													className="h-4 rounded bg-sidebar-accent-foreground/10 flex-1"
-													style={{
-														width: `${item}%`
-													}}
-												/>
-												<div className="h-3 w-12 rounded bg-sidebar-accent-foreground/10" />
-											</div>
-											<div className="h-3 w-3/4 rounded bg-sidebar-accent-foreground/10" />
-											<div className="h-3 w-1/2 rounded bg-sidebar-accent-foreground/10" />
-										</div>
-									))}
-								</div>
-							) : hasEmptyChatHistory ? (
-								<div className="p-4 text-center text-sm text-muted-foreground">
-									Your conversations will appear here once you
-									start chatting!
-								</div>
-							) : (
-								<>
-									{paginatedChatHistories &&
-										(() => {
-											const chatsFromHistory =
-												paginatedChatHistories.flatMap(
-													(paginatedChatHistory) =>
-														paginatedChatHistory.chats
-												)
-
-											// Filter chats based on search query
-											const filteredChats =
-												filterChatsBySearch(
-													chatsFromHistory,
-													searchQuery
-												)
-
-											// If searching and no results found
-											if (
-												searchQuery.trim() &&
-												filteredChats.length === 0
-											) {
-												return (
-													<div className="p-4 text-center text-sm text-muted-foreground">
-														No chats found matching
-														"{searchQuery}"
-													</div>
-												)
-											}
-
-											const groupedChats =
-												groupChatsByDate(filteredChats)
-
-											return (
-												<div className="flex flex-col">
-													{groupedChats.today.length >
-														0 && (
-														<div>
-															<div className="px-4 py-2 text-xs font-medium text-sidebar-foreground/70">
-																Today
-															</div>
-															{groupedChats.today.map(
-																(chat) => (
-																	<ChatItem
-																		key={
-																			chat.id
-																		}
-																		chat={
-																			chat
-																		}
-																		isActive={
-																			chat.id ===
-																			id
-																		}
-																		onDelete={(
-																			chatId
-																		) => {
-																			setDeleteId(
-																				chatId
-																			)
-																			setShowDeleteDialog(
-																				true
-																			)
-																		}}
-																		setOpenMobile={() =>
-																			setOpen(
-																				false
-																			)
-																		}
-																		searchQuery={
-																			searchQuery
-																		}
-																	/>
-																)
-															)}
-														</div>
-													)}
-
-													{groupedChats.yesterday
-														.length > 0 && (
-														<div>
-															<div className="px-4 py-2 text-xs font-medium text-sidebar-foreground/70">
-																Yesterday
-															</div>
-															{groupedChats.yesterday.map(
-																(chat) => (
-																	<ChatItem
-																		key={
-																			chat.id
-																		}
-																		chat={
-																			chat
-																		}
-																		isActive={
-																			chat.id ===
-																			id
-																		}
-																		onDelete={(
-																			chatId
-																		) => {
-																			setDeleteId(
-																				chatId
-																			)
-																			setShowDeleteDialog(
-																				true
-																			)
-																		}}
-																		setOpenMobile={() =>
-																			setOpen(
-																				false
-																			)
-																		}
-																		searchQuery={
-																			searchQuery
-																		}
-																	/>
-																)
-															)}
-														</div>
-													)}
-
-													{groupedChats.lastWeek
-														.length > 0 && (
-														<div>
-															<div className="px-4 py-2 text-xs font-medium text-sidebar-foreground/70">
-																Last 7 days
-															</div>
-															{groupedChats.lastWeek.map(
-																(chat) => (
-																	<ChatItem
-																		key={
-																			chat.id
-																		}
-																		chat={
-																			chat
-																		}
-																		isActive={
-																			chat.id ===
-																			id
-																		}
-																		onDelete={(
-																			chatId
-																		) => {
-																			setDeleteId(
-																				chatId
-																			)
-																			setShowDeleteDialog(
-																				true
-																			)
-																		}}
-																		setOpenMobile={() =>
-																			setOpen(
-																				false
-																			)
-																		}
-																		searchQuery={
-																			searchQuery
-																		}
-																	/>
-																)
-															)}
-														</div>
-													)}
-
-													{groupedChats.lastMonth
-														.length > 0 && (
-														<div>
-															<div className="px-4 py-2 text-xs font-medium text-sidebar-foreground/70">
-																Last 30 days
-															</div>
-															{groupedChats.lastMonth.map(
-																(chat) => (
-																	<ChatItem
-																		key={
-																			chat.id
-																		}
-																		chat={
-																			chat
-																		}
-																		isActive={
-																			chat.id ===
-																			id
-																		}
-																		onDelete={(
-																			chatId
-																		) => {
-																			setDeleteId(
-																				chatId
-																			)
-																			setShowDeleteDialog(
-																				true
-																			)
-																		}}
-																		setOpenMobile={() =>
-																			setOpen(
-																				false
-																			)
-																		}
-																		searchQuery={
-																			searchQuery
-																		}
-																	/>
-																)
-															)}
-														</div>
-													)}
-
-													{groupedChats.older.length >
-														0 && (
-														<div>
-															<div className="px-4 py-2 text-xs font-medium text-sidebar-foreground/70">
-																Older
-															</div>
-															{groupedChats.older.map(
-																(chat) => (
-																	<ChatItem
-																		key={
-																			chat.id
-																		}
-																		chat={
-																			chat
-																		}
-																		isActive={
-																			chat.id ===
-																			id
-																		}
-																		onDelete={(
-																			chatId
-																		) => {
-																			setDeleteId(
-																				chatId
-																			)
-																			setShowDeleteDialog(
-																				true
-																			)
-																		}}
-																		setOpenMobile={() =>
-																			setOpen(
-																				false
-																			)
-																		}
-																		searchQuery={
-																			searchQuery
-																		}
-																	/>
-																)
-															)}
-														</div>
-													)}
-												</div>
+											className="h-4 rounded-2xl flex-1 bg-sidebar-accent-foreground/10"
+											style={{ width: `${width}%` }}
+										/>
+									</div>
+								))
+							) : filteredImages.length > 0 ? (
+								filteredImages.map((image) => (
+									<ImageItem
+										key={image.id}
+										image={image}
+										onClick={() => {
+											router.push(
+												`/gallery?image=${image.id}`
 											)
-										})()}
-
-									{!searchQuery.trim() && (
-										<>
-											<motion.div
-												onViewportEnter={() => {
-													if (
-														!isValidating &&
-														!hasReachedEnd
-													) {
-														setSize(
-															(size) => size + 1
-														)
-													}
-												}}
-											/>
-
-											{hasReachedEnd ? (
-												<div className="p-4 text-center text-xs text-muted-foreground">
-													You have reached the end of
-													your chat history.
-												</div>
-											) : (
-												<div className="p-4 text-center text-xs text-muted-foreground">
-													Loading more chats...
-												</div>
-											)}
-										</>
-									)}
-								</>
+											setOpen(false)
+										}}
+									/>
+								))
+							) : (
+								<div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+									{searchQuery
+										? "No matching images"
+										: "No images yet"}
+								</div>
 							)}
-						</SidebarGroupContent>
-					</SidebarGroup>
-				</SidebarContent>
-			</Sidebar>
-
-			<AlertDialog
-				open={showDeleteDialog}
-				onOpenChange={setShowDeleteDialog}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>
-							Are you absolutely sure?
-						</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action cannot be undone. This will permanently
-							delete your chat and remove it from our servers.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={handleDelete}>
-							Continue
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+			</SidebarContent>
+			<SidebarFooter className="gap-0 -mx-2">
+				{user && (
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<SidebarMenuButton className="h-10 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+									<span className="text-xs font-bold uppercase">
+										{user.email?.[0] ??
+											user.name?.[0] ??
+											"U"}
+									</span>
+								</div>
+								<div className="grid flex-1 text-left text-sm leading-tight">
+									<span className="truncate font-semibold">
+										{user.name ?? "User"}
+									</span>
+									<span className="truncate text-xs text-muted-foreground">
+										{user.email}
+									</span>
+								</div>
+								<MoreHorizontal className="ml-auto size-4" />
+							</SidebarMenuButton>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+							side="bottom"
+							align="end"
+							sideOffset={4}
+						>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={() => {
+									router.push("/")
+								}}
+							>
+								Dashboard
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onSelect={(event) => {
+									event.preventDefault()
+									router.push("/api/auth/signout")
+								}}
+							>
+								Sign out
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
+			</SidebarFooter>
+		</Sidebar>
 	)
 }
 
-function ChatItem({
-	chat,
-	isActive,
-	onDelete,
-	setOpenMobile,
-	searchQuery
+function ImageItem({
+	image,
+	onClick
 }: {
-	chat: Chat
-	isActive: boolean
-	onDelete: (chatId: string) => void
-	setOpenMobile: (open: boolean) => void
-	searchQuery?: string
+	image: DBImage
+	onClick: () => void
 }) {
-	const { visibilityType, setVisibilityType } = useChatVisibility({
-		chatId: chat.id,
-		initialVisibilityType: chat.visibility
-	})
-
-	const router = useRouter()
-
-	const handleChatClick = () => {
-		setOpenMobile(false)
-		router.push(`/chat/${chat.id}`)
-	}
-
-	// Highlight search matches in the title
-	const highlightedTitle = React.useMemo(() => {
-		if (!searchQuery?.trim()) return chat.title
-
-		const query = searchQuery.toLowerCase().trim()
-		const title = chat.title
-		const index = title.toLowerCase().indexOf(query)
-
-		if (index === -1) return title
-
-		return (
-			<>
-				{title.substring(0, index)}
-				<mark className="bg-yellow-200 dark:bg-yellow-800 text-inherit">
-					{title.substring(index, index + query.length)}
-				</mark>
-				{title.substring(index + query.length)}
-			</>
-		)
-	}, [chat.title, searchQuery])
-
 	return (
-		<div className="group relative">
-			<a
-				href={`/chat/${chat.id}`}
-				onClick={(e) => {
-					e.preventDefault()
-					handleChatClick()
-				}}
-				className={`flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-					isActive
-						? "bg-sidebar-accent text-sidebar-accent-foreground"
-						: ""
-				}`}
+		<SidebarMenuItem>
+			<SidebarMenuButton
+				className="h-auto p-2 text-left"
+				onClick={onClick}
 			>
-				<div className="flex w-full items-center gap-3">
-					{visibilityType === "public" ? (
-						<Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-					) : (
-						<Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-					)}
-					<span className="truncate font-medium flex-1 min-w-0">
-						{highlightedTitle}
-					</span>
-					<span className="text-xs text-muted-foreground flex-shrink-0">
-						{new Date(chat.createdAt).toLocaleDateString("en-US", {
-							month: "short",
-							day: "numeric"
-						})}
-					</span>
-					<div className="flex-shrink-0">
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<button
-									type="button"
-									className="opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 transition-opacity p-1 rounded hover:bg-sidebar-accent"
-								>
-									<MoreHorizontal className="h-4 w-4" />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent side="bottom" align="end">
-								<DropdownMenuSub>
-									<DropdownMenuSubTrigger className="cursor-pointer">
-										<ShareIcon />
-										<span>Share</span>
-									</DropdownMenuSubTrigger>
-									<DropdownMenuPortal>
-										<DropdownMenuSubContent>
-											<DropdownMenuItem
-												className="cursor-pointer flex-row justify-between"
-												onClick={() =>
-													setVisibilityType("private")
-												}
-											>
-												<div className="flex flex-row gap-2 items-center">
-													<LockIcon size={12} />
-													<span>Private</span>
-												</div>
-												{visibilityType ===
-												"private" ? (
-													<CheckCircleFillIcon />
-												) : null}
-											</DropdownMenuItem>
-											<DropdownMenuItem
-												className="cursor-pointer flex-row justify-between"
-												onClick={() =>
-													setVisibilityType("public")
-												}
-											>
-												<div className="flex flex-row gap-2 items-center">
-													<GlobeIcon />
-													<span>Public</span>
-												</div>
-												{visibilityType === "public" ? (
-													<CheckCircleFillIcon />
-												) : null}
-											</DropdownMenuItem>
-										</DropdownMenuSubContent>
-									</DropdownMenuPortal>
-								</DropdownMenuSub>
-								<DropdownMenuItem
-									className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive"
-									onSelect={() => onDelete(chat.id)}
-								>
-									<TrashIcon />
-									<span>Delete</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+				<div className="flex items-center gap-3 w-full">
+					<div className="size-8 rounded bg-muted flex-shrink-0 overflow-hidden">
+						{image.imageUrl && image.status === "completed" ? (
+							<img
+								src={image.imageUrl}
+								alt="Generated artwork"
+								className="w-full h-full object-cover"
+							/>
+						) : (
+							<div className="w-full h-full flex items-center justify-center">
+								<Wand2 className="h-3 w-3 text-muted-foreground" />
+							</div>
+						)}
+					</div>
+					<div className="flex-1 min-w-0">
+						<p className="text-sm font-medium truncate">
+							{image.prompt.slice(0, 40)}
+							{image.prompt.length > 40 ? "..." : ""}
+						</p>
+						<div className="flex items-center gap-2 mt-1">
+							<Badge
+								variant="outline"
+								className="text-xs h-4 px-1"
+							>
+								{image.status}
+							</Badge>
+							<span className="text-xs text-muted-foreground">
+								{new Date(image.createdAt).toLocaleDateString()}
+							</span>
+						</div>
 					</div>
 				</div>
-			</a>
-		</div>
+			</SidebarMenuButton>
+		</SidebarMenuItem>
 	)
 }

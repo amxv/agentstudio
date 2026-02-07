@@ -1,14 +1,13 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# Autonomous Agent Guide: Building ImageZue on Next.js 15 & Vercel
 
-# Autonomous Agent Guide: Building GoldenGoose on Next.js 15 & Vercel
+## Welcome to ImageZue Development
 
-## Welcome to GoldenGoose Development
-
-You're building **GoldenGoose** - an AI-powered SWE Project Management Tool that keeps engineers and AI Coding agents in sync with the project's progress. It allows users to easily add todos of things to fix or improve in the project as well as systematically create and manage implementation plans using intelligent reasoning coding models. Think of it as a cross between Linear, Devin, and the Todo List app.
+You're building **ImageZue** - an AI-powered Image Generation Tool that creates stunning visuals from text prompts and allows users to manage, organize, and refine their AI-generated artwork. It combines advanced AI models with intuitive gallery management, prompt engineering, and image editing capabilities. Think of it as a cross between Midjourney, Adobe Creative Cloud, and Pinterest.
 
 This guide will walk you through implementing features systematically with a focus on quality and incremental development.
 
@@ -18,109 +17,33 @@ NEVER RUN 'bun run build'. It ruins my dev server. Just run bun check.
 
 If you can't access a page with curl, check `middleware.ts` because we use Auth.js to protect most routes.
 
-## 🔧 GoldenGoose Cloud Integration
+## 🎨 Core ImageZue Features
 
-As a coding agent connected to **GoldenGoose Cloud**, you have access to powerful MCP (Model Context Protocol) tools for project management. All project data, features, tasks, and roadmaps are managed through these tools rather than markdown files.
+ImageZue focuses on providing the best AI image generation experience:
 
-### 🔑 Authentication
+### 🖼️ Image Generation
+- Text-to-image generation using multiple AI models (DALL-E, Midjourney, Stable Diffusion)
+- Advanced prompt engineering with style presets and modifiers
+- Batch generation with variations and iterations
+- Real-time generation progress tracking
 
-**CRITICAL**: Every MCP tool call requires authentication via API key. Your API key is stored in `secrets.json` and must be included in every GoldenGoose MCP tool call:
+### 📱 Gallery Management
+- Personal image collections and albums
+- Advanced search and filtering by prompts, styles, models
+- Favorites and rating system
+- Sharing and collaboration features
 
-```json
-{
-"gg_api_key": "gg_your_actual_api_key_here"
-}
-```
+### ✨ Image Enhancement
+- AI-powered upscaling and enhancement
+- Style transfer and artistic filters
+- Background removal and replacement
+- Image editing with AI assistance
 
-### 📋 Available MCP Tools
-
-You have access to these GoldenGoose MCP tools for project management:
-
-#### Project Management
-
-- `mcp_goldengoose_get_project_list` - Get all your active projects
-- `mcp_goldengoose_get_project_status` - Get detailed project progress
-- `mcp_goldengoose_view_roadmap` - View complete project roadmap
-
-#### Feature Management
-
-- `mcp_goldengoose_add_feature` - Create new features
-- `mcp_goldengoose_get_feature_details` - Get feature details with tasks
-- `mcp_goldengoose_search_features` - Search features by criteria
-- `mcp_goldengoose_get_implementation_plan` - Get AI-generated plans
-
-#### Task Management
-
-- `mcp_goldengoose_add_task` - Create new tasks
-- `mcp_goldengoose_get_next_task` - Get highest priority task
-- `mcp_goldengoose_update_task_progress` - Update task status
-
-### 🎯 Project Management Workflow
-
-Instead of managing markdown checklists, follow this workflow:
-
-#### 1. Start Your Session
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_get_project_list">
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
-
-#### 2. Get Your Next Task
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_get_next_task">
-<parameter name="projectId">your_project_id</parameter>
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
-
-#### 3. Work on Implementation
-
-Follow the development patterns below, then update task progress:
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_update_task_progress">
-<parameter name="taskId">task_id</parameter>
-<parameter name="projectId">project_id</parameter>
-<parameter name="status">completed</parameter>
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
-
-#### 4. Add New Features/Tasks As Needed
-
-When you identify new work:
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_add_feature">
-<parameter name="projectId">project_id</parameter>
-<parameter name="name">Feature Name</parameter>
-<parameter name="description">Feature description</parameter>
-<parameter name="priority">high</parameter>
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
-
-#### 5. Check Overall Progress
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_view_roadmap">
-<parameter name="projectId">project_id</parameter>
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
+### 🎯 Prompt Engineering
+- Prompt templates and presets
+- Prompt history and favorites
+- Community prompt sharing
+- AI-powered prompt optimization
 
 ## 📚 Documentation Strategy: Ref/Context7 & Web Search
 
@@ -159,8 +82,8 @@ When Context7 doesn't have what you need, or you need the latest community solut
 ```
 <function_calls>
 <invoke name="web_search">
-<parameter name="search_term">Next.js 15 server components best practices 2024</parameter>
-<parameter name="explanation">Looking for the latest best practices for server components in Next.js 15</parameter>
+<parameter name="search_term">Next.js 15 file upload best practices 2024</parameter>
+<parameter name="explanation">Looking for the latest best practices for handling file uploads in Next.js 15</parameter>
 </invoke>
 </function_calls>
 ```
@@ -168,12 +91,12 @@ When Context7 doesn't have what you need, or you need the latest community solut
 Use web search for:
 
 - Recent error solutions
-- Community best practices
-- Latest framework updates
-- Performance optimization techniques
+- AI model API updates
+- Image processing techniques
+- Performance optimization
 - Deployment troubleshooting
 
-## 🛠️ GoldenGoose Tech Stack Reference
+## 🛠️ ImageZue Tech Stack Reference
 
 Here's your complete tech stack with Context7 library IDs for quick access:
 
@@ -204,8 +127,14 @@ Here's your complete tech stack with Context7 library IDs for quick access:
 ### AI Integration
 
 - **Vercel AI SDK**: `/vercel/ai` - AI/LLM integration
-- **OpenAI**: `/openai/openai-node` - GPT models
+- **OpenAI**: `/openai/openai-node` - DALL-E and GPT models
 - **Anthropic**: `/anthropics/anthropic-sdk-typescript` - Claude models
+
+### Image Processing
+
+- **Sharp**: Image processing and optimization
+- **Canvas API**: Client-side image manipulation
+- **AWS S3/Vercel Blob**: Image storage and CDN
 
 ## 🌍 Environment Variables
 
@@ -223,6 +152,29 @@ const publicKey = process.env.NEXT_PUBLIC_API_KEY
 const secretKey = process.env.SECRET_API_KEY
 ```
 
+### Required Environment Variables
+
+```bash
+# AI Model APIs
+OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key
+REPLICATE_API_TOKEN=your_replicate_token
+
+# Database
+DATABASE_URL=your_neon_database_url
+
+# Authentication
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=your_app_url
+
+# File Storage
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
+
+# Image Processing
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+```
+
 ### Vercel Configuration
 
 Environment variables are automatically pulled from:
@@ -237,22 +189,22 @@ Environment variables are automatically pulled from:
 - ✅ **Secure**: Server variables never exposed to client
 - ✅ **Simple**: No special configuration needed
 
-## 🎨 GoldenGoose Design System & UI Patterns
+## 🎨 ImageZue Design System & UI Patterns
 
-This section documents the carefully crafted design patterns and stylistic preferences established throughout GoldenGoose's interface. **ALL new components and pages MUST follow these exact patterns** to maintain visual consistency and user experience quality.
+This section documents the carefully crafted design patterns and stylistic preferences established throughout ImageZue's interface. **ALL new components and pages MUST follow these exact patterns** to maintain visual consistency and user experience quality.
 
 ### 🏗️ Page Layout Structure
 
-GoldenGoose uses a clean, minimal layout structure with consistent spacing and modern styling:
+ImageZue uses a clean, minimal layout structure with consistent spacing and modern styling:
 
 ```tsx
-// Standard page layout with sidebar (chat layout pattern)
+// Standard page layout with sidebar (gallery layout pattern)
 <SidebarProvider defaultOpen={!isCollapsed}>
 <AppSidebar user={session?.user} />
 <SidebarInset>{children}</SidebarInset>
 </SidebarProvider>
 
-// Full-page layout (for auth pages or standalone content)
+// Full-page layout (for generation or editing pages)
 <div className="flex flex-col min-w-0 h-dvh bg-background">
 <PageHeader />
 <MainContent />
@@ -280,7 +232,7 @@ href="/"
 className="flex flex-row gap-3 items-center"
 >
 <span className="text-lg font-semibold px-2 hover:bg-muted rounded-2xl cursor-pointer">
-App Name
+ImageZue
 </span>
 </Link>
 <Tooltip>
@@ -289,7 +241,7 @@ App Name
 <PlusIcon />
 </Button>
 </TooltipTrigger>
-<TooltipContent>Action Text</TooltipContent>
+<TooltipContent>Generate Image</TooltipContent>
 </Tooltip>
 </div>
 </SidebarMenu>
@@ -303,6 +255,79 @@ App Name
 - ✅ Icons: Consistent sizing and proper tooltip placement
 - ✅ Spacing: `gap-3` for related elements, `gap-2` for closer elements
 
+### 🖼️ Image Gallery Design System
+
+**Image Grid Layout:**
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+{images.map((image) => (
+<ImageCard key={image.id} image={image} />
+))}
+</div>
+```
+
+**Image Card Style:**
+
+```tsx
+<Card className="rounded-3xl border bg-card text-card-foreground shadow-xs overflow-hidden group">
+<div className="aspect-square relative">
+<Image
+src={image.url}
+alt={image.prompt}
+fill
+className="object-cover transition-transform group-hover:scale-105"
+/>
+<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors">
+<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white">
+<Heart className="h-4 w-4" />
+</Button>
+</div>
+</div>
+</div>
+<CardContent className="p-4">
+<p className="text-sm text-muted-foreground line-clamp-2">
+{image.prompt}
+</p>
+</CardContent>
+</Card>
+```
+
+### 🎛️ Generation Interface Design
+
+**Prompt Input Area:**
+
+```tsx
+<Card className="rounded-3xl border bg-card text-card-foreground shadow-xs">
+<CardContent className="p-6">
+<div className="space-y-4">
+<Label htmlFor="prompt" className="text-base font-medium">
+Describe your image
+</Label>
+<Textarea
+id="prompt"
+placeholder="A serene landscape with mountains and a lake at sunset..."
+className="min-h-[120px] resize-none border-0 bg-muted focus:bg-background transition-colors"
+/>
+<div className="flex flex-wrap gap-2">
+{promptSuggestions.map((suggestion) => (
+<Button
+key={suggestion}
+variant="outline"
+size="sm"
+className="rounded-full"
+onClick={() => appendToPrompt(suggestion)}
+>
+{suggestion}
+</Button>
+))}
+</div>
+</div>
+</CardContent>
+</Card>
+```
+
 ### 🃏 Card Design System
 
 **Primary Card Style:**
@@ -315,11 +340,22 @@ App Name
 </Card>
 ```
 
-**Message/Content Card Style:**
+**Generation Progress Card:**
 
 ```tsx
-<div className="bg-primary text-primary-foreground px-3 py-2 rounded-3xl">
-{/* User message content */}
+<div className="bg-primary text-primary-foreground px-4 py-3 rounded-3xl">
+<div className="flex items-center gap-3">
+<div className="animate-spin">
+<Loader2 className="h-4 w-4" />
+</div>
+<span className="text-sm">Generating your image...</span>
+</div>
+<div className="mt-2 bg-white/20 rounded-full h-2">
+<div
+className="bg-white rounded-full h-2 transition-all duration-300"
+style={{ width: `${progress}%` }}
+/>
+</div>
 </div>
 ```
 
@@ -329,7 +365,7 @@ App Name
 - ✅ Shadows: `shadow-xs` for subtle depth (not heavy shadows)
 - ✅ Backgrounds: Use theme variables (`bg-card`, `bg-primary`) for consistency
 - ✅ Content padding: `p-6` standard, `pt-0` when following headers
-- ✅ User content: `bg-primary text-primary-foreground` with `px-3 py-2`
+- ✅ Progress indicators: Use themed backgrounds with subtle transparency
 
 ### 🔘 Button Design Patterns
 
@@ -341,22 +377,27 @@ App Name
 <Icon />
 </Button>
 
-// Standard outline button
-<Button variant="outline" className="gap-2">
-<Icon className="h-4 w-4" />
-Action Text
+// Generation button
+<Button className="rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+<Sparkles className="h-4 w-4 mr-2" />
+Generate Image
 </Button>
 
-// Default button
-<Button className="rounded-2xl">Primary Action</Button>
+// Style preset button
+<Button
+variant="outline"
+className="rounded-full border-2 hover:bg-accent"
+>
+Photorealistic
+</Button>
 ```
 
 **Button Design Rules:**
 
 - ✅ Ghost variant: `variant="ghost"` for subtle actions
 - ✅ Icon buttons: `p-2 h-fit rounded-full` for circular icon buttons
-- ✅ Text buttons: `gap-2` for icon spacing, `rounded-2xl` for rounded corners
-- ✅ Icon sizing: `h-4 w-4` or use default `size-4` from SVG props
+- ✅ Generation buttons: Use gradients for primary actions
+- ✅ Style buttons: `rounded-full` with `border-2` for preset selections
 - ✅ Interactive states: Built-in hover states from shadcn components
 
 ### 🎨 Color System & Visual Hierarchy
@@ -373,193 +414,160 @@ className="text-zinc-600 dark:text-zinc-400" // Custom muted text
 // Background hierarchy
 className="bg-background" // Page background
 className="bg-card" // Card background
-className="bg-muted" // Muted input/content background
-className="bg-primary" // Primary accent background
+className="bg-muted" // Input/content background
+className="bg-gradient-to-r from-purple-500 to-pink-500" // Generation accent
 ```
 
 **Visual Indicators:**
 
 ```tsx
-// Avatar/Profile circles
-<div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
-<SparklesIcon size={14} />
-</div>
+// Model indicator badges
+<Badge variant="secondary" className="rounded-full">
+DALL-E 3
+</Badge>
 
-// Loading/Skeleton states
-<div className="h-4 rounded-2xl flex-1 bg-sidebar-accent-foreground/10" />
+// Generation status
+<div className="flex items-center gap-2">
+<div className="size-2 rounded-full bg-green-500 animate-pulse" />
+<span className="text-sm text-muted-foreground">Ready to generate</span>
+</div>
 ```
 
-### 📱 Responsive Design Patterns
+### 📱 Responsive Image Gallery
 
-**Content Width Management:**
+**Grid Responsiveness:**
 
 ```tsx
-// Chat/content area
-<div className="w-full mx-auto max-w-3xl px-4">
-{/* Main content */}
+// Responsive image grid
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+{/* Image cards */}
 </div>
 
-// User messages (narrower)
-<div className="group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl">
-{/* User content */}
+// Masonry layout for varied aspect ratios
+<div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+{images.map((image) => (
+<div key={image.id} className="break-inside-avoid">
+<ImageCard image={image} />
+</div>
+))}
+</div>
+```
+
+**Responsive Design Patterns:**
+
+```tsx
+// Generation interface
+<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+{/* Generation controls */}
 </div>
 
-// Form areas
-<div className="flex flex-col gap-4 px-4 sm:px-16">
-{/* Form content */}
+// Image viewer modal
+<Dialog>
+<DialogContent className="max-w-4xl max-h-[90vh] p-0">
+<div className="relative aspect-auto">
+<Image src={image.url} alt={image.prompt} className="w-full h-auto" />
 </div>
+</DialogContent>
+</Dialog>
 ```
 
 **Responsive Spacing:**
 
-- ✅ Content: `max-w-3xl` for main content, `max-w-2xl` for user content
-- ✅ Padding: `px-4` base, `sm:px-16` for forms on larger screens
-- ✅ Gaps: `gap-4` for form fields, `gap-2` for related elements
-- ✅ Icon containers: `size-8` for consistent circular containers
+- ✅ Gallery: Responsive columns from 1 to 5 based on screen size
+- ✅ Generation: `max-w-4xl` for optimal prompt input area
+- ✅ Padding: `px-4 sm:px-6 lg:px-8` for responsive spacing
+- ✅ Gaps: `gap-4` for grid layouts, `space-y-4` for masonry
 
-### 📦 Loading States & Skeletons
+### 📦 Loading States & Progress Indicators
 
-**Skeleton Pattern:**
+**Image Generation Loading:**
 
 ```tsx
-// List skeleton items
-{[44, 32, 28, 64, 52].map((item) => (
-<div key={item} className="rounded-2xl h-8 flex gap-2 px-2 items-center">
-<div
-className="h-4 rounded-2xl flex-1 bg-sidebar-accent-foreground/10"
-style={{ width: `${item}%` }}
-/>
+// Generation in progress
+<Card className="rounded-3xl border bg-card">
+<CardContent className="p-6">
+<div className="flex flex-col items-center space-y-4">
+<div className="relative">
+<div className="w-16 h-16 rounded-full border-4 border-muted animate-spin border-t-primary" />
+<Sparkles className="absolute inset-0 m-auto h-6 w-6 text-primary" />
 </div>
-))}
+<div className="text-center">
+<h3 className="font-medium">Creating your masterpiece</h3>
+<p className="text-sm text-muted-foreground">This may take 30-60 seconds</p>
+</div>
+</div>
+</CardContent>
+</Card>
 
-// Global skeleton class usage
-<div className="skeleton">
-{/* Any content with skeleton styles applied automatically */}
-</div>
+// Image loading skeleton
+<div className="aspect-square bg-muted animate-pulse rounded-2xl" />
 ```
 
 **Loading State Rules:**
 
-- ✅ Skeleton backgrounds: `bg-sidebar-accent-foreground/10` or `bg-foreground/20`
-- ✅ Rounded corners: `rounded-2xl` to match button/card styling
-- ✅ Height consistency: `h-8` for list items, `h-4` for text content
-- ✅ Animation: Built-in `animate-pulse` from skeleton CSS classes
+- ✅ Generation spinner: Custom spinner with app-specific styling
+- ✅ Image skeletons: `aspect-square` or `aspect-video` with `animate-pulse`
+- ✅ Progress bars: Use branded colors with smooth transitions
+- ✅ Loading text: Descriptive and encouraging messages
 
 ### 🧩 Form Design Patterns
 
-**Standard Form Structure:**
+**Generation Form Structure:**
 
 ```tsx
-<Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
-<div className="flex flex-col gap-2">
-<Label
-htmlFor="field-id"
-className="text-zinc-600 font-normal dark:text-zinc-400"
->
-Field Label
+<Form action={generateImage} className="space-y-6">
+<div className="space-y-4">
+<div>
+<Label htmlFor="prompt" className="text-base font-medium">
+Image Description
 </Label>
-<Input
-id="field-id"
-name="field"
-className="bg-muted text-md md:text-sm"
-type="text"
-placeholder="Placeholder text"
+<Textarea
+id="prompt"
+name="prompt"
+placeholder="Describe the image you want to create..."
+className="mt-2 min-h-[100px] resize-none"
 required
 />
 </div>
-{/* Form actions */}
+<div className="grid grid-cols-2 gap-4">
+<div>
+<Label htmlFor="style" className="text-sm font-medium">
+Style
+</Label>
+<Select name="style">
+<SelectTrigger className="mt-1">
+<SelectValue placeholder="Choose style" />
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="photorealistic">Photorealistic</SelectItem>
+<SelectItem value="artistic">Artistic</SelectItem>
+<SelectItem value="cartoon">Cartoon</SelectItem>
+</SelectContent>
+</Select>
+</div>
+<div>
+<Label htmlFor="model" className="text-sm font-medium">
+AI Model
+</Label>
+<Select name="model">
+<SelectTrigger className="mt-1">
+<SelectValue placeholder="Choose model" />
+</SelectTrigger>
+<SelectContent>
+<SelectItem value="dall-e-3">DALL-E 3</SelectItem>
+<SelectItem value="midjourney">Midjourney</SelectItem>
+<SelectItem value="stable-diffusion">Stable Diffusion</SelectItem>
+</SelectContent>
+</Select>
+</div>
+</div>
+</div>
+<Button type="submit" className="w-full rounded-2xl">
+<Sparkles className="h-4 w-4 mr-2" />
+Generate Image
+</Button>
 </Form>
 ```
-
-**Form Design Rules:**
-
-- ✅ Form container: `flex flex-col gap-4` with responsive padding
-- ✅ Field groups: `flex flex-col gap-2` for label-input pairs
-- ✅ Labels: `text-zinc-600 font-normal dark:text-zinc-400` for subtle styling
-- ✅ Inputs: `bg-muted` background with responsive text sizing
-- ✅ Field spacing: `gap-2` between label and input, `gap-4` between field groups
-
-### 🎭 Modal & Dialog Design Patterns
-
-Based on the existing alert dialog pattern:
-
-```tsx
-<AlertDialog>
-<AlertDialogContent>
-<AlertDialogHeader>
-<AlertDialogTitle>Dialog Title</AlertDialogTitle>
-<AlertDialogDescription>
-Dialog description text
-</AlertDialogDescription>
-</AlertDialogHeader>
-<AlertDialogFooter>
-<AlertDialogCancel>Cancel</AlertDialogCancel>
-<AlertDialogAction>Confirm</AlertDialogAction>
-</AlertDialogFooter>
-</AlertDialogContent>
-</AlertDialog>
-```
-
-### 🎪 Animation & Interaction
-
-**Motion Patterns:**
-
-```tsx
-// Page/message entrance animations
-<motion.div
-initial={{ y: 5, opacity: 0 }}
-animate={{ y: 0, opacity: 1 }}
-className="w-full mx-auto max-w-3xl px-4"
->
-{/* Content */}
-</motion.div>
-
-// Conditional animations with AnimatePresence
-<AnimatePresence>
-{condition && <motion.div>Content</motion.div>}
-</AnimatePresence>
-```
-
-**Interaction States:**
-
-```tsx
-// Hover states
-className="hover:bg-muted rounded-2xl" // Subtle background change
-className="hover:bg-accent hover:text-accent-foreground" // Button hover
-
-// Focus states (built into components)
-className="focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-
-// Group interactions
-className="opacity-0 group-hover/message:opacity-100" // Show on parent hover
-```
-
-### 📐 Spacing & Rhythm System
-
-**Consistent Spacing Hierarchy:**
-
-- ✅ Major sections: `gap-4` for forms and content
-- ✅ Related elements: `gap-2` for closely related items
-- ✅ Form elements: `gap-2` between label and input
-- ✅ Content padding: `px-4` base, responsive increases for larger screens
-- ✅ List items: `h-8` height with `px-2` horizontal padding
-
-### 📦 Empty State Design
-
-**Consistent Empty State Pattern:**
-
-```tsx
-<div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-Your content will appear here once you start using the feature!
-</div>
-```
-
-**Empty State Rules:**
-
-- ✅ Text color: `text-zinc-500` for muted appearance
-- ✅ Layout: `flex flex-row justify-center items-center`
-- ✅ Typography: `text-sm` for subtle messaging
-- ✅ Spacing: `gap-2` for icons or multiple elements
 
 ### 🚨 Critical Design Rules
 
@@ -567,38 +575,23 @@ Your content will appear here once you start using the feature!
 
 1. **❌ Don't mix border radius patterns** - Always use `rounded-2xl` or `rounded-3xl`
 2. **❌ Don't use heavy shadows** - Stick to `shadow-xs` or no shadow
-3. **❌ Don't ignore theme variables** - Always use CSS custom properties for colors
-4. **❌ Don't use inconsistent spacing** - Follow the `gap-2`, `gap-4` hierarchy
-5. **❌ Don't skip responsive considerations** - Test on mobile and desktop
-6. **❌ Don't use solid, harsh backgrounds** - Prefer muted, theme-aware colors
-7. **❌ Don't skip loading states** - Always provide skeleton or loading indicators
-8. **❌ Don't use inconsistent icon sizing** - Stick to `h-4 w-4` or component defaults
-9. **❌ Don't ignore accessibility** - Use proper labels, focus states, and semantic HTML
-
-### 🎯 Design Implementation Checklist
-
-Before considering any component complete:
-
-- ✅ Uses consistent `rounded-2xl` or `rounded-3xl` border radius
-- ✅ Implements proper theme-aware colors using CSS variables
-- ✅ Includes appropriate loading/skeleton states
-- ✅ Works responsively on mobile and desktop viewports
-- ✅ Uses consistent spacing hierarchy (`gap-2`, `gap-4`, etc.)
-- ✅ Implements proper hover and focus states
-- ✅ Follows the established typography patterns
-- ✅ Uses semantic HTML and proper accessibility attributes
-
-**Remember**: This design system creates GoldenGoose's clean, modern, and professional interface. Every component should feel cohesive and follow these established patterns for optimal user experience.
+3. **❌ Don't ignore image aspect ratios** - Use proper `aspect-square` or `aspect-video`
+4. **❌ Don't skip loading states** - Always show generation progress
+5. **❌ Don't use inconsistent spacing** - Follow the `gap-4`, `space-y-4` hierarchy
+6. **❌ Don't forget responsive grids** - Test on mobile and desktop
+7. **❌ Don't use harsh transitions** - Prefer smooth, subtle animations
+8. **❌ Don't skip image optimization** - Use Next.js Image component
+9. **❌ Don't ignore accessibility** - Use proper alt text and focus states
 
 ## 🏗️ Core Development Principles
 
-As you build GoldenGoose, follow these principles:
+As you build ImageZue, follow these principles:
 
 1. **Server Components First**: Use client components only for interactivity
 2. **Type Safety**: TypeScript everywhere, no `any` types
-3. **Test-Driven**: Write tests before code
-4. **Security by Default**: Always authenticate and isolate user data
-5. **Performance Focused**: Optimize for fast loading and good Core Web Vitals
+3. **Image Optimization**: Use Next.js Image component and proper formats
+4. **Security by Default**: Always authenticate and validate image uploads
+5. **Performance Focused**: Optimize for fast image loading and generation
 6. **Clean Code**: Let React Compiler optimize, don't pre-optimize
 
 ## 🚀 Feature Implementation Process
@@ -609,7 +602,7 @@ Let's walk through implementing a feature from start to finish:
 
 Before writing any code:
 
-1. Use MCP tools to check current project status and roadmap
+1. Understand the image generation workflow
 2. Read any existing documentation
 3. Understand the user story and requirements
 
@@ -623,30 +616,18 @@ Use your documentation tools wisely:
 <function_calls>
 <invoke name="mcp_context7_get-library-docs">
 <parameter name="context7CompatibleLibraryID">/vercel/next.js</parameter>
-<parameter name="topic">server actions</parameter>
+<parameter name="topic">file uploads</parameter>
 </invoke>
 </function_calls>
 ```
 
-**For current best practices:**
+**For AI integration:**
 
 ```
 <function_calls>
 <invoke name="web_search">
-<parameter name="search_term">Next.js server actions authentication pattern 2024</parameter>
-<parameter name="explanation">Finding current best practices for securing server actions</parameter>
-</invoke>
-</function_calls>
-```
-
-**For studying successful implementations:**
-
-```
-<function_calls>
-<invoke name="mcp_mcp-deepwiki_deepwiki_fetch">
-<parameter name="url">vercel/nextjs-subscription-payments</parameter>
-<parameter name="mode">aggregate</parameter>
-<parameter name="maxDepth">1</parameter>
+<parameter name="search_term">OpenAI DALL-E API integration Next.js 2024</parameter>
+<parameter name="explanation">Finding current best practices for integrating DALL-E API</parameter>
 </invoke>
 </function_calls>
 ```
@@ -657,60 +638,55 @@ Create the necessary directories and files:
 
 ```bash
 # Create feature directories
-mkdir -p src/app/(pages)/{feature-name}
-mkdir -p src/actions
-mkdir -p tests/features/{feature-name}
+mkdir -p app/(pages)/generate
+mkdir -p app/(pages)/gallery
+mkdir -p app/api/images
+mkdir -p actions/images
+mkdir -p tests/features/images
 
-# Create or update the feature checklist
-touch docs/features/{feature-name}/checklist.md
+# Create component directories
+mkdir -p components/image-generation
+mkdir -p components/image-gallery
 ```
 
 ### Step 4: Database Design
 
-Always start with the data layer using Drizzle ORM:
-
-1. **Design your schema** in `src/db/schema.ts`:
+Start with the data layer using Drizzle ORM:
 
 ```typescript
-// Example: Adding a new voice_agents table
-export const voiceAgents = pgTable('voice_agents', {
+// Example: Adding image generation tables
+export const images = pgTable('images', {
+id: serial('id').primaryKey(),
+prompt: text('prompt').notNull(),
+imageUrl: text('image_url').notNull(),
+model: text('model').notNull(), // 'dall-e-3', 'midjourney', etc.
+style: text('style'), // 'photorealistic', 'artistic', etc.
+width: integer('width'),
+height: integer('height'),
+userId: text('user_id').notNull(),
+isPublic: boolean('is_public').default(false),
+createdAt: timestamp('created_at').defaultNow().notNull(),
+updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})                                                                ;
+
+export const collections = pgTable('collections', {
 id: serial('id').primaryKey(),
 name: text('name').notNull(),
 description: text('description'),
-phoneNumber: text('phone_number'),
-instructions: text('instructions'),
 userId: text('user_id').notNull(),
+isPublic: boolean('is_public').default(false),
 createdAt: timestamp('created_at').defaultNow().notNull(),
-updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })                                                         ;
 
-export const voiceAgentsRelations = relations(voiceAgents, ({ one, many }) => ({
-// Define relationships here
-}))                                                                              ;
+export const imageCollections = pgTable('image_collections', {
+imageId: integer('image_id').references(() => images.id),
+collectionId: integer('collection_id').references(() => collections.id),
+}, (table) => ({
+pk: primaryKey(table.imageId, table.collectionId),
+}))                                                                      ;
 ```
 
-2. **Apply schema changes** immediately: `bun db:push`
-3. **Test with MCP tools** (optional, for validation):
-
-```
-<function_calls>
-<invoke name="mcp_Neon_run_sql">
-<parameter name="params">{
-"projectId": "square-unit-96831934",
-"branchId": "br-blue-frog-a6npin6j",
-"databaseName": "icephone-db",
-"sql": "SELECT * FROM voice_agents LIMIT 1;"
-}</parameter>
-</invoke>
-</function_calls>
-```
-
-This approach ensures:
-
-- ✅ Schema stays in sync with Drizzle migrations
-- ✅ Type safety throughout your application
-- ✅ Proper migration tracking
-- ✅ Rollback capabilities when needed
+Apply schema changes: `bun db:push`
 
 ### Step 5: Build Server Actions
 
@@ -719,15 +695,33 @@ Follow this secure pattern for ALL server actions:
 ```typescript
 'use server';
 import { auth } from '@/app/(auth)/auth';
+import { generateImageWithDALLE } from '@/lib/ai/image-generation';
 
-export async function createLead(input: LeadInput) {
+export async function generateImage(input: ImageGenerationInput) {
+const session = await auth()                                       ;
+if (!session?.user) throw new Error('Unauthorized');
+
+// Generate image using AI service
+const imageUrl = await generateImageWithDALLE(input.prompt, input.model) ;
+
+// Save to database
+const image = await db.insert(images).values({
+...input,
+imageUrl,
+userId: session.user.id // CRITICAL: Always scope to user
+}).returning()                                            ;
+
+return image[0] ;
+}
+
+export async function getUserImages() {
 const session = await auth()                         ;
 if (!session?.user) throw new Error('Unauthorized');
 
-return await db.insert(leads).values({
-...input,
-userId: session.user.id // CRITICAL: Always scope to user
-})                                                        ;
+return await db.query.images.findMany({
+where: eq(images.userId, session.user.id),
+orderBy: desc(images.createdAt)
+})                                         ;
 }
 ```
 
@@ -737,66 +731,87 @@ Build incrementally with proper patterns:
 
 ```typescript
 // Server Component (default) - page.tsx
-import { getLeads } from '@/actions/leads';
+import { getUserImages } from '@/actions/images';
 
-export default async function LeadsPage() {
-const leads = await getLeads()              ;
+export default async function GalleryPage() {
+const images = await getUserImages()          ;
 
 return (
 <div className="container mx-auto p-6">
-<h1 className="text-3xl font-bold mb-6">Leads</h1>
-<LeadsList leads={leads} />
+<h1 className="text-3xl font-bold mb-6">Your Gallery</h1>
+<ImageGallery images={images} />
 </div>
-)                                                  ;
+)                                                         ;
 }
 
-// Client Component (only for interactivity) - LeadsList.tsx
+// Client Component (only for interactivity) - ImageGallery.tsx
 'use client';
 import { useState } from 'react';
 
-export function LeadsList({ leads: initialLeads }) {
-const [leads, setLeads] = useState(initialLeads)     ;
-
+export function ImageGallery({ images: initialImages }) {
+const [images, setImages] = useState(initialImages)          ;
+const [selectedFilter, setSelectedFilter] = useState('all');
 // Interactive features here
-return <div>...</div>        ;
 }
 ```
 
-### Step 7: Test Everything
+### Step 7: AI Integration
+
+Integrate with AI services securely:
+
+```typescript
+// lib/ai/image-generation.ts
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+apiKey: process.env.OPENAI_API_KEY
+})                                 ;
+
+export async function generateImageWithDALLE(
+prompt: string,
+model: string = 'dall-e-3'
+) {
+try {
+const response = await openai.images.generate({
+model,
+prompt,
+n: 1,
+size: '1024x1024',
+quality: 'standard'
+})                                              ;
+
+return response.data[0].url                      ;
+} catch (error) {
+console.error('Image generation failed:', error) ;
+throw new Error('Failed to generate image');
+}
+}
+```
+
+### Step 8: Test Everything
 
 Create comprehensive tests:
 
 ```typescript
-// tests/features/leads/actions.test.ts
-describe('Lead Actions', () => {
-it('should enforce user isolation', async () => {
-const lead = await createLead({ name: 'Test Lead' }) ;
-expect(lead.userId).toBe(mockUser.id)                ;
+// tests/features/images/generation.test.ts
+describe('Image Generation', () => {
+it('should generate image for authenticated user', async () => {
+const result = await generateImage({
+prompt: 'A beautiful sunset',
+model: 'dall-e-3'
+})                                                               ;
+expect(result.imageUrl).toBeDefined()                            ;
+expect(result.userId).toBe(mockUser.id)                          ;
+})                                                               ;
+
+it('should reject unauthorized users', async () => {
+await expect(generateImage({ prompt: 'Test' }))
+.rejects.toThrow('Unauthorized');
 })                                                   ;
-
-it('should validate input', async () => {
-await expect(createLead({ name: '' })).rejects.toThrow() ;
-})                                                       ;
-})                                                       ;
+})                                                   ;
 ```
 
-Run tests continuously: `bun test tests/features/leads --watch`
-
-### Step 8: Update Project Progress
-
-After completing work, always update GoldenGoose:
-
-```
-<function_calls>
-<invoke name="mcp_goldengoose_update_task_progress">
-<parameter name="taskId">your_task_id</parameter>
-<parameter name="projectId">your_project_id</parameter>
-<parameter name="status">completed</parameter>
-<parameter name="notes">Implemented feature with proper authentication and tests</parameter>
-<parameter name="apiKey">gg_your_api_key</parameter>
-</invoke>
-</function_calls>
-```
+Run tests continuously: `bun test tests/features/images --watch`
 
 ## 💡 Critical Patterns You Must Follow
 
@@ -808,11 +823,11 @@ Every server action MUST authenticate:
 'use server';
 import { auth } from '@/app/(auth)/auth';
 
-export async function createLead(input: LeadInput) {
-const session = await auth()                         ;
+export async function generateImage(input: ImageInput) {
+const session = await auth()                             ;
 if (!session?.user) throw new Error('Unauthorized');
 
-return await db.insert(leads).values({
+return await generateImageWithAI({
 ...input,
 userId: session.user.id // CRITICAL: Always scope to user
 })                                                        ;
@@ -825,46 +840,63 @@ Always scope queries to the current user:
 
 ```typescript
 // ❌ NEVER do this
-const allLeads = await db.query.leads.findMany() ;
+const allImages = await db.query.images.findMany() ;
 
 // ✅ ALWAYS do this
-const userLeads = await db.query.leads.findMany({
-where: eq(leads.userId, user.id)
-})                                                ;
+const userImages = await db.query.images.findMany({
+where: eq(images.userId, user.id)
+})                                                  ;
 ```
 
-### Use Server Components by Default
+### Image Optimization
 
-Only use client components when you need:
+Always use Next.js Image component:
 
-- User input (forms, clicks)
-- Browser APIs
-- Real-time updates
-- Third-party client libraries
+```tsx
+// ✅ Optimized image loading
+<Image
+src={image.imageUrl}
+alt={image.prompt}
+width={512}
+height={512}
+className="rounded-2xl object-cover"
+placeholder="blur"
+blurDataURL="data:image/jpeg;base64,..."
+/>
+```
 
-### Handle Errors Gracefully
+### Handle Generation States
 
-Implement proper error boundaries:
+Implement proper loading and error states:
 
-```typescript
-// app/(pages)/leads/error.tsx
+```tsx
 'use client';
+import { useState } from 'react';
 
-export default function Error({
-error,
-reset,
-}: {
-error: Error & { digest?: string }                                        ;
-reset: () => void                                                         ;
-}) {
+export function ImageGenerator() {
+const [isGenerating, setIsGenerating] = useState(false) ;
+const [error, setError] = useState(null)                ;
+
+const handleGenerate = async (prompt: string) => {
+setIsGenerating(true)                              ;
+setError(null)                                     ;
+
+try {
+await generateImage({ prompt }) ;
+} catch (err) {
+setError(err.message)           ;
+} finally {
+setIsGenerating(false)          ;
+}
+}                               ;
+
 return (
-<div className="flex flex-col items-center justify-center min-h-[400px]">
-<h2 className="text-xl font-semibold mb-4">Something went wrong!</h2>
-<button onClick={reset} className="btn btn-outline">
-Try again
-</button>
+<div>
+{isGenerating && <GenerationProgress />}
+{error && <ErrorMessage error={error} />}
+<GenerationForm onSubmit={handleGenerate} disabled={isGenerating} />
 </div>
-)                                                                         ;
+)                                                                    ;
 }
 ```
 
@@ -878,9 +910,8 @@ Try again
 bun add -g vercel
 ```
 
-2. **Configure deployment** in `vercel.json` (optional)
-3. **Add scripts** to package.json
-4. **Deploy:**
+2. **Configure environment variables** in Vercel dashboard
+3. **Deploy:**
 
 ```bash
 vercel        # Deploy to preview
@@ -893,14 +924,17 @@ Before every deployment:
 
 - ✅ Tests pass: `bun test`
 - ✅ Types clean: `bun run check`
-- ✅ Environment variables set in Vercel dashboard
+- ✅ AI API keys configured
+- ✅ Image storage configured
+- ✅ Database migrations applied
 
 ### Monitor Success
 
 After deployment, monitor:
 
-- Build time < 5 minutes
-- Response time < 500ms
+- Image generation success rate > 95%
+- Average generation time < 60 seconds
+- Image loading time < 2 seconds
 - Error rate < 0.1%
 - Core Web Vitals scores
 
@@ -912,11 +946,11 @@ A feature is complete when:
 - ✅ TypeScript has no errors
 - ✅ User authentication verified
 - ✅ Data isolation implemented
+- ✅ Images load optimally
+- ✅ Generation works reliably
 - ✅ Mobile responsive
 - ✅ Error handling works
 - ✅ Loading states are smooth
-- ✅ Bundle size is optimized
-- ✅ Progress updated in GoldenGoose Cloud
 
 ## 🔧 Troubleshooting Guide
 
@@ -925,8 +959,9 @@ When things go wrong:
 1. **Check server logs**: `tail -n 200 logs/server.log`
 2. **Check browser console**: Use the MCP browser tools
 3. **Verify database state**: Use Neon MCP tools
-4. **Search for solutions**: Use web search for recent fixes
-5. **Check documentation**: Use Context7 for official guides
+4. **Test AI endpoints**: Check API status and quotas
+5. **Search for solutions**: Use web search for recent fixes
+6. **Check documentation**: Use Context7 for official guides
 
 ## 🎉 Quick Reference
 
@@ -950,7 +985,6 @@ bun test --watch
 
 # Type check, format, and lint
 bun run check
-
 ```
 
 ## Neon Database Configuration
@@ -967,7 +1001,7 @@ bun run check
 - Use proper foreign key relationships between tables
 - Include proper indexing on frequently queried columns
 - Add timestamps: `created_at`, `updated_at` on all tables
-- Use enum types for status fields where appropriate
+- Use enum types for image models and styles
 
 ## Auth.js Authentication
 
@@ -976,7 +1010,6 @@ bun run check
 - On the server side, use the `auth()` function from `@/app/(auth)/auth` to get the current session.
 - On the client side, use the `useSession` hook from `next-auth/react` to get the current user's session.
 - For pages that require authentication, use `auth()` to check the session and redirect if needed.
-- The auth configuration supports both regular users and guest users as defined in the auth files.
 
 ### Authentication Patterns
 
@@ -1018,59 +1051,28 @@ return <div>Hello {session.user.email}</div> ;
 3. **Build server actions** in `src/actions/(name).ts`
 4. **Define types** in `src/types.ts`
 
-**Why Drizzle First:**
-
-- ✅ Maintains migration history and rollback capabilities
-- ✅ Ensures type safety throughout your application
-- ✅ Keeps schema and code in perfect sync
-- ✅ Provides better developer experience with IntelliSense
-
-**Using MCP Tools (for testing/debugging only):**
-
-- **Always use the development branch ID `br-blue-frog-a6npin6j` for MCP Neon tools during development**
-- Use `mcp_run_sql_transaction` tool for testing queries or debugging existing data:
-
-```sql
-BEGIN TRANSACTION                                                    ;
-UPDATE feedback SET rating = rating + 1 WHERE rating < 5 RETURNING * ;
-ROLLBACK                                                             ;
-```
-
-**Key Point**: Only use MCP tools for read operations, data exploration, or testing queries. Always use Drizzle for schema changes and migrations.
-
-Note that in Next.js, we always prefer to use server actions instead of API routes, so that the code is simple to read and write.
-
-### 6️⃣ Quality Check
-
-Before marking complete:
-
-- ✅ All tests pass
-- ✅ TypeScript clean
-- ✅ User data isolated
-- ✅ Mobile responsive
-- ✅ Errors handled gracefully
-- ✅ Performance optimized
-
 ## Best Practices Checklist
 
 ### Before Starting Implementation
 
-- [ ] **User Flow Mapped**: Clear understanding of user journey
+- [ ] **User Flow Mapped**: Clear understanding of image generation workflow
 - [ ] **Database Schema Designed**: All tables and relationships planned
-- [ ] **API Endpoints Identified**: Know what server actions you need
+- [ ] **AI Integration Strategy**: Know which models and APIs you'll use
 - [ ] **Component Architecture**: Server vs Client components decided
 - [ ] **Authentication Strategy**: User permissions and data isolation planned
-- [ ] **Performance Considerations**: Caching, lazy loading, pagination
+- [ ] **Image Storage**: Plan for file uploads and CDN
+- [ ] **Performance Considerations**: Image optimization and loading
 - [ ] **Mobile Responsiveness**: Design works on all screen sizes
-- [ ] **Error Handling**: Plan for edge cases and failures
+- [ ] **Error Handling**: Plan for generation failures and edge cases
 
 ### During Implementation
 
 - [ ] **Test Incrementally**: Test each piece before moving to next
 - [ ] **Type Safety**: Use TypeScript throughout the stack
 - [ ] **Security First**: Always validate user permissions
-- [ ] **Performance Monitor**: Watch for N+1 queries and bundle size
-- [ ] **Accessibility**: Follow WCAG guidelines
+- [ ] **Image Optimization**: Use Next.js Image component
+- [ ] **Performance Monitor**: Watch for slow generation times
+- [ ] **Accessibility**: Follow WCAG guidelines for images
 - [ ] **Code Quality**: Follow project conventions and linting rules
 
 ## 🏆 Key Patterns for Success
@@ -1081,31 +1083,19 @@ Let the compiler optimize your code automatically:
 
 ```jsx
 // Just write clean code - no manual optimization needed
-function LeadsList({ leads, searchTerm }) {
-const filteredLeads = leads.filter(lead =>
-lead.name.toLowerCase().includes(searchTerm.toLowerCase())
-)                                                          ;
+function ImageGallery({ images, filters }) {
+const filteredImages = images.filter(image =>
+filters.style ? image.style === filters.style : true
+)                                                        ;
 
 return (
-<div>
-{filteredLeads.map(lead => (
-<LeadCard key={lead.id} lead={lead} />
+<div className="grid grid-cols-3 gap-4">
+{filteredImages.map(image => (
+<ImageCard key={image.id} image={image} />
 ))}
 </div>
-)                                      ;
+)                                          ;
 }
-```
-
-Only manually optimize expensive operations:
-
-```jsx
-// Keep useMemo for truly expensive calculations
-const processedAnalytics = useMemo(() => {
-return rawCallData
-.filter(call => call.duration > 30)
-.map(call => calculateSentimentScore(call.transcript))
-.sort((a, b) => b.score - a.score)                     ;
-}, [rawCallData])                                      ;
 ```
 
 ### Security Pattern (Non-Negotiable)
@@ -1114,56 +1104,63 @@ Every server action MUST authenticate:
 
 ```typescript
 'use server';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth } from '@/app/(auth)/auth';
 
-export async function createLead(input: LeadInput) {
-const user = await currentUser()                     ;
-if (!user) throw new Error('Unauthorized');
+export async function saveImageToCollection(imageId: number, collectionId: number) {
+const session = await auth()                                                         ;
+if (!session?.user) throw new Error('Unauthorized');
 
-return await db.insert(leads).values({
-...input,
-userId: user.id // CRITICAL: Always scope to user
+// Verify user owns both image and collection
+const image = await db.query.images.findFirst({
+where: and(eq(images.id, imageId), eq(images.userId, session.user.id))
+})                                                                     ;
+if (!image) throw new Error('Image not found');
+
+return await db.insert(imageCollections).values({
+imageId,
+collectionId,
 })                                                ;
 }
 ```
 
-### Smart Data Loading
+### Smart Image Loading
 
 Use server components for initial data:
 
 ```typescript
 // ✅ Server component loads data
-export default async function LeadsPage() {
-const leads = await getLeads()              ;
-return <LeadsClient initialLeads={leads} /> ;
+export default async function GalleryPage() {
+const images = await getUserImages()            ;
+return <GalleryClient initialImages={images} /> ;
 }
 
 // ✅ Client component handles interactions
 'use client';
-export function LeadsClient({ initialLeads }) {
-const [leads, setLeads] = useState(initialLeads) ;
+export function GalleryClient({ initialImages }) {
+const [images, setImages] = useState(initialImages)          ;
+const [selectedFilter, setSelectedFilter] = useState('all');
 // Interactive features here
 }
 ```
 
-### Background Tasks
+### Background Generation
 
 Use Next.js `after` for non-blocking operations:
 
 ```typescript
 import { unstable_after as after } from 'next/server';
 
-export async function processCall(callId: string) {
-const call = await updateCallStatus(callId, 'completed');
+export async function generateImage(prompt: string) {
+const image = await createImageGeneration(prompt)     ;
 
 // These run after response is sent
 after(async () => {
-await generateTranscript(callId)     ;
-await updateAnalytics(call.leadId)   ;
-await sendFollowupEmail(call.leadId) ;
-})                                   ;
+await saveToDatabase(image)         ;
+await processForSearch(image)       ;
+await notifyUser(image.userId)      ;
+})                                  ;
 
-return call ;
+return image ;
 }
 ```
 
@@ -1177,7 +1174,7 @@ return call ;
 - If the problem could be related to a server side function that in any way interacts with the database, please try to use the `mcp_run_sql` tool from neon to interact with the db directly to understand the problem. After applying your changes, run the tool again to confirm that your solution has indeed worked.
 - If I say "build error", you should run `bun run build` and fix any issues that you notice. Always run `bun run build` and confirm that the build was successful after your changes.
 - I will often give you screenshots when something goes wrong with the UI. Try to "see" the UI through the photo and try to fix the design by looking at other components that might be visible / used in the page render. You should search and read as many components / pages / files as you need to so you understand the full context of the React render.
-- If you can solve an issue using Next.js features vs using features of external packages, try using the Next.js solution because it is usually less error prone. This is not always the case as there might be popular javascript packages that solve issues in a simple way.
+- If you can solve an issue using Next.js features vs using features of external packages, try using the Next.js solution because it is usually less error prone.
 - Always run commands to figure out things - I will always give you permission to run almost any terminal command because I want you to read the output from the terminal directly. This results in a faster feedback loop. Feel free to add packages, remove files, or anything else through the terminal. I will give you permission.
 - If you think searching the web is a good idea to look for docs or any other up to date information, just do it.
 
@@ -1198,14 +1195,14 @@ return call ;
 
 ## 🎯 Final Reminders
 
-1. **User First**: Every feature should solve a real development workflow problem
+1. **User First**: Every feature should enhance the image generation experience
 2. **Security Always**: Never skip authentication or data isolation
-3. **Performance Matters**: Keep it fast for optimal developer experience
+3. **Performance Matters**: Keep image loading and generation fast
 4. **Test Everything**: Confidence comes from comprehensive testing
-5. **Document Progress**: Update GoldenGoose Cloud with your progress using MCP tools
+5. **Mobile First**: Design for mobile, enhance for desktop
 
-## 🚀 You're Building the Future of Software Development
+## 🚀 You're Building the Future of AI Image Generation
 
-GoldenGoose will help thousands of developers and AI coding agents stay in sync with project progress and systematically manage implementation plans. Every line of code you write brings us closer to that goal.
+ImageZue will help thousands of creators and artists generate stunning AI artwork with ease. Every line of code you write brings us closer to that goal.
 
-Happy coding! 🚀
+Happy coding! 🎨✨

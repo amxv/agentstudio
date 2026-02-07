@@ -28,7 +28,14 @@ import { useSidebar } from "./ui/sidebar"
 import { VersionFooter } from "./version-footer"
 import type { VisibilityType } from "./visibility-selector"
 
-export const artifactDefinitions = [textArtifact, imageArtifact, sheetArtifact]
+import { slidesArtifact } from "@/artifacts/slides/client"
+
+export const artifactDefinitions = [
+	textArtifact,
+	imageArtifact,
+	sheetArtifact,
+	slidesArtifact
+]
 export type ArtifactKind = (typeof artifactDefinitions)[number]["kind"]
 
 export interface UIArtifact {

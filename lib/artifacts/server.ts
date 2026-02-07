@@ -1,5 +1,6 @@
 import { imageDocumentHandler } from "@/artifacts/image/server"
 import { sheetDocumentHandler } from "@/artifacts/sheet/server"
+import { slidesDocumentHandler } from "@/artifacts/slides/server"
 import { textDocumentHandler } from "@/artifacts/text/server"
 import type { ArtifactKind } from "@/components/artifact"
 import type { DataStreamWriter, UIMessage } from "ai"
@@ -106,6 +107,16 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
  */
 export const documentHandlersByArtifactKind: Array<
 	DocumentHandler<ArtifactKind>
-> = [textDocumentHandler, imageDocumentHandler, sheetDocumentHandler]
+> = [
+	textDocumentHandler,
+	imageDocumentHandler,
+	sheetDocumentHandler,
+	slidesDocumentHandler
+]
 
-export const artifactKinds: Array<ArtifactKind> = ["text", "image", "sheet"]
+export const artifactKinds: Array<ArtifactKind> = [
+	"text",
+	"image",
+	"sheet",
+	"slides"
+]
