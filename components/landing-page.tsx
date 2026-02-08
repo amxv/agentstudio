@@ -475,42 +475,43 @@ function AIImageModelsSection() {
 function ChatAIModelsSection() {
 	const chatModels = [
 		{
-			name: "Claude Sonnet 4",
+			name: "Cloud Opus 4.6",
 			provider: "Anthropic",
-			description: "Balanced reasoning and creative direction."
+			description: "High-capability reasoning and creative direction."
 		},
 		{
-			name: "Claude Sonnet 4 (Reasoning)",
-			provider: "Anthropic",
-			description: "Enhanced step-by-step reasoning for complex creative briefs."
-		},
-		{
-			name: "GPT-4.1",
+			name: "GPT 5.2",
 			provider: "OpenAI",
-			description: "OpenAI's flagship model. The platform default for chat."
+			description: "OpenAI's latest flagship model for broad, reliable performance."
 		},
 		{
-			name: "o4-mini",
-			provider: "OpenAI",
-			description: "Fast and efficient for quick interactions and everyday tasks."
-		},
-		{
-			name: "Gemini 2.5 Pro",
+			name: "Gemini 3 Pro",
 			provider: "Google",
-			description:
-				"Advanced multimodal model with deep context understanding."
+			description: "Advanced multimodal model with deep context understanding."
 		},
 		{
-			name: "Gemini 2.5 Flash",
+			name: "Gemini 3 Flash",
 			provider: "Google",
-			description: "Fast and responsive for quick creative exchanges."
+			description: "Fast and responsive model for quick creative exchanges."
+		},
+		{
+			name: "Deep Seek 3.2",
+			provider: "DeepSeek",
+			description: "Strong reasoning model tuned for efficient problem solving."
+		},
+		{
+			name: "Kimi K2.5",
+			provider: "Kimi",
+			description: "Conversational model designed for fast, context-aware responses."
 		}
 	]
 
 	const chatProviderColors: Record<string, string> = {
 		Anthropic: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
 		OpenAI: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-		Google: "bg-blue-500/10 text-blue-700 dark:text-blue-400"
+		Google: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+		DeepSeek: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
+		Kimi: "bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-400"
 	}
 
 	return (
