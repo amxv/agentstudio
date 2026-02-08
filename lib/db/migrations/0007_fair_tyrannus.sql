@@ -1,4 +1,4 @@
-CREATE TABLE "Collection" (
+CREATE TABLE IF NOT EXISTS "Collection" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"title" text NOT NULL,
@@ -7,14 +7,14 @@ CREATE TABLE "Collection" (
 	"visibility" varchar DEFAULT 'private' NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "CollectionImage" (
+CREATE TABLE IF NOT EXISTS "CollectionImage" (
 	"collectionId" uuid NOT NULL,
 	"imageId" uuid NOT NULL,
 	"addedAt" timestamp NOT NULL,
 	CONSTRAINT "CollectionImage_collectionId_imageId_pk" PRIMARY KEY("collectionId","imageId")
 );
 --> statement-breakpoint
-CREATE TABLE "Image" (
+CREATE TABLE IF NOT EXISTS "Image" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"projectId" uuid NOT NULL,
 	"prompt" text NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE "Image" (
 	"completedAt" timestamp
 );
 --> statement-breakpoint
-CREATE TABLE "Project" (
+CREATE TABLE IF NOT EXISTS "Project" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"createdAt" timestamp NOT NULL,
 	"title" text NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE "Project" (
 	"visibility" varchar DEFAULT 'private' NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "Prompt" (
+CREATE TABLE IF NOT EXISTS "Prompt" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"content" text NOT NULL,
@@ -55,29 +55,29 @@ CREATE TABLE "Prompt" (
 	"usageCount" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "Chat" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Document" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Message_v2" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Message" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Stream" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Suggestion" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "Vote_v2" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-DROP TABLE "Chat" CASCADE;--> statement-breakpoint
-DROP TABLE "Document" CASCADE;--> statement-breakpoint
-DROP TABLE "Message_v2" CASCADE;--> statement-breakpoint
-DROP TABLE "Message" CASCADE;--> statement-breakpoint
-DROP TABLE "Stream" CASCADE;--> statement-breakpoint
-DROP TABLE "Suggestion" CASCADE;--> statement-breakpoint
-DROP TABLE "Vote_v2" CASCADE;--> statement-breakpoint
-ALTER TABLE "Vote" DROP CONSTRAINT "Vote_chatId_Chat_id_fk";
+ALTER TABLE IF EXISTS "Chat" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Document" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Message_v2" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Message" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Stream" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Suggestion" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+ALTER TABLE IF EXISTS "Vote_v2" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
+DROP TABLE IF EXISTS "Chat" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Document" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Message_v2" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Message" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Stream" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Suggestion" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Vote_v2" CASCADE;--> statement-breakpoint
+DROP TABLE IF EXISTS "Vote" CASCADE;--> statement-breakpoint
+CREATE TABLE "Vote" (
+	"imageId" uuid NOT NULL,
+	"userId" uuid NOT NULL,
+	"isUpvoted" boolean NOT NULL,
+	CONSTRAINT "Vote_imageId_userId_pk" PRIMARY KEY("imageId","userId")
+);
 --> statement-breakpoint
-ALTER TABLE "Vote" DROP CONSTRAINT "Vote_messageId_Message_id_fk";
---> statement-breakpoint
-ALTER TABLE "Vote" DROP CONSTRAINT "Vote_chatId_messageId_pk";--> statement-breakpoint
-ALTER TABLE "Vote" ADD CONSTRAINT "Vote_imageId_userId_pk" PRIMARY KEY("imageId","userId");--> statement-breakpoint
-ALTER TABLE "User" ADD COLUMN "name" varchar(100);--> statement-breakpoint
-ALTER TABLE "Vote" ADD COLUMN "imageId" uuid NOT NULL;--> statement-breakpoint
-ALTER TABLE "Vote" ADD COLUMN "userId" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "name" varchar(100);--> statement-breakpoint
 ALTER TABLE "Collection" ADD CONSTRAINT "Collection_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CollectionImage" ADD CONSTRAINT "CollectionImage_collectionId_Collection_id_fk" FOREIGN KEY ("collectionId") REFERENCES "public"."Collection"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CollectionImage" ADD CONSTRAINT "CollectionImage_imageId_Image_id_fk" FOREIGN KEY ("imageId") REFERENCES "public"."Image"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -86,6 +86,4 @@ ALTER TABLE "Image" ADD CONSTRAINT "Image_userId_User_id_fk" FOREIGN KEY ("userI
 ALTER TABLE "Project" ADD CONSTRAINT "Project_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Prompt" ADD CONSTRAINT "Prompt_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Vote" ADD CONSTRAINT "Vote_imageId_Image_id_fk" FOREIGN KEY ("imageId") REFERENCES "public"."Image"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Vote" ADD CONSTRAINT "Vote_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Vote" DROP COLUMN "chatId";--> statement-breakpoint
-ALTER TABLE "Vote" DROP COLUMN "messageId";
+ALTER TABLE "Vote" ADD CONSTRAINT "Vote_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;
