@@ -5,7 +5,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "~/logdev next dev --turbo",
-		"build": "tsx lib/db/migrate && next build",
+		"build": "next build",
+		"build:with-migrations": "tsx lib/db/migrate && next build",
 		"start": "next start",
 		"lint": "eslint --config eslint.config.mjs app components lib hooks --fix && biome lint --write --unsafe",
 		"lint:fix": "eslint --config eslint.config.mjs app components lib hooks --fix && biome lint --write --unsafe",

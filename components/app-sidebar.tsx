@@ -20,7 +20,7 @@ import { motion } from "framer-motion"
 
 import { ZueLogo } from "@/components/zue-logo"
 import { getUserImages } from "@/lib/actions/generate"
-import type { DBImage } from "@/lib/db/schema"
+import type { Chat, DBImage } from "@/lib/db/schema"
 import { fetcher } from "@/lib/utils"
 
 import {
@@ -55,6 +55,30 @@ import {
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+
+export interface ChatHistory {
+	chats: Array<Chat>
+	hasMore: boolean
+}
+
+const PAGE_SIZE = 20
+
+export function getChatHistoryPaginationKey(
+	pageIndex: number,
+	previousPageData: ChatHistory
+) {
+	if (previousPageData && previousPageData.hasMore === false) {
+		return null
+	}
+
+	if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`
+
+	const firstChatFromPage = previousPageData.chats.at(-1)
+
+	if (!firstChatFromPage) return null
+
+	return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`
+}
 
 export function AppSidebar({
 	user,

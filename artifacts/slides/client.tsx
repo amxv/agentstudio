@@ -460,18 +460,11 @@ export const slidesArtifact = new Artifact<"slides", SlidesArtifactMetadata>({
 		{
 			icon: <FileText />,
 			description: "View markdown",
-			onClick: ({ appendMessage, content }) => {
-				let slidesData: SlidesContent
-				try {
-					slidesData = JSON.parse(content)
-				} catch {
-					toast.error("Invalid slide data")
-					return
-				}
-
+			onClick: ({ appendMessage }) => {
 				appendMessage({
 					role: "user",
-					content: `Here's the original markdown for this slide deck:\n\n\`\`\`markdown\n${slidesData.originalMarkdown}\n\`\`\``
+					content:
+						"Please show me the markdown source for this slide deck."
 				})
 			}
 		}

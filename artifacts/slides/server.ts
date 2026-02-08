@@ -111,18 +111,21 @@ export const slidesDocumentHandler = createDocumentHandler({
 			let markdownContent = ""
 
 			// Try to extract markdown from the message content
-			if (latestUserMessage?.content) {
-				if (typeof latestUserMessage.content === "string") {
-					markdownContent = latestUserMessage.content
-				} else if (Array.isArray(latestUserMessage.content)) {
-					// Handle multipart content
-					const textParts = latestUserMessage.content.filter(
-						(part: any) => part.type === "text"
-					)
-					markdownContent = textParts
-						.map((part: any) => part.text)
-						.join("\n")
-				}
+			const messageContent = latestUserMessage?.content as unknown
+			if (typeof messageContent === "string") {
+				markdownContent = messageContent
+			} else if (Array.isArray(messageContent)) {
+				// Handle multipart content from SDK variants
+				const textParts = messageContent.filter(
+					(part): part is { type: string; text?: unknown } =>
+						typeof part === "object" &&
+						part !== null &&
+						"type" in part &&
+						(part as { type: string }).type === "text"
+				)
+				markdownContent = textParts
+					.map((part) => String(part.text ?? ""))
+					.join("\n")
 			}
 
 			// If no markdown found in messages, use a default template
