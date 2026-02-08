@@ -475,7 +475,7 @@ function AIImageModelsSection() {
 function ChatAIModelsSection() {
 	const chatModels = [
 		{
-			name: "Cloud Opus 4.6",
+			name: "Claude Opus 4.6",
 			provider: "Anthropic",
 			description: "High-capability reasoning and creative direction."
 		},
@@ -495,7 +495,7 @@ function ChatAIModelsSection() {
 			description: "Fast and responsive model for quick creative exchanges."
 		},
 		{
-			name: "Deep Seek 3.2",
+			name: "DeepSeek 3.2",
 			provider: "DeepSeek",
 			description: "Strong reasoning model tuned for efficient problem solving."
 		},
