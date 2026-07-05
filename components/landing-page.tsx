@@ -83,98 +83,98 @@ const imageModels: ModelCard[] = [
 		name: "GPT Image 2",
 		provider: "OpenAI",
 		description:
-			"Default generator for prompt adherence, typography, product detail, and polished commercial output.",
+			"Polished commercial images, product detail, readable type, and strong prompt following.",
 		tone: "bg-[#b8ff4d]"
 	},
 	{
 		name: "GPT Image 2 Edit",
 		provider: "OpenAI",
 		description:
-			"Preserve, transform, and refine uploaded references or previous generations with a dedicated edit route.",
+			"Refine uploaded references, preserve key details, and turn rough directions into clean edits.",
 		tone: "bg-[#69e7ff]"
 	},
 	{
 		name: "GPT Image 1.5",
 		provider: "OpenAI",
 		description:
-			"Premium OpenAI alternative for high-quality generation with a different visual character.",
+			"A premium OpenAI option when you want another high-quality visual direction.",
 		tone: "bg-[#ffd447]"
 	},
 	{
 		name: "Nano Banana Pro",
 		provider: "Google",
 		description:
-			"Gemini 3 Pro image model for high-resolution creative generation and complex visual instructions.",
+			"Gemini 3 Pro image generation for high-resolution concepts and layered creative briefs.",
 		tone: "bg-[#ff6bcb]"
 	},
 	{
 		name: "Nano Banana Pro Edit",
 		provider: "Google",
 		description:
-			"Multi-reference editor for combining, preserving, and modifying several images with subject consistency.",
+			"Multi-reference editing for combining images while keeping subjects and styles consistent.",
 		tone: "bg-[#b8ff4d]"
 	},
 	{
 		name: "Seedream 4.5",
 		provider: "ByteDance",
 		description:
-			"Modern generator with strong material rendering, layout quality, and visual consistency.",
+			"Sharp visual exploration with strong materials, layouts, and overall consistency.",
 		tone: "bg-[#ff8a4c]"
 	},
 	{
 		name: "Seedream 5 Lite",
 		provider: "ByteDance",
 		description:
-			"Fast, cost-efficient model for high-volume drafts and high-resolution general generation.",
+			"Fast drafts and high-volume exploration when you want many directions quickly.",
 		tone: "bg-[#69e7ff]"
 	},
 	{
 		name: "Seedream 5 Lite Edit",
 		provider: "ByteDance",
 		description:
-			"Cost-efficient multi-reference editor for quick visual iteration and reference-based changes.",
+			"Quick reference-based edits for testing variations without slowing the creative loop.",
 		tone: "bg-[#ffd447]"
 	},
 	{
 		name: "FLUX.2 Pro",
 		provider: "Black Forest Labs",
 		description:
-			"Production-grade endpoint for professional text-to-image work through the FAL catalog.",
+			"Professional text-to-image generation for refined concepts and production-style drafts.",
 		tone: "bg-[#ff6bcb]"
 	},
 	{
 		name: "FLUX.2 Pro Edit",
 		provider: "Black Forest Labs",
 		description:
-			"Production multi-reference editor for reliable transformation and composition workflows.",
+			"Reliable multi-reference edits for transformations, composites, and visual remixes.",
 		tone: "bg-[#b8ff4d]"
 	},
 	{
 		name: "Ideogram v4",
 		provider: "Ideogram",
 		description:
-			"Specialist model for posters, logos, signage, social graphics, and readable text in images.",
+			"Posters, logos, signage, social graphics, and images where text needs to hold up.",
 		tone: "bg-[#69e7ff]"
 	},
 	{
 		name: "Krea 2 Large",
 		provider: "Krea",
 		description:
-			"High-fidelity creative model for polished visual exploration and style-driven generation.",
+			"High-fidelity style exploration for polished campaign, moodboard, and concept work.",
 		tone: "bg-[#ff8a4c]"
 	},
 	{
 		name: "Nano Banana Lite",
 		provider: "Google",
 		description:
-			"Fast Gemini image model for responsive drafts and lightweight iteration.",
+			"Responsive Gemini drafts for lightweight iteration and quick creative checks.",
 		tone: "bg-[#ffd447]"
 	},
 	{
 		name: "FLUX.2 Klein 9B",
 		provider: "Black Forest Labs",
 		description:
-			"Lightweight FLUX.2 model for lower-cost experimentation and fast generation.",
+			"Lower-cost FLUX.2 experimentation for early ideas and fast visual sampling.",
 		tone: "bg-[#ff6bcb]"
 	}
 ]
@@ -183,49 +183,57 @@ const chatModels: ModelCard[] = [
 	{
 		name: "Claude Fable 5",
 		provider: "Anthropic",
-		description: "Long-running agentic and creative work.",
+		description:
+			"Long creative sessions, campaign thinking, and multi-step image plans.",
 		tone: "bg-[#ffd447]"
 	},
 	{
 		name: "Claude Opus 4.8",
 		provider: "Anthropic",
-		description: "Premium deep reasoning for complex workflows.",
+		description:
+			"Deep planning for complex briefs, brand systems, and tricky revisions.",
 		tone: "bg-[#ff8a4c]"
 	},
 	{
 		name: "Claude Sonnet 5",
 		provider: "Anthropic",
-		description: "Default balanced model for high-quality direction.",
+		description:
+			"Balanced creative direction, prompt writing, and everyday agent work.",
 		tone: "bg-[#b8ff4d]"
 	},
 	{
 		name: "Claude Haiku 4.5",
 		provider: "Anthropic",
-		description: "Fast current Claude model for responsive interactions.",
+		description:
+			"Fast creative feedback when you want quick turns and light planning.",
 		tone: "bg-[#69e7ff]"
 	},
 	{
 		name: "GPT-5.5",
 		provider: "OpenAI",
-		description: "OpenAI's current model for tool-heavy work.",
+		description:
+			"OpenAI planning for tool use, structured prompts, and complex tasks.",
 		tone: "bg-[#ff6bcb]"
 	},
 	{
 		name: "Gemini 3.5 Flash",
 		provider: "Google",
-		description: "Stable frontier Gemini model for capable responses.",
+		description:
+			"Capable Gemini responses for fast ideation and production support.",
 		tone: "bg-[#b8ff4d]"
 	},
 	{
 		name: "Gemini 3.1 Pro Preview",
 		provider: "Google",
-		description: "Preview model for multimodal and reasoning-heavy work.",
+		description:
+			"Advanced Gemini preview for multimodal briefs and reasoning-heavy asks.",
 		tone: "bg-[#ffd447]"
 	},
 	{
 		name: "Gemini 3.1 Flash-Lite",
 		provider: "Google",
-		description: "Cost-efficient Gemini for high-volume interactions.",
+		description:
+			"Cost-efficient Gemini for high-volume chats and quick prompt passes.",
 		tone: "bg-[#69e7ff]"
 	}
 ]
@@ -233,75 +241,75 @@ const chatModels: ModelCard[] = [
 const features = [
 	{
 		icon: Brain,
-		title: "Strict model routing",
+		title: "Agentic brief handling",
 		description:
-			"Text requests and edit requests move through explicit catalog routes. No hidden swaps to retired models."
+			"Describe the outcome you want; the assistant decides whether to generate, edit, or create a supporting artifact."
 	},
 	{
 		icon: Wand2,
-		title: "Prompt enhancement",
+		title: "Prompt refinement",
 		description:
-			"Short prompts get richer visual detail; detailed prompts stay intact so your intent is preserved."
+			"Start loose or specific. Short notes become richer image prompts while detailed art direction stays intact."
 	},
 	{
 		icon: FileImage,
-		title: "Generation inspector",
+		title: "Model transparency",
 		description:
-			"See the original prompt, enhanced prompt, selected model, endpoint, parameters, and timestamp."
+			"Each result records the prompt, model, settings, and time so you can understand what worked."
 	},
 	{
 		icon: History,
-		title: "Version history",
+		title: "Revision history",
 		description:
-			"Every edit becomes a new version. Step through iterations and download the one that landed."
+			"Every edit becomes a new version. Compare directions and return to the strongest one."
 	},
 	{
 		icon: Upload,
-		title: "Image inputs",
+		title: "Reference-aware editing",
 		description:
-			"Upload, drag, paste, or link images for edits and multi-reference workflows."
+			"Upload, drag, paste, or link images for edits, style references, and multi-image compositions."
 	},
 	{
 		icon: RatioIcon,
-		title: "Aspect ratios",
+		title: "Aspect ratio control",
 		description:
-			"Square, widescreen, portrait, classic landscape, and classic portrait are mapped per model."
+			"Move between square, widescreen, portrait, landscape, and presentation-friendly formats."
 	},
 	{
 		icon: Images,
 		title: "Gallery",
 		description:
-			"Browse generated images with thumbnails, metadata, download controls, and prompt copy."
+			"Review finished images, copy prompts, download assets, and reuse past directions."
 	},
 	{
 		icon: FolderOpen,
 		title: "Collections",
 		description:
-			"Organize output by campaign, client, project, moodboard, or internal review."
+			"Organize output by campaign, client, product line, moodboard, or internal review."
 	},
 	{
 		icon: Bookmark,
 		title: "Prompt library",
 		description:
-			"Save reusable prompts, categorize them, tag them, and track what works."
+			"Save prompts that reliably produce useful looks, then reuse them when the style fits."
 	},
 	{
 		icon: Presentation,
-		title: "Slides",
+		title: "Slide visuals",
 		description:
-			"Turn markdown into presentation slide images with the same image catalog."
+			"Turn outlines or markdown into presentation-ready slide images."
 	},
 	{
 		icon: FileText,
-		title: "Text artifacts",
+		title: "Written artifacts",
 		description:
-			"Draft written content with streaming display and editable artifact panels."
+			"Draft campaign copy, notes, or supporting text alongside the visual direction."
 	},
 	{
 		icon: Table2,
 		title: "Sheets",
 		description:
-			"Create structured CSV-style tables and spreadsheet content from natural language."
+			"Create simple structured tables for image plans, variants, content lists, and reviews."
 	}
 ]
 
@@ -365,10 +373,10 @@ function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 					className={`hidden items-center gap-2 text-xs font-bold uppercase text-black md:flex ${monoFont.className}`}
 				>
 					<span className="border-2 border-black bg-white px-3 py-1">
-						AI SDK 7
+						14 image models
 					</span>
 					<span className="border-2 border-black bg-[#69e7ff] px-3 py-1">
-						FAL Catalog
+						Reference edits
 					</span>
 				</div>
 				<Button
@@ -402,13 +410,13 @@ function HeroMockup() {
 						<span
 							className={`text-xs font-black uppercase text-black ${monoFont.className}`}
 						>
-							creative console
+							creative brief
 						</span>
 					</div>
 					<span
 						className={`border-2 border-black bg-white px-2 py-1 text-[10px] font-bold uppercase text-black ${monoFont.className}`}
 					>
-						live catalog
+						model picker
 					</span>
 				</div>
 				<div className="grid gap-4 md:grid-cols-[1fr_1.1fr]">
@@ -468,7 +476,7 @@ function HeroMockup() {
 										format: PNG
 									</span>
 									<span className="bg-[#b8ff4d] p-1">
-										route: text
+										mode: generate
 									</span>
 								</div>
 							</div>
@@ -493,20 +501,21 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 					<div
 						className={`mb-6 inline-flex rotate-[-2deg] border-4 border-black bg-[#69e7ff] px-4 py-2 text-xs font-black uppercase text-black shadow-[5px_5px_0_#000] ${monoFont.className}`}
 					>
-						AI image studio with a new model brain
+						Agentic image generation and editing
 					</div>
 					<h1
 						className={`max-w-5xl text-5xl leading-[0.88] tracking-[-0.04em] text-black sm:text-7xl lg:text-8xl ${displayFont.className}`}
 					>
-						MAKE THE IMAGE. BREAK THE TEMPLATE.
+						BRIEF IT. EDIT IT. SHIP THE IMAGE.
 					</h1>
 					<p
 						className={`mt-8 max-w-2xl border-l-4 border-black pl-5 text-lg font-semibold leading-relaxed text-black md:text-xl ${monoFont.className}`}
 					>
-						AgentStudio turns plain-language requests into
-						production visuals, edits, slide images, text artifacts,
-						and structured sheets. The assistant plans the work; the
-						catalog picks the exact current model route.
+						AgentStudio is a conversational workspace for exploring
+						image models, building visual directions, editing with
+						references, and keeping every strong variation
+						organized. Give it the brief; the agent plans the next
+						creative move.
 					</p>
 					<div className="mt-9 flex flex-col gap-4 sm:flex-row">
 						<BrutalButton
@@ -519,14 +528,14 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 							href={isAuthenticated ? "/chat" : "/login"}
 							variant="secondary"
 						>
-							Chat Workflow
+							Try Agent Chat
 						</BrutalButton>
 					</div>
 					<div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
 						{[
-							["14", "FAL image models"],
-							["8", "chat models"],
-							["0", "hidden fallbacks"]
+							["14", "image models"],
+							["8", "planning models"],
+							["∞", "reference edits"]
 						].map(([value, label]) => (
 							<div
 								key={label}
@@ -561,13 +570,14 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 
 function FeatureMarquee() {
 	const chips = [
+		"Brief",
 		"Generate",
-		"Edit",
-		"Inspect",
+		"Reference edit",
 		"Version",
 		"Upload",
 		"Paste",
 		"Link",
+		"Compare models",
 		"Slide decks",
 		"Sheets",
 		"Prompt library"
@@ -643,23 +653,23 @@ function WorkflowSection() {
 	const steps = [
 		{
 			icon: PenLine,
-			title: "Say what you want",
-			body: "Ask for a launch poster, logo exploration, product scene, edit, slide deck, article, or sheet."
+			title: "Brief the agent",
+			body: "Describe the campaign, product shot, logo exploration, poster, style, or edit you want to test."
 		},
 		{
 			icon: Brain,
-			title: "Assistant plans",
-			body: "The chat model turns your request into a grounded prompt and chooses the right artifact action."
+			title: "It plans the shot",
+			body: "The assistant turns messy creative direction into a clear prompt, edit plan, or artifact request."
 		},
 		{
 			icon: Braces,
-			title: "Catalog routes",
-			body: "Text and edit requests use explicit model pairs from the current FAL catalog."
+			title: "Use the right model",
+			body: "GPT Image, Nano Banana, Seedream, FLUX, Ideogram, and Krea are available for different visual jobs."
 		},
 		{
 			icon: Download,
-			title: "Export the winner",
-			body: "Inspect details, browse versions, copy, download, and organize everything in the gallery."
+			title: "Keep the winners",
+			body: "Compare versions, download final assets, copy useful prompts, and organize the work in the gallery."
 		}
 	]
 
@@ -668,8 +678,8 @@ function WorkflowSection() {
 			<div className="mx-auto max-w-7xl px-4 md:px-8">
 				<SectionHeader
 					kicker="How it works"
-					title="A chat that drives a production machine."
-					description="The interface stays conversational while the backend stays strict: current models, explicit routes, and visible generation details."
+					title="From rough brief to usable visual direction."
+					description="Use it like a creative operator: add references, ask for changes, compare models, save the best versions, and keep moving."
 					color="bg-[#ffd447]"
 				/>
 				<motion.div
@@ -718,9 +728,9 @@ function ImageModelsSection() {
 		<section className="border-b-4 border-black bg-[#fff7d6] py-20 md:py-28">
 			<div className="mx-auto max-w-7xl px-4 md:px-8">
 				<SectionHeader
-					kicker="Image catalog"
-					title="14 current FAL image routes. No old model ghosts."
-					description="OpenAI, Google, ByteDance, Black Forest Labs, Ideogram, and Krea are exposed through the shipped catalog. Text and edit variants are explicit."
+					kicker="Image models"
+					title="Explore generation and editing models from one workspace."
+					description="Use OpenAI, Google, ByteDance, Black Forest Labs, Ideogram, and Krea models for polished generations, fast drafts, typography-heavy graphics, and reference-based edits."
 					color="bg-[#ff6bcb]"
 				/>
 				<motion.div
@@ -766,9 +776,9 @@ function ChatModelsSection() {
 		<section className="border-b-4 border-black bg-[#ff6bcb] py-20 md:py-28">
 			<div className="mx-auto max-w-7xl px-4 md:px-8">
 				<SectionHeader
-					kicker="LLM layer"
-					title="8 current chat models guide the creative workflow."
-					description="Claude Fable, Opus, Sonnet, Haiku, GPT-5.5, and Gemini 3 variants handle creative direction, prompt planning, tool calls, and artifact work."
+					kicker="Agent models"
+					title="Bring a serious planning model into the creative loop."
+					description="Claude, GPT-5.5, and Gemini models help turn rough asks into clear prompts, edit plans, model choices, and supporting artifacts."
 					color="bg-[#b8ff4d]"
 				/>
 				<motion.div
@@ -812,9 +822,9 @@ function FeatureGridSection() {
 		<section className="border-b-4 border-black bg-[#b8ff4d] py-20 md:py-28">
 			<div className="mx-auto max-w-7xl px-4 md:px-8">
 				<SectionHeader
-					kicker="Feature stack"
-					title="All the useful stuff, not just a prompt box."
-					description="AgentStudio is a full workspace: image generation, edits, uploads, details, artifacts, organization, and export tools."
+					kicker="Workspace"
+					title="Built for exploration, not one-off generations."
+					description="Evaluate directions, keep references attached, preserve prompt history, compare revisions, and turn promising ideas into assets."
 					color="bg-[#69e7ff]"
 				/>
 				<motion.div
@@ -861,10 +871,13 @@ function FeatureGridSection() {
 
 function InputAndArtifactsSection() {
 	const artifacts = [
-		["Images", "Generate, edit, version, inspect, and download visuals."],
-		["Slides", "Turn markdown into presentation slide images."],
-		["Text", "Draft written artifacts with streaming and editing."],
-		["Sheets", "Create structured tabular data from language."]
+		["Images", "Generate, edit, compare, version, and download visuals."],
+		[
+			"Slides",
+			"Turn outlines or markdown into visual presentation slides."
+		],
+		["Text", "Draft campaign copy and notes beside the image work."],
+		["Sheets", "Create structured plans, variants, and content lists."]
 	]
 
 	return (
@@ -880,7 +893,7 @@ function InputAndArtifactsSection() {
 					<h2
 						className={`text-4xl leading-none md:text-5xl ${displayFont.className}`}
 					>
-						Bring images in however you work.
+						Give it references, not just prompts.
 					</h2>
 					<div className="mt-8 grid gap-4 sm:grid-cols-2">
 						{inputMethods.map((method) => (
@@ -913,7 +926,7 @@ function InputAndArtifactsSection() {
 					<h2
 						className={`text-4xl leading-none md:text-5xl ${displayFont.className}`}
 					>
-						More than single images.
+						Use one workspace for the whole creative pass.
 					</h2>
 					<div className="mt-8 space-y-4">
 						{artifacts.map(([name, description]) => (
@@ -947,15 +960,15 @@ function ControlRoomSection() {
 	const controls = [
 		{
 			icon: ShieldCheck,
-			label: "Stale cookies normalize to current defaults"
+			label: "See which model made each result"
 		},
-		{ icon: Eye, label: "Generation details expose model and endpoint" },
-		{ icon: Search, label: "Gallery keeps output discoverable" },
-		{ icon: Palette, label: "Model-specific options are allowlisted" },
-		{ icon: Clock, label: "Every version stays browsable" },
-		{ icon: Moon, label: "Dark and light modes are supported" },
-		{ icon: Smartphone, label: "Responsive controls work on mobile" },
-		{ icon: Zap, label: "Fast draft and premium routes coexist" }
+		{ icon: Eye, label: "Compare versions before committing" },
+		{ icon: Search, label: "Keep strong outputs discoverable" },
+		{ icon: Palette, label: "Reuse prompts that produce the right look" },
+		{ icon: Clock, label: "Return to every previous revision" },
+		{ icon: Moon, label: "Work in dark or light mode" },
+		{ icon: Smartphone, label: "Create from desktop or mobile" },
+		{ icon: Zap, label: "Use fast drafts or premium models" }
 	]
 
 	return (
@@ -963,9 +976,9 @@ function ControlRoomSection() {
 			<div className="mx-auto max-w-7xl px-4 md:px-8">
 				<div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
 					<SectionHeader
-						kicker="Control room"
-						title="Transparent when it matters. Loud when it should be."
-						description="The page is bold; the runtime is disciplined. Users get a creative interface while the server keeps model behavior explicit."
+						kicker="Why it matters"
+						title="A better way to test agentic image tools."
+						description="Most tools split chat, model playgrounds, editing apps, and asset libraries. AgentStudio keeps the agent, models, references, versions, and artifacts in one creative loop."
 						color="bg-[#ff8a4c]"
 					/>
 					<motion.div
@@ -1010,14 +1023,14 @@ function FinalCTASection({ isAuthenticated }: { isAuthenticated: boolean }) {
 				<h2
 					className={`mx-auto max-w-4xl text-5xl leading-[0.9] tracking-[-0.04em] text-black md:text-7xl ${displayFont.className}`}
 				>
-					Tell it what to make. Let the catalog do the routing.
+					Start with a brief. Leave with directions you can compare.
 				</h2>
 				<p
 					className={`mx-auto mt-6 max-w-2xl text-base font-semibold leading-relaxed text-black md:text-lg ${monoFont.className}`}
 				>
-					Generate images, edit with references, inspect the exact
-					model path, save versions, organize results, and keep
-					creating without touching a maze of settings.
+					Explore models, edit with references, understand what
+					worked, and keep every strong variation organized for the
+					next round.
 				</p>
 				<div className="mt-10 flex justify-center">
 					<BrutalButton
@@ -1049,7 +1062,7 @@ function Footer() {
 				<span
 					className={`text-xs font-bold uppercase text-white/80 ${monoFont.className}`}
 				>
-					Current models. Explicit routes. Built for visual work.
+					Agentic image generation and editing workspace.
 				</span>
 			</div>
 		</footer>
