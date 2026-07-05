@@ -21,10 +21,16 @@ import { generateImage } from "@/lib/actions/generate"
 import { toast } from "sonner"
 
 const AI_MODELS = [
-	{ value: "stable-diffusion-xl", label: "Stable Diffusion XL" },
-	{ value: "dall-e-3", label: "DALL-E 3" },
-	{ value: "midjourney", label: "Midjourney" },
-	{ value: "flux", label: "Flux" }
+	{ value: "gpt-image-2", label: "GPT Image 2" },
+	{ value: "gpt-image-1-5", label: "GPT Image 1.5" },
+	{ value: "nano-banana-pro", label: "Nano Banana Pro" },
+	{ value: "seedream-4-5", label: "Seedream 4.5" },
+	{ value: "seedream-5-lite", label: "Seedream 5 Lite" },
+	{ value: "flux-2-pro", label: "FLUX.2 Pro" },
+	{ value: "ideogram-v4", label: "Ideogram v4" },
+	{ value: "krea-v2-large", label: "Krea 2 Large" },
+	{ value: "nano-banana-lite", label: "Nano Banana Lite" },
+	{ value: "flux-2-klein", label: "FLUX.2 Klein 9B" }
 ]
 
 const IMAGE_STYLES = [
@@ -50,7 +56,7 @@ export function GenerateForm() {
 	const [isGenerating, setIsGenerating] = useState(false)
 	const [prompt, setPrompt] = useState("")
 	const [negativePrompt, setNegativePrompt] = useState("")
-	const [model, setModel] = useState("stable-diffusion-xl")
+	const [model, setModel] = useState("gpt-image-2")
 	const [style, setStyle] = useState("photorealistic")
 	const [aspectRatio, setAspectRatio] = useState("1:1")
 	const [steps, setSteps] = useState([50])

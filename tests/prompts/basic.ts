@@ -1,6 +1,6 @@
-import type { CoreMessage } from "ai"
+import type { ModelMessage } from "ai"
 
-export const TEST_PROMPTS: Record<string, CoreMessage> = {
+export const TEST_PROMPTS: Record<string, ModelMessage> = {
 	USER_SKY: {
 		role: "user",
 		content: [{ type: "text", text: "Why is the sky blue?" }]
@@ -57,7 +57,7 @@ export const TEST_PROMPTS: Record<string, CoreMessage> = {
 				type: "tool-result",
 				toolCallId: "call_123",
 				toolName: "createDocument",
-				result: {
+				output: {
 					id: "3ca386a4-40c6-4630-8ed1-84cbd46cc7eb",
 					title: "Essay about Silicon Valley",
 					kind: "text",
@@ -66,7 +66,7 @@ export const TEST_PROMPTS: Record<string, CoreMessage> = {
 				}
 			}
 		]
-	},
+	} as unknown as ModelMessage,
 	GET_WEATHER_CALL: {
 		role: "user",
 		content: [
@@ -83,7 +83,7 @@ export const TEST_PROMPTS: Record<string, CoreMessage> = {
 				type: "tool-result",
 				toolCallId: "call_456",
 				toolName: "getWeather",
-				result: {
+				output: {
 					latitude: 37.763283,
 					longitude: -122.41286,
 					generationtime_ms: 0.06449222564697266,
@@ -138,5 +138,5 @@ export const TEST_PROMPTS: Record<string, CoreMessage> = {
 				}
 			}
 		]
-	}
+	} as unknown as ModelMessage
 }

@@ -90,8 +90,8 @@ export async function generateImage(
 			.returning()
 
 		try {
-			// For now, we'll simulate image generation with a placeholder
-			// In a real app, you would integrate with actual AI image generation APIs
+			// This gallery action still simulates image generation. The chat
+			// artifact path uses the FAL-backed catalog in lib/ai/models.ts.
 			const imageUrl = await simulateImageGeneration(input)
 
 			// Update image record with URL
@@ -142,13 +142,7 @@ async function simulateImageGeneration(
 	// Simulate generation time
 	await new Promise((resolve) => setTimeout(resolve, 2000))
 
-	// For demo purposes, return a placeholder image URL
-	// In production, this would call actual AI image generation APIs like:
-	// - OpenAI DALL-E 3
-	// - Stability AI
-	// - Midjourney API
-	// - Flux
-	// - etc.
+	// For demo purposes, return a placeholder image URL.
 
 	const placeholderImages = [
 		"https://picsum.photos/1024/1024?random=1",

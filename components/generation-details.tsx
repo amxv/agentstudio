@@ -5,16 +5,21 @@ interface GenerationDetailsProps {
 		modelUsed: string
 		modelName: string
 		modelDescription: string
+		provider?: string
+		falEndpoint?: string
+		modelFamily?: string
+		endpointKind?: string
 		parameters: {
-			guidanceScale: number
-			inferenceSteps: number
 			aspectRatio: string
-			size: string
-			strength?: number
+			quality?: string
+			resolution?: string
+			outputFormat?: string
 			hasInputImages: boolean
 			inputImageCount: number
+			hasMask?: boolean
 		}
 		generationType: string
+		warnings?: Array<{ code?: string; message?: string } | string>
 		timestamp: string
 	}
 }
@@ -42,6 +47,11 @@ export function GenerationDetailsContent({ details }: GenerationDetailsProps) {
 				<p className="text-xs text-muted-foreground mt-1">
 					ID: {details.modelUsed}
 				</p>
+				{details.falEndpoint && (
+					<p className="text-xs text-muted-foreground mt-1">
+						FAL: {details.falEndpoint}
+					</p>
+				)}
 			</div>
 
 			<div>
@@ -75,32 +85,31 @@ export function GenerationDetailsContent({ details }: GenerationDetailsProps) {
 						<br />
 						<span>{details.parameters.aspectRatio}</span>
 					</div>
-					<div>
-						<span className="text-muted-foreground">
-							Guidance Scale:
-						</span>
-						<br />
-						<span>{details.parameters.guidanceScale}</span>
-					</div>
-					<div>
-						<span className="text-muted-foreground">
-							Inference Steps:
-						</span>
-						<br />
-						<span>{details.parameters.inferenceSteps}</span>
-					</div>
-					<div>
-						<span className="text-muted-foreground">Size:</span>
-						<br />
-						<span>{details.parameters.size}</span>
-					</div>
-					{details.parameters.strength && (
+					{details.parameters.quality && (
 						<div>
 							<span className="text-muted-foreground">
-								Strength:
+								Quality:
 							</span>
 							<br />
-							<span>{details.parameters.strength}</span>
+							<span>{details.parameters.quality}</span>
+						</div>
+					)}
+					{details.parameters.resolution && (
+						<div>
+							<span className="text-muted-foreground">
+								Resolution:
+							</span>
+							<br />
+							<span>{details.parameters.resolution}</span>
+						</div>
+					)}
+					{details.parameters.outputFormat && (
+						<div>
+							<span className="text-muted-foreground">
+								Output:
+							</span>
+							<br />
+							<span>{details.parameters.outputFormat}</span>
 						</div>
 					)}
 					{details.parameters.hasInputImages && (

@@ -2,8 +2,8 @@
 
 import type { Vote } from "@/lib/db/schema"
 import { cn, sanitizeText } from "@/lib/utils"
-import type { UseChatHelpers } from "@ai-sdk/react"
-import type { UIMessage } from "ai"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
+import type { AppUIMessage as UIMessage } from "@/lib/ai/types"
 import cx from "classnames"
 import equal from "fast-deep-equal"
 import { AnimatePresence, motion } from "framer-motion"
@@ -20,6 +20,22 @@ import { Button } from "./ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { Weather } from "./weather"
 import { SquarePen } from "lucide-react"
+import type { ArtifactKind } from "./artifact"
+
+type DocumentToolArgs = {
+	title: string
+	kind?: ArtifactKind
+}
+
+type DocumentToolResultData = {
+	id: string
+	title: string
+	kind: ArtifactKind
+}
+
+type WeatherAtLocation = NonNullable<
+	Parameters<typeof Weather>[0]["weatherAtLocation"]
+>
 
 const PurePreviewMessage = ({
 	chatId,
@@ -100,7 +116,16 @@ const PurePreviewMessage = ({
 									<MessageReasoning
 										key={key}
 										isLoading={isLoading}
-										reasoning={part.reasoning}
+										reasoning={
+											(
+												part as {
+													reasoning?: string
+													text?: string
+												}
+											).reasoning ??
+											(part as { text?: string }).text ??
+											""
+										}
 									/>
 								)
 							}
@@ -182,12 +207,21 @@ const PurePreviewMessage = ({
 							}
 
 							if (type === "tool-invocation") {
-								const { toolInvocation } = part
+								const { toolInvocation } = part as unknown as {
+									toolInvocation: {
+										toolName: string
+										toolCallId: string
+										state: string
+										args?: unknown
+										result?: unknown
+									}
+								}
 								const { toolName, toolCallId, state } =
 									toolInvocation
 
 								if (state === "call") {
-									const { args } = toolInvocation
+									const args =
+										toolInvocation.args as DocumentToolArgs
 
 									return (
 										<div
@@ -226,32 +260,40 @@ const PurePreviewMessage = ({
 								}
 
 								if (state === "result") {
-									const { result } = toolInvocation
+									const result = toolInvocation.result
 
 									return (
 										<div key={toolCallId}>
 											{toolName === "getWeather" ? (
 												<Weather
-													weatherAtLocation={result}
+													weatherAtLocation={
+														result as WeatherAtLocation
+													}
 												/>
 											) : toolName ===
 												"createDocument" ? (
 												<DocumentPreview
 													isReadonly={isReadonly}
-													result={result}
+													result={
+														result as DocumentToolResultData
+													}
 												/>
 											) : toolName ===
 												"updateDocument" ? (
 												<DocumentToolResult
 													type="update"
-													result={result}
+													result={
+														result as DocumentToolResultData
+													}
 													isReadonly={isReadonly}
 												/>
 											) : toolName ===
 												"requestSuggestions" ? (
 												<DocumentToolResult
 													type="request-suggestions"
-													result={result}
+													result={
+														result as DocumentToolResultData
+													}
 													isReadonly={isReadonly}
 												/>
 											) : (

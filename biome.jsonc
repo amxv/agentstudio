@@ -9,7 +9,10 @@
 			"node_modules",
 			".next",
 			"public",
-			".vercel"
+			".vercel",
+			"playwright-report",
+			"test-results",
+			"blob-report"
 		]
 	},
 	"vcs": {

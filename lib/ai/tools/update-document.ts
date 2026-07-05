@@ -1,7 +1,8 @@
 import { documentHandlersByArtifactKind } from "@/lib/artifacts/server"
 import { getDocumentById, saveDocument } from "@/lib/db/queries"
-import { type DataStreamWriter, tool } from "ai"
-import type { UIMessage } from "ai"
+import { tool } from "ai"
+import type { AppDataStreamWriter as DataStreamWriter } from "@/lib/ai/types"
+import type { AppUIMessage as UIMessage } from "@/lib/ai/types"
 import type { Session } from "next-auth"
 import { z } from "zod"
 
@@ -24,7 +25,7 @@ export const updateDocument = ({
 }: UpdateDocumentProps) =>
 	tool({
 		description: "Update a document with the given description.",
-		parameters: z.object({
+		inputSchema: z.object({
 			id: z.string().describe("The ID of the document to update"),
 			description: z
 				.string()

@@ -138,7 +138,7 @@ Alibaba's all-round diffusion-based image generation and editing model with enha
 **Seedream 4.0** -- *ByteDance*
 A unified multimodal architecture integrating text-to-image generation and editing with 10x faster inference than its predecessor. Strong at high-resolution 2K outputs, structured layouts, readable text generation, and infographics.
 
-**Nano Banana (Gemini 2.5 Flash Image)** -- *Google*
+**Nano Banana** -- *Google*
 Google's fast, conversational image model designed for iterative creative workflows, generating images 2-3x faster than comparable models. Specializes in intelligent modifications of existing photos with natural language instructions and character consistency.
 
 **Reve V1 (December)** -- *Reve*
@@ -169,14 +169,16 @@ An advanced image editing model that feeds inputs through visual language unders
 
 ### Body
 
-The conversational assistant that interprets your requests and manages your creative workflow is powered by your choice of six language models. Switch between them at any time to find the best fit for your task.
+The conversational assistant that interprets your requests and manages your creative workflow is powered by the current model catalog from Anthropic, OpenAI, and Google. Switch between them at any time to find the best fit for your task.
 
-**Claude Sonnet 4** -- Balanced reasoning and creative direction from Anthropic.
-**Claude Sonnet 4 (Reasoning)** -- Enhanced step-by-step reasoning for complex creative briefs.
-**GPT-4.1** -- OpenAI's flagship model. The platform default for chat.
-**o4-mini** -- Fast and efficient for quick interactions and everyday tasks.
-**Gemini 2.5 Pro** -- Google's advanced multimodal model with deep context understanding.
-**Gemini 2.5 Flash** -- Fast and responsive for quick creative exchanges.
+**Claude Fable 5** -- Long-running agentic and creative work from Anthropic.
+**Claude Opus 4.8** -- Premium deep reasoning and complex workflows.
+**Claude Sonnet 5** -- Balanced default for high-quality creative direction.
+**Claude Haiku 4.5** -- Fast current Claude model for responsive interactions.
+**GPT-5.5** -- OpenAI's latest model for complex workflows.
+**Gemini 3.5 Flash** -- Google's stable frontier Gemini model for fast, capable responses.
+**Gemini 3.1 Pro Preview** -- Advanced Gemini model for multimodal and reasoning-heavy work.
+**Gemini 3.1 Flash-Lite** -- Cost-efficient Gemini model for quick interactions.
 
 ---
 

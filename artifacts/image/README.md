@@ -1,6 +1,6 @@
-# Image Artifact - Enhanced with Multimodal Support
+# Image Artifact
 
-The image artifact now supports both **text-to-image** and **image-to-image** generation using Fal AI's FLUX models, with full support for file attachments and multimodal input.
+The image artifact supports both **text-to-image** and **image-to-image** generation through the centralized FAL model catalog, with full support for file attachments and multimodal input.
 
 ## Features
 
@@ -9,7 +9,7 @@ The image artifact now supports both **text-to-image** and **image-to-image** ge
 - **Multi-Image Generation**: Process multiple images simultaneously for enhanced context understanding
 - **File Upload Support**: Upload single or multiple images directly through the chat interface
 - **URL Support**: Use image URLs in prompts for transformations
-- **Automatic Model Selection**: Intelligently chooses the best model based on input type and number of images
+- **Catalog-Based Model Selection**: Routes between paired text and edit endpoints based on input type and number of images
 - **Quality Enhancement**: Automatically adds quality terms to prompts
 - **Multiple Image Formats**: Supports JPG, PNG, GIF, WebP, and BMP
 
@@ -67,26 +67,20 @@ Make this image more vibrant and add dramatic lighting
 
 ## Model Selection
 
-- **Text-to-Image**: Uses selected T2I model (e.g., `fal-ai/flux-pro/kontext/text-to-image`) for pure text prompts
-- **Image-to-Image**: Uses selected I2I model (e.g., `fal-ai/flux-pro/kontext`) for single image transformation tasks
-- **Multi-Image**: Automatically uses `fal-ai/flux-pro/kontext/max/multi` when multiple images are detected for enhanced context understanding
+- **Text-to-Image**: Uses the selected text model for pure text prompts, such as GPT Image 2, Nano Banana Pro, Seedream, Ideogram, Krea, or supported FLUX.2 endpoints
+- **Image-to-Image**: Uses the selected model's configured edit route for image transformation tasks, such as GPT Image 2 Edit, Nano Banana Pro Edit, Seedream 5 Lite Edit, or FLUX.2 Pro Edit
+- **Multi-Image**: Uses edit models with multi-reference support when multiple image inputs are provided
 
-**Important**: Multi-image models (like FLUX Kontext Max Multi) always require the `image_urls` parameter as an array, even when processing a single image. This is automatically handled by the system.
+**Important**: The server only routes through explicit catalog entries in `lib/ai/models.ts`. Unsupported text/edit combinations fail fast instead of silently switching to a different model.
 
 ## Parameters
 
-### Text-to-Image Parameters
+### Shared Parameters
 
-- **Guidance Scale**: 10 (controls prompt adherence)
-- **Inference Steps**: 50 (quality vs speed trade-off)
-- **Size**: 1024x1024 (square format)
-
-### Image-to-Image Parameters
-
-- **Strength**: 0.8 for new input images, 0.6 for modifications
-- **Guidance Scale**: 10
-- **Inference Steps**: 50
-- **Size**: 1024x1024
+- **Aspect Ratio**: User-selected aspect ratio is mapped through the model catalog
+- **Output Format**: PNG by default, with JPEG and WebP available where supported
+- **Quality / Resolution**: Sent only to models that explicitly support those options
+- **Image Inputs**: Sent through AI SDK 7 `generateImage` prompt image parts for edit workflows
 
 ## Examples
 
@@ -128,7 +122,7 @@ Enhance this landscape with better lighting and more vivid colors
 1. **Use File Uploads**: File uploads are prioritized over URL parsing for better reliability
 2. **Be Specific**: Include details about style, lighting, composition, and mood
 3. **Quality Terms**: The system automatically adds quality enhancement terms
-4. **Strength Parameter**: Lower strength preserves more of the original image
+4. **Model Fit**: Use edit-capable models when the source image must be preserved or transformed
 5. **Clear Instructions**: Separate the image input from the modification text clearly
 
 ## Toolbar Actions
@@ -148,7 +142,7 @@ The image artifact now seamlessly integrates with the chat system's attachment f
 1. **Attachment Detection**: Automatically detects image attachments in messages
 2. **Priority System**: File attachments take priority over URL parsing
 3. **Clean Text Extraction**: Removes embedded URLs from prompts when attachments are present
-4. **Fallback Support**: Falls back to URL parsing if no attachments are found
+4. **URL Support**: Parses image URLs when no upload attachment is present
 
 ## Error Handling
 
@@ -167,6 +161,6 @@ The system will log detailed error information for debugging purposes.
 This artifact leverages the Chat SDK's multimodal capabilities:
 
 - **File Upload API**: Uses `/api/files/upload` for secure file handling
-- **Attachment System**: Integrates with `experimental_attachments` from AI SDK
+- **Attachment System**: Integrates with uploaded image attachments and AI SDK UI messages
 - **Streaming Support**: Real-time image generation with progress feedback
 - **Version Control**: Maintains history of generated images

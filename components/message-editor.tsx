@@ -1,8 +1,10 @@
 "use client"
 
 import { deleteTrailingMessages } from "@/app/(chat)/actions"
-import type { UseChatHelpers } from "@ai-sdk/react"
-import { ChatRequestOptions, type Message } from "ai"
+import type {
+	AppUIMessage as Message,
+	AppUseChatHelpers as UseChatHelpers
+} from "@/lib/ai/types"
 import {
 	type Dispatch,
 	type SetStateAction,
@@ -92,7 +94,6 @@ export function MessageEditor({
 							id: message.id
 						})
 
-						// @ts-expect-error todo: support UIMessage in setMessages
 						setMessages((messages) => {
 							const index = messages.findIndex(
 								(m) => m.id === message.id
@@ -103,9 +104,12 @@ export function MessageEditor({
 									...message,
 									content: draftContent,
 									parts: [
-										{ type: "text", text: draftContent }
+										{
+											type: "text" as const,
+											text: draftContent
+										}
 									]
-								}
+								} as Message
 
 								return [
 									...messages.slice(0, index),

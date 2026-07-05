@@ -3,7 +3,10 @@ import { sheetDocumentHandler } from "@/artifacts/sheet/server"
 import { slidesDocumentHandler } from "@/artifacts/slides/server"
 import { textDocumentHandler } from "@/artifacts/text/server"
 import type { ArtifactKind } from "@/components/artifact"
-import type { DataStreamWriter, UIMessage } from "ai"
+import type {
+	AppDataStreamWriter as DataStreamWriter,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 import type { Session } from "next-auth"
 import { saveDocument } from "../db/queries"
 import type { Document } from "../db/schema"

@@ -22,16 +22,21 @@ interface GenerationDetails {
 	modelUsed: string
 	modelName: string
 	modelDescription: string
+	provider?: string
+	falEndpoint?: string
+	modelFamily?: string
+	endpointKind?: string
 	parameters: {
-		guidanceScale: number
-		inferenceSteps: number
 		aspectRatio: string
-		size: string
-		strength?: number
+		quality?: string
+		resolution?: string
+		outputFormat?: string
 		hasInputImages: boolean
 		inputImageCount: number
+		hasMask?: boolean
 	}
 	generationType: string
+	warnings?: Array<{ code?: string; message?: string } | string>
 	timestamp: string
 }
 

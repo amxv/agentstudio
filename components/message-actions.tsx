@@ -1,4 +1,4 @@
-import type { Message } from "ai"
+import type { AppUIMessage as Message } from "@/lib/ai/types"
 import { useSWRConfig } from "swr"
 import { useCopyToClipboard } from "usehooks-ts"
 

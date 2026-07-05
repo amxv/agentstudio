@@ -1,6 +1,6 @@
 "use client"
 
-import type { UseChatHelpers } from "@ai-sdk/react"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
 import { motion } from "framer-motion"
 import { memo } from "react"
 import { Button } from "./ui/button"

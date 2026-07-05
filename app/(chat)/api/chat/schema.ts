@@ -22,7 +22,10 @@ export const postRequestBodySchema = z.object({
 					contentType: z.enum([
 						"image/png",
 						"image/jpg",
-						"image/jpeg"
+						"image/jpeg",
+						"image/gif",
+						"image/webp",
+						"image/bmp"
 					])
 				})
 			)

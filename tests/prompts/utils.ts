@@ -1,9 +1,38 @@
-import type { CoreMessage, LanguageModelV1StreamPart } from "ai"
+import type {
+	LanguageModelV3StreamPart,
+	LanguageModelV3Usage
+} from "@ai-sdk/provider"
+import type { ModelMessage } from "ai"
 import { TEST_PROMPTS } from "./basic"
 
+type TestStreamPart = LanguageModelV3StreamPart
+type TestFinishReason = TestStreamPart & { type: "finish" }
+
+const testUsage: LanguageModelV3Usage = {
+	inputTokens: {
+		total: 3,
+		noCache: 3,
+		cacheRead: 0,
+		cacheWrite: 0
+	},
+	outputTokens: {
+		total: 10,
+		text: 10,
+		reasoning: 0
+	}
+}
+
+const finishPart = (
+	unified: TestFinishReason["finishReason"]["unified"]
+): TestFinishReason => ({
+	type: "finish",
+	finishReason: { unified, raw: unified },
+	usage: testUsage
+})
+
 export function compareMessages(
-	firstMessage: CoreMessage,
-	secondMessage: CoreMessage
+	firstMessage: ModelMessage,
+	secondMessage: ModelMessage
 ): boolean {
 	if (firstMessage.role !== secondMessage.role) return false
 
@@ -42,26 +71,40 @@ export function compareMessages(
 	return true
 }
 
-const textToDeltas = (text: string): LanguageModelV1StreamPart[] => {
-	const deltas = text
-		.split(" ")
-		.map((char) => ({ type: "text-delta" as const, textDelta: `${char} ` }))
+const textToDeltas = (text: string): TestStreamPart[] => {
+	const textId = "text-1"
+	const deltas: TestStreamPart[] = [
+		{ type: "text-start", id: textId },
+		...text.split(" ").map((char) => ({
+			type: "text-delta" as const,
+			id: textId,
+			delta: `${char} `
+		})),
+		{ type: "text-end", id: textId }
+	]
 
 	return deltas
 }
 
-const reasoningToDeltas = (text: string): LanguageModelV1StreamPart[] => {
-	const deltas = text
-		.split(" ")
-		.map((char) => ({ type: "reasoning" as const, textDelta: `${char} ` }))
+const reasoningToDeltas = (text: string): TestStreamPart[] => {
+	const reasoningId = "reasoning-1"
+	const deltas: TestStreamPart[] = [
+		{ type: "reasoning-start", id: reasoningId },
+		...text.split(" ").map((char) => ({
+			type: "reasoning-delta" as const,
+			id: reasoningId,
+			delta: `${char} `
+		})),
+		{ type: "reasoning-end", id: reasoningId }
+	]
 
 	return deltas
 }
 
 export const getResponseChunksByPrompt = (
-	prompt: CoreMessage[],
+	prompt: ModelMessage[],
 	isReasoningEnabled = false
-): Array<LanguageModelV1StreamPart> => {
+): TestStreamPart[] => {
 	const recentMessage = prompt.at(-1)
 
 	if (!recentMessage) {
@@ -75,12 +118,7 @@ export const getResponseChunksByPrompt = (
 					"The sky is blue because of rayleigh scattering!"
 				),
 				...textToDeltas("It's just blue duh!"),
-				{
-					type: "finish",
-					finishReason: "stop",
-					logprobs: undefined,
-					usage: { completionTokens: 10, promptTokens: 3 }
-				}
+				finishPart("stop")
 			]
 		}
 		if (compareMessages(recentMessage, TEST_PROMPTS.USER_GRASS)) {
@@ -89,70 +127,31 @@ export const getResponseChunksByPrompt = (
 					"Grass is green because of chlorophyll absorption!"
 				),
 				...textToDeltas("It's just green duh!"),
-				{
-					type: "finish",
-					finishReason: "stop",
-					logprobs: undefined,
-					usage: { completionTokens: 10, promptTokens: 3 }
-				}
+				finishPart("stop")
 			]
 		}
 	}
 
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_THANKS)) {
-		return [
-			...textToDeltas("You're welcome!"),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
-		]
+		return [...textToDeltas("You're welcome!"), finishPart("stop")]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_GRASS)) {
-		return [
-			...textToDeltas("It's just green duh!"),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
-		]
+		return [...textToDeltas("It's just green duh!"), finishPart("stop")]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_SKY)) {
-		return [
-			...textToDeltas("It's just blue duh!"),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
-		]
+		return [...textToDeltas("It's just blue duh!"), finishPart("stop")]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_NEXTJS)) {
 		return [
 			...textToDeltas("With Next.js, you can ship fast!"),
 
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_IMAGE_ATTACHMENT)) {
 		return [
 			...textToDeltas("This painting is by Monet!"),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.USER_TEXT_ARTIFACT)) {
@@ -161,18 +160,12 @@ export const getResponseChunksByPrompt = (
 				type: "tool-call",
 				toolCallId: "call_123",
 				toolName: "createDocument",
-				toolCallType: "function",
-				args: JSON.stringify({
+				input: JSON.stringify({
 					title: "Essay about Silicon Valley",
 					kind: "text"
 				})
 			},
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 	if (
@@ -198,12 +191,7 @@ Despite its remarkable success, Silicon Valley faces significant challenges incl
 
 As we move forward, Silicon Valley continues to reinvent itself. While some predict its decline due to remote work trends and competition from other tech hubs, the region's adaptability and innovative spirit suggest it will remain influential in shaping our technological future for decades to come.
 `),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 	if (
@@ -211,16 +199,19 @@ As we move forward, Silicon Valley continues to reinvent itself. While some pred
 	) {
 		return [
 			{
-				type: "text-delta",
-				textDelta:
-					"A document was created and is now visible to the user."
+				type: "text-start",
+				id: "text-1"
 			},
 			{
-				type: "finish",
-				finishReason: "tool-calls",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+				type: "text-delta",
+				id: "text-1",
+				delta: "A document was created and is now visible to the user."
+			},
+			{
+				type: "text-end",
+				id: "text-1"
+			},
+			finishPart("tool-calls")
 		]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.GET_WEATHER_CALL)) {
@@ -229,18 +220,12 @@ As we move forward, Silicon Valley continues to reinvent itself. While some pred
 				type: "tool-call",
 				toolCallId: "call_456",
 				toolName: "getWeather",
-				toolCallType: "function",
-				args: JSON.stringify({
+				input: JSON.stringify({
 					latitude: 37.7749,
 					longitude: -122.4194
 				})
 			},
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 	if (compareMessages(recentMessage, TEST_PROMPTS.GET_WEATHER_RESULT)) {
@@ -248,14 +233,9 @@ As we move forward, Silicon Valley continues to reinvent itself. While some pred
 			...textToDeltas(
 				"The current temperature in San Francisco is 17°C."
 			),
-			{
-				type: "finish",
-				finishReason: "stop",
-				logprobs: undefined,
-				usage: { completionTokens: 10, promptTokens: 3 }
-			}
+			finishPart("stop")
 		]
 	}
 
-	return [{ type: "text-delta", textDelta: "Unknown test prompt!" }]
+	return textToDeltas("Unknown test prompt!")
 }

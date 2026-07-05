@@ -87,7 +87,7 @@ This document provides a comprehensive test plan to verify that the multimodal i
 **Expected Results:**
 
 - All uploaded images should be processed
-- System should automatically select the multi-image model (`fal-ai/flux-pro/kontext/max/multi`)
+- System should automatically select the configured multi-reference edit route from the current image catalog
 - Generated image should incorporate elements from all input images
 - Console should show `image_urls` parameter being used instead of `image_url`
 

@@ -113,17 +113,18 @@ export function AppSidebar({
 			<SidebarHeader>
 				<SidebarMenu>
 					<div className="flex flex-row justify-between items-center">
-						<div
+						<button
+							type="button"
 							onClick={() => {
 								router.push("/generate")
 								setOpen(false)
 							}}
-							className="flex flex-row gap-3 items-center"
+							className="flex flex-row gap-3 items-center bg-transparent border-0 p-0"
 						>
 							<span className="text-lg font-semibold px-2 hover:bg-muted rounded-2xl cursor-pointer">
 								AgentStudio
 							</span>
-						</div>
+						</button>
 						<Button
 							variant="ghost"
 							type="button"
@@ -308,16 +309,16 @@ function ImageItem({
 			>
 				<div className="flex items-center gap-3 w-full">
 					<div className="size-8 rounded bg-muted flex-shrink-0 overflow-hidden">
-							{image.imageUrl && image.status === "completed" ? (
-								<Image
-									src={image.imageUrl}
-									alt="Generated artwork"
-									fill
-									unoptimized
-									sizes="32px"
-									className="object-cover"
-								/>
-							) : (
+						{image.imageUrl && image.status === "completed" ? (
+							<Image
+								src={image.imageUrl}
+								alt="Generated artwork"
+								fill
+								unoptimized
+								sizes="32px"
+								className="object-cover"
+							/>
+						) : (
 							<div className="w-full h-full flex items-center justify-center">
 								<Wand2 className="h-3 w-3 text-muted-foreground" />
 							</div>

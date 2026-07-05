@@ -4,10 +4,18 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@/app/(auth)/auth"
 import { Chat } from "@/components/chat"
 import { DataStreamHandler } from "@/components/data-stream-handler"
-import { DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL } from "@/lib/ai/models"
+import {
+	DEFAULT_CHAT_MODEL,
+	DEFAULT_IMAGE_MODEL,
+	isChatModelId,
+	isImageModelId
+} from "@/lib/ai/models"
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries"
 import type { DBMessage } from "@/lib/db/schema"
-import type { Attachment, UIMessage } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
 	const params = await props.params
@@ -56,6 +64,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 	const imageModelFromCookie = cookieStore.get("image-model")
 	const aspectRatioFromCookie = cookieStore.get("aspect-ratio")
 	const guidanceScaleFromCookie = cookieStore.get("guidance-scale")
+	const initialChatModel =
+		chatModelFromCookie && isChatModelId(chatModelFromCookie.value)
+			? chatModelFromCookie.value
+			: DEFAULT_CHAT_MODEL
+	const initialImageModel =
+		imageModelFromCookie && isImageModelId(imageModelFromCookie.value)
+			? imageModelFromCookie.value
+			: DEFAULT_IMAGE_MODEL
 
 	if (!chatModelFromCookie || !imageModelFromCookie) {
 		return (
@@ -64,12 +80,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 					key={chat.id}
 					id={chat.id}
 					initialMessages={convertToUIMessages(messagesFromDb)}
-					initialChatModel={
-						chatModelFromCookie?.value || DEFAULT_CHAT_MODEL
-					}
-					initialImageModel={
-						imageModelFromCookie?.value || DEFAULT_IMAGE_MODEL
-					}
+					initialChatModel={initialChatModel}
+					initialImageModel={initialImageModel}
 					initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
 					initialGuidanceScale={
 						guidanceScaleFromCookie?.value || "10"
@@ -90,8 +102,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 				key={chat.id}
 				id={chat.id}
 				initialMessages={convertToUIMessages(messagesFromDb)}
-				initialChatModel={chatModelFromCookie.value}
-				initialImageModel={imageModelFromCookie.value}
+				initialChatModel={initialChatModel}
+				initialImageModel={initialImageModel}
 				initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
 				initialGuidanceScale={guidanceScaleFromCookie?.value || "10"}
 				initialVisibilityType={chat.visibility}

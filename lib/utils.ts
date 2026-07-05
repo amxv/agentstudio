@@ -1,5 +1,5 @@
 import type { Document } from "@/lib/db/schema"
-import type { CoreAssistantMessage, CoreToolMessage, UIMessage } from "ai"
+import type { AppUIMessage as UIMessage } from "@/lib/ai/types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ChatSDKError, type ErrorCode } from "./errors"
@@ -56,8 +56,7 @@ export function generateUUID(): string {
 	})
 }
 
-type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage
-type ResponseMessage = ResponseMessageWithoutId & { id: string }
+type ResponseMessage = { id: string }
 
 export function getMostRecentUserMessage(messages: Array<UIMessage>) {
 	const userMessages = messages.filter((message) => message.role === "user")

@@ -1,69 +1,45 @@
 // Centralized model IDs - define once, use everywhere
 export const MODEL_IDS = {
-	CLAUDE_SONNET_4: "claude-sonnet-4",
-	CLAUDE_SONNET_4_REASONING: "claude-sonnet-4-reasoning",
-	GPT_4_1: "gpt-4.1",
-	O4_MINI: "o4-mini",
-	GEMINI_2_5_PRO: "gemini-2.5-pro",
-	GEMINI_2_5_FLASH: "gemini-2.5-flash"
+	CLAUDE_FABLE_5: "claude-fable-5",
+	CLAUDE_OPUS_4_8: "claude-opus-4-8",
+	CLAUDE_SONNET_5: "claude-sonnet-5",
+	CLAUDE_HAIKU_4_5: "claude-haiku-4-5",
+	GPT_5_5: "gpt-5.5",
+	GEMINI_3_5_FLASH: "gemini-3.5-flash",
+	GEMINI_3_1_PRO_PREVIEW: "gemini-3.1-pro-preview",
+	GEMINI_3_1_FLASH_LITE: "gemini-3.1-flash-lite"
 } as const
 
-// Image model IDs
 export const IMAGE_MODEL_IDS = {
-	// Text-to-Image Models
-	FLUX_KONTEXT_T2I: "flux-kontext-t2i",
-	FLUX_KONTEXT_MAX_T2I: "flux-kontext-max-t2i",
-	IMAGEN4_PREVIEW: "imagen4-preview",
-	RECRAFT_V3_T2I: "recraft-v3-t2i",
-	FLUX_PRO_ULTRA: "flux-pro-ultra",
-	FLUX_PRO_V11: "flux-pro-v11",
-	IDEOGRAM_V3: "ideogram-v3",
-
-	// Image-to-Image Models
-	// Note: When users have existing image artifacts in the conversation,
-	// the system automatically maps T2I models to their I2I counterparts
-	// to enable editing of existing images without requiring explicit model switching
-	FLUX_KONTEXT_I2I: "flux-kontext-i2i",
-	FLUX_KONTEXT_MAX_I2I: "flux-kontext-max-i2i",
-	RECRAFT_V3_I2I: "recraft-v3-i2i",
-	IDEOGRAM_V3_REMIX: "ideogram-v3-remix",
-
-	// Multi-Image Models
-	// Note: Automatically selected when multiple images are detected in the chat context
-	FLUX_KONTEXT_MAX_MULTI: "flux-kontext-max-multi",
-	IDEOGRAM_V3_MULTI: "ideogram-v3-multi",
-
-	// Backend models - these are used internally for automatic selection (legacy)
-	FLUX_PRO_FIRST_TIME: "flux-pro-first-time",
-	FLUX_PRO_TEXT_TO_IMAGE: "flux-pro-text-to-image",
-	FLUX_PRO_IMAGE_TO_IMAGE: "flux-pro-image-to-image",
-	FLUX_SCHNELL: "flux-schnell",
-	FLUX_DEV: "flux-dev"
+	GPT_IMAGE_2: "gpt-image-2",
+	GPT_IMAGE_2_EDIT: "gpt-image-2-edit",
+	GPT_IMAGE_1_5: "gpt-image-1-5",
+	NANO_BANANA_PRO: "nano-banana-pro",
+	NANO_BANANA_PRO_EDIT: "nano-banana-pro-edit",
+	SEEDREAM_4_5: "seedream-4-5",
+	SEEDREAM_5_LITE: "seedream-5-lite",
+	SEEDREAM_5_LITE_EDIT: "seedream-5-lite-edit",
+	FLUX_2_PRO: "flux-2-pro",
+	FLUX_2_PRO_EDIT: "flux-2-pro-edit",
+	IDEOGRAM_V4: "ideogram-v4",
+	KREA_V2_LARGE: "krea-v2-large",
+	NANO_BANANA_LITE: "nano-banana-lite",
+	FLUX_2_KLEIN: "flux-2-klein"
 } as const
 
 export type ModelId = (typeof MODEL_IDS)[keyof typeof MODEL_IDS]
 export type ImageModelId =
 	(typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS]
 
-// Universal aspect ratio format used in UI
 export type UniversalAspectRatio = "1:1" | "16:9" | "9:16" | "4:3" | "3:4"
+export type ImageEndpointKind =
+	| "text-to-image"
+	| "image-edit"
+	| "multi-reference-edit"
 
-// Model-specific aspect ratio formats
-export type FluxAspectRatio = "1:1" | "16:9" | "9:16" | "4:3" | "3:4"
-export type RecraftIdeogramAspectRatio =
-	| "square_hd"
-	| "square"
-	| "portrait_4_3"
-	| "portrait_16_9"
-	| "landscape_4_3"
-	| "landscape_16_9"
-
-export interface AspectRatioConfig {
-	parameterName: string // The parameter name used by the model API
-	supportedRatios: UniversalAspectRatio[]
-	defaultRatio: UniversalAspectRatio
-	formatType: "flux" | "recraft-ideogram"
-}
+export type ImageQuality = "low" | "medium" | "high"
+export type ImageResolution = "1K" | "2K" | "4K"
+export type ImageOutputFormat = "jpeg" | "png" | "webp"
 
 export interface ChatModel {
 	id: ModelId
@@ -77,478 +53,537 @@ export interface ImageModel {
 	name: string
 	description: string
 	provider: "fal"
+	falEndpoint: string
+	modelFamily: string
+	endpointKind: ImageEndpointKind
 	capabilities: {
 		textToImage: boolean
 		imageToImage: boolean
-		multiImage?: boolean // New capability for multi-image processing
+		multiImage: boolean
+		mask?: boolean
+		styleReference?: boolean
 	}
-	parameters: {
-		maxSize: string
-		guidanceScale: number
-		inferenceSteps: number
+	accepts: {
+		imageInput: boolean
+		mask: boolean
+		imageSize: boolean
+		aspectRatio: boolean
+		quality: boolean
+		resolution: boolean
+		numImages: boolean
+		outputFormat: boolean
+		syncMode: boolean
+		seed: boolean
+		guidanceScale: boolean
+		inferenceSteps: boolean
+		strength: boolean
 	}
-	aspectRatio?: AspectRatioConfig // Optional - only for T2I models
+	routing?: {
+		textRoute?: ImageModelId
+		editRoute?: ImageModelId
+	}
+	defaults: {
+		quality?: ImageQuality
+		resolution?: ImageResolution
+		outputFormat: ImageOutputFormat
+		aspectRatio: UniversalAspectRatio
+	}
 }
 
 export const chatModels: Array<ChatModel> = [
 	{
-		id: MODEL_IDS.CLAUDE_SONNET_4,
-		name: "Claude Sonnet 4",
+		id: MODEL_IDS.CLAUDE_FABLE_5,
+		name: "Claude Fable 5",
 		description:
-			"Anthropic's latest balanced model with superior coding and reasoning",
+			"Anthropic's most capable widely released model for long-running agents and complex work.",
 		provider: "anthropic"
 	},
 	{
-		id: MODEL_IDS.CLAUDE_SONNET_4_REASONING,
-		name: "Claude Sonnet 4 (Reasoning)",
+		id: MODEL_IDS.CLAUDE_OPUS_4_8,
+		name: "Claude Opus 4.8",
 		description:
-			"Claude Sonnet 4 with enhanced step-by-step reasoning capabilities",
+			"Anthropic's recommended model for complex agentic coding and enterprise work.",
 		provider: "anthropic"
 	},
 	{
-		id: MODEL_IDS.GPT_4_1,
-		name: "GPT-4.1",
+		id: MODEL_IDS.CLAUDE_SONNET_5,
+		name: "Claude Sonnet 5",
 		description:
-			"OpenAI's latest flagship model with enhanced capabilities",
+			"Anthropic's best combination of speed and intelligence for everyday high-quality work.",
+		provider: "anthropic"
+	},
+	{
+		id: MODEL_IDS.CLAUDE_HAIKU_4_5,
+		name: "Claude Haiku 4.5",
+		description:
+			"Anthropic's fastest current Claude model with near-frontier intelligence.",
+		provider: "anthropic"
+	},
+	{
+		id: MODEL_IDS.GPT_5_5,
+		name: "GPT-5.5",
+		description:
+			"OpenAI's latest model for coding, tool-heavy agents, grounded assistants, and complex workflows.",
 		provider: "openai"
 	},
 	{
-		id: MODEL_IDS.O4_MINI,
-		name: "o4-mini",
-		description: "OpenAI's efficient reasoning model for everyday tasks",
-		provider: "openai"
-	},
-	{
-		id: MODEL_IDS.GEMINI_2_5_PRO,
-		name: "Gemini 2.5 Pro",
+		id: MODEL_IDS.GEMINI_3_5_FLASH,
+		name: "Gemini 3.5 Flash",
 		description:
-			"Google's advanced multimodal model with extensive context",
+			"Google's stable Gemini 3 model for sustained frontier performance on agentic and coding tasks.",
 		provider: "google"
 	},
 	{
-		id: MODEL_IDS.GEMINI_2_5_FLASH,
-		name: "Gemini 2.5 Flash",
-		description: "Google's fast and efficient model for quick responses",
+		id: MODEL_IDS.GEMINI_3_1_PRO_PREVIEW,
+		name: "Gemini 3.1 Pro Preview",
+		description:
+			"Google's preview Gemini Pro model for advanced reasoning and multimodal work.",
+		provider: "google"
+	},
+	{
+		id: MODEL_IDS.GEMINI_3_1_FLASH_LITE,
+		name: "Gemini 3.1 Flash-Lite",
+		description:
+			"Google's stable, cost-efficient Gemini 3 model for fast high-volume tasks.",
 		provider: "google"
 	}
 ]
+
+const baseAccepts = {
+	mask: false,
+	imageSize: false,
+	aspectRatio: true,
+	quality: false,
+	resolution: false,
+	numImages: true,
+	outputFormat: true,
+	syncMode: true,
+	seed: false,
+	guidanceScale: false,
+	inferenceSteps: false,
+	strength: false
+}
 
 export const imageModels: Array<ImageModel> = [
-	// Text-to-Image Models
 	{
-		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I,
-		name: "FLUX Kontext",
+		id: IMAGE_MODEL_IDS.GPT_IMAGE_2,
+		name: "GPT Image 2",
 		description:
-			"High-quality text-to-image generation with excellent prompt adherence",
+			"OpenAI's latest image model on FAL, with strong typography, prompt adherence, and commercial-quality detail.",
 		provider: "fal",
+		falEndpoint: "fal-ai/gpt-image-2",
+		modelFamily: "gpt-image-2",
+		endpointKind: "text-to-image",
 		capabilities: {
 			textToImage: true,
-			imageToImage: false
+			imageToImage: false,
+			multiImage: false
 		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			imageSize: true,
+			quality: true
 		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
+		routing: { editRoute: IMAGE_MODEL_IDS.GPT_IMAGE_2_EDIT },
+		defaults: {
+			quality: "high",
+			outputFormat: "png",
+			aspectRatio: "1:1"
 		}
 	},
 	{
-		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I,
-		name: "FLUX Kontext Max",
+		id: IMAGE_MODEL_IDS.GPT_IMAGE_2_EDIT,
+		name: "GPT Image 2 Edit",
 		description:
-			"Premium FLUX model with improved prompt adherence and typography",
+			"Highest-quality GPT Image 2 editing route for uploaded images, existing image artifacts, and masked edits.",
 		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.IMAGEN4_PREVIEW,
-		name: "Imagen 4",
-		description:
-			"Google's latest image generation model with photorealistic results",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 8,
-			inferenceSteps: 40
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.RECRAFT_V3_T2I,
-		name: "Recraft V3",
-		description: "SOTA model for vector art and brand style generation",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 7,
-			inferenceSteps: 35
-		},
-		aspectRatio: {
-			parameterName: "image_size",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "recraft-ideogram"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_PRO_ULTRA,
-		name: "FLUX Pro Ultra",
-		description:
-			"Professional-grade image generation with up to 2K resolution",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "2048x2048",
-			guidanceScale: 12,
-			inferenceSteps: 60
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_PRO_V11,
-		name: "FLUX Pro v1.1",
-		description: "Enhanced FLUX Pro model with improved quality and speed",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.IDEOGRAM_V3,
-		name: "Ideogram V3",
-		description:
-			"Specialized for high-quality posters and logos with exceptional typography",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 9,
-			inferenceSteps: 45
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "recraft-ideogram"
-		}
-	},
-
-	// Image-to-Image Models
-	{
-		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I,
-		name: "FLUX Kontext",
-		description: "Advanced image transformation and editing capabilities",
-		provider: "fal",
+		falEndpoint: "fal-ai/gpt-image-2/image-to-image",
+		modelFamily: "gpt-image-2",
+		endpointKind: "image-edit",
 		capabilities: {
 			textToImage: false,
-			imageToImage: true
+			imageToImage: true,
+			multiImage: true,
+			mask: true
 		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
+		accepts: {
+			...baseAccepts,
+			imageInput: true,
+			aspectRatio: false,
+			imageSize: false,
+			quality: true,
+			mask: true
+		},
+		routing: { textRoute: IMAGE_MODEL_IDS.GPT_IMAGE_2 },
+		defaults: {
+			quality: "high",
+			outputFormat: "png",
+			aspectRatio: "1:1"
 		}
 	},
 	{
-		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I,
-		name: "FLUX Kontext Max",
+		id: IMAGE_MODEL_IDS.GPT_IMAGE_1_5,
+		name: "GPT Image 1.5",
 		description:
-			"Premium image editing with enhanced consistency and quality",
+			"Top-tier OpenAI image generation on FAL for high-quality general creative output.",
 		provider: "fal",
+		falEndpoint: "fal-ai/gpt-image-1.5",
+		modelFamily: "gpt-image-1.5",
+		endpointKind: "text-to-image",
 		capabilities: {
-			textToImage: false,
-			imageToImage: true
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
 		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			imageSize: true,
+			quality: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.GPT_IMAGE_2_EDIT },
+		defaults: {
+			quality: "high",
+			outputFormat: "png",
+			aspectRatio: "1:1"
 		}
 	},
 	{
-		id: IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
-		name: "Recraft V3",
-		description: "Vector art and brand style image editing",
-		provider: "fal",
-		capabilities: {
-			textToImage: false,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 7,
-			inferenceSteps: 35
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
-		name: "Ideogram V3 Remix",
-		description: "Creative image remixing and style transfer",
-		provider: "fal",
-		capabilities: {
-			textToImage: false,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 9,
-			inferenceSteps: 45
-		}
-	},
-
-	// Multi-Image Models
-	{
-		id: IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI,
-		name: "FLUX Kontext Max",
+		id: IMAGE_MODEL_IDS.NANO_BANANA_PRO,
+		name: "Nano Banana Pro",
 		description:
-			"Advanced multi-image processing with enhanced context understanding",
+			"Gemini 3 Pro Image generation on FAL, with high-quality output and strong instruction following.",
 		provider: "fal",
+		falEndpoint: "fal-ai/gemini-3-pro-image-preview",
+		modelFamily: "nano-banana-pro",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			resolution: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.NANO_BANANA_PRO_EDIT },
+		defaults: {
+			resolution: "2K",
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.NANO_BANANA_PRO_EDIT,
+		name: "Nano Banana Pro Edit",
+		description:
+			"Gemini editing route for complex natural-language edits and multi-reference character consistency.",
+		provider: "fal",
+		falEndpoint: "fal-ai/nano-banana-pro/edit",
+		modelFamily: "nano-banana-pro",
+		endpointKind: "multi-reference-edit",
+		capabilities: {
+			textToImage: false,
+			imageToImage: true,
+			multiImage: true
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: true,
+			resolution: true
+		},
+		routing: { textRoute: IMAGE_MODEL_IDS.NANO_BANANA_PRO },
+		defaults: {
+			resolution: "2K",
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.SEEDREAM_4_5,
+		name: "Seedream 4.5",
+		description:
+			"Modern ByteDance text-to-image model with strong quality and cost performance.",
+		provider: "fal",
+		falEndpoint: "fal-ai/bytedance/seedream/v4.5/text-to-image",
+		modelFamily: "seedream",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			imageSize: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.SEEDREAM_5_LITE_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.SEEDREAM_5_LITE,
+		name: "Seedream 5 Lite",
+		description:
+			"Fast, cost-effective ByteDance generator with high-resolution output.",
+		provider: "fal",
+		falEndpoint: "fal-ai/bytedance/seedream/v5/lite/text-to-image",
+		modelFamily: "seedream",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			imageSize: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.SEEDREAM_5_LITE_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.SEEDREAM_5_LITE_EDIT,
+		name: "Seedream 5 Lite Edit",
+		description:
+			"Cost-effective ByteDance editor for multi-reference image edits.",
+		provider: "fal",
+		falEndpoint: "fal-ai/bytedance/seedream/v5/lite/edit",
+		modelFamily: "seedream",
+		endpointKind: "multi-reference-edit",
+		capabilities: {
+			textToImage: false,
+			imageToImage: true,
+			multiImage: true
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: true,
+			imageSize: true
+		},
+		routing: { textRoute: IMAGE_MODEL_IDS.SEEDREAM_5_LITE },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.FLUX_2_PRO,
+		name: "FLUX.2 Pro",
+		description:
+			"Production-grade FLUX.2 generation with fixed quality optimization and predictable output.",
+		provider: "fal",
+		falEndpoint: "fal-ai/flux-2-pro",
+		modelFamily: "flux-2",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.FLUX_2_PRO_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.FLUX_2_PRO_EDIT,
+		name: "FLUX.2 Pro Edit",
+		description:
+			"Production-grade FLUX.2 multi-reference editing with catalog-scoped parameters.",
+		provider: "fal",
+		falEndpoint: "fal-ai/flux-2-pro/edit",
+		modelFamily: "flux-2",
+		endpointKind: "multi-reference-edit",
+		capabilities: {
+			textToImage: false,
+			imageToImage: true,
+			multiImage: true
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: true
+		},
+		routing: { textRoute: IMAGE_MODEL_IDS.FLUX_2_PRO },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.IDEOGRAM_V4,
+		name: "Ideogram v4",
+		description:
+			"Specialist model for posters, logos, crisp typography, and design assets.",
+		provider: "fal",
+		falEndpoint: "ideogram/v4",
+		modelFamily: "ideogram",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			imageSize: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.GPT_IMAGE_2_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.KREA_V2_LARGE,
+		name: "Krea 2 Large",
+		description:
+			"Creative high-fidelity generation route with support for style-reference workflows.",
+		provider: "fal",
+		falEndpoint: "krea/v2/large/text-to-image",
+		modelFamily: "krea",
+		endpointKind: "text-to-image",
+		capabilities: {
+			textToImage: true,
+			imageToImage: false,
+			multiImage: false,
+			styleReference: true
+		},
+		accepts: {
+			...baseAccepts,
+			imageInput: false,
+			seed: true
+		},
+		routing: { editRoute: IMAGE_MODEL_IDS.GPT_IMAGE_2_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
+		}
+	},
+	{
+		id: IMAGE_MODEL_IDS.NANO_BANANA_LITE,
+		name: "Nano Banana Lite",
+		description:
+			"Fast, lower-cost Gemini image model for drafts and quick iterations.",
+		provider: "fal",
+		falEndpoint: "google/nano-banana-lite",
+		modelFamily: "nano-banana-lite",
+		endpointKind: "text-to-image",
 		capabilities: {
 			textToImage: true,
 			imageToImage: true,
 			multiImage: true
 		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
+		accepts: {
+			...baseAccepts,
+			imageInput: true
 		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
 		}
 	},
 	{
-		id: IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI,
-		name: "Ideogram V3",
+		id: IMAGE_MODEL_IDS.FLUX_2_KLEIN,
+		name: "FLUX.2 Klein 9B",
 		description:
-			"Multi-image processing with exceptional typography and poster generation (up to 4 images)",
+			"Budget FLUX.2 route for low-cost generation and experimentation.",
 		provider: "fal",
+		falEndpoint: "fal-ai/flux-2/klein/9b",
+		modelFamily: "flux-2",
+		endpointKind: "text-to-image",
 		capabilities: {
 			textToImage: true,
-			imageToImage: true,
-			multiImage: true
+			imageToImage: false,
+			multiImage: false
 		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 9,
-			inferenceSteps: 45
+		accepts: {
+			...baseAccepts,
+			imageInput: false
 		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "recraft-ideogram"
-		}
-	},
-
-	// Backend models - not shown to users but used internally (legacy)
-	{
-		id: IMAGE_MODEL_IDS.FLUX_PRO_FIRST_TIME,
-		name: "FLUX Kontext (First-Time)",
-		description: "Special model for first image generation in conversation",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_PRO_TEXT_TO_IMAGE,
-		name: "FLUX Kontext (Text-to-Image)",
-		description: "High-quality text-to-image generation",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: false
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_PRO_IMAGE_TO_IMAGE,
-		name: "FLUX Kontext (Image-to-Image)",
-		description: "Advanced image transformation capabilities",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 10,
-			inferenceSteps: 50
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_SCHNELL,
-		name: "FLUX Schnell",
-		description: "Fast image generation with good quality",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 7,
-			inferenceSteps: 25
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
-		}
-	},
-	{
-		id: IMAGE_MODEL_IDS.FLUX_DEV,
-		name: "FLUX Dev",
-		description: "Development model with balanced speed and quality",
-		provider: "fal",
-		capabilities: {
-			textToImage: true,
-			imageToImage: true
-		},
-		parameters: {
-			maxSize: "1024x1024",
-			guidanceScale: 8,
-			inferenceSteps: 35
-		},
-		aspectRatio: {
-			parameterName: "aspect_ratio",
-			supportedRatios: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-			defaultRatio: "1:1",
-			formatType: "flux"
+		routing: { editRoute: IMAGE_MODEL_IDS.FLUX_2_PRO_EDIT },
+		defaults: {
+			outputFormat: "png",
+			aspectRatio: "1:1"
 		}
 	}
 ]
 
-// All available model IDs as arrays for easy use in schemas
 export const ALL_MODEL_IDS = Object.values(MODEL_IDS)
 export const ALL_IMAGE_MODEL_IDS = Object.values(IMAGE_MODEL_IDS)
+export const USER_SELECTABLE_IMAGE_MODEL_IDS = ALL_IMAGE_MODEL_IDS
 
-// User-selectable image models (exclude legacy backend models)
-export const USER_SELECTABLE_IMAGE_MODEL_IDS = [
-	// Text-to-Image Models
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I,
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I,
-	IMAGE_MODEL_IDS.IMAGEN4_PREVIEW,
-	IMAGE_MODEL_IDS.RECRAFT_V3_T2I,
-	IMAGE_MODEL_IDS.FLUX_PRO_ULTRA,
-	IMAGE_MODEL_IDS.FLUX_PRO_V11,
-	IMAGE_MODEL_IDS.IDEOGRAM_V3,
-	// Image-to-Image Models
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I,
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I,
-	IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
-	IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
-	// Multi-Image Models
-	IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI,
-	IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
-]
+export const DEFAULT_CHAT_MODEL: ModelId = MODEL_IDS.CLAUDE_SONNET_5
+export const DEFAULT_IMAGE_MODEL: ImageModelId = IMAGE_MODEL_IDS.GPT_IMAGE_2
 
-export const DEFAULT_CHAT_MODEL: string = MODEL_IDS.GPT_4_1
-export const DEFAULT_IMAGE_MODEL: string = IMAGE_MODEL_IDS.IDEOGRAM_V3
+export const getImageModelConfig = (modelId: ImageModelId): ImageModel => {
+	const model = imageModels.find((imageModel) => imageModel.id === modelId)
+	if (!model) {
+		throw new Error(`Unknown image model: ${modelId}`)
+	}
+	return model
+}
 
-// Aspect ratio conversion utilities
-export const convertUniversalToModelAspectRatio = (
-	universalRatio: UniversalAspectRatio,
-	formatType: "flux" | "recraft-ideogram"
-): string => {
-	if (formatType === "flux") {
-		// FLUX models use the same format as universal
-		return universalRatio
+export const isImageModelId = (modelId: string): modelId is ImageModelId =>
+	(ALL_IMAGE_MODEL_IDS as readonly string[]).includes(modelId)
+
+export const isChatModelId = (modelId: string): modelId is ModelId =>
+	(ALL_MODEL_IDS as readonly string[]).includes(modelId)
+
+export const getRoutedImageModelId = ({
+	selectedModelId,
+	hasInputImages
+}: {
+	selectedModelId: ImageModelId
+	hasInputImages: boolean
+}): ImageModelId => {
+	const selectedModel = getImageModelConfig(selectedModelId)
+
+	if (hasInputImages) {
+		if (selectedModel.capabilities.imageToImage) {
+			return selectedModelId
+		}
+		if (selectedModel.routing?.editRoute) {
+			return selectedModel.routing.editRoute
+		}
+		throw new Error(
+			`Image model ${selectedModelId} cannot edit images and has no edit route`
+		)
 	}
 
-	// Recraft and Ideogram models use different format
-	const recraftIdeogramMapping: Record<
-		UniversalAspectRatio,
-		RecraftIdeogramAspectRatio
-	> = {
+	if (selectedModel.capabilities.textToImage) {
+		return selectedModelId
+	}
+	if (selectedModel.routing?.textRoute) {
+		return selectedModel.routing.textRoute
+	}
+	throw new Error(
+		`Image model ${selectedModelId} requires image input and has no text route`
+	)
+}
+
+export const modelSupportsGuidanceScale = (modelId: ImageModelId): boolean =>
+	getImageModelConfig(modelId).accepts.guidanceScale
+
+export const mapUniversalRatioToImageSize = (
+	aspectRatio: UniversalAspectRatio
+): string => {
+	const mapping: Record<UniversalAspectRatio, string> = {
 		"1:1": "square_hd",
 		"4:3": "landscape_4_3",
 		"3:4": "portrait_4_3",
@@ -556,42 +591,5 @@ export const convertUniversalToModelAspectRatio = (
 		"9:16": "portrait_16_9"
 	}
 
-	return recraftIdeogramMapping[universalRatio] || "square_hd"
-}
-
-export const getAspectRatioParameterForModel = (
-	modelId: ImageModelId,
-	universalRatio: UniversalAspectRatio
-): { parameterName: string; value: string } | null => {
-	const model = imageModels.find((m) => m.id === modelId)
-	if (!model || !model.aspectRatio) {
-		// I2I models don't have aspect ratio parameters
-		return null
-	}
-
-	const { aspectRatio } = model
-	const convertedValue = convertUniversalToModelAspectRatio(
-		universalRatio,
-		aspectRatio.formatType
-	)
-
-	return {
-		parameterName: aspectRatio.parameterName,
-		value: convertedValue
-	}
-}
-
-// Check if a model supports guidance scale parameter
-export const modelSupportsGuidanceScale = (modelId: ImageModelId): boolean => {
-	// Recraft, Ideogram, and Imagen models don't support guidance scale
-	const unsupportedModels: ImageModelId[] = [
-		IMAGE_MODEL_IDS.RECRAFT_V3_T2I,
-		IMAGE_MODEL_IDS.RECRAFT_V3_I2I,
-		IMAGE_MODEL_IDS.IDEOGRAM_V3,
-		IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX,
-		IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI,
-		IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
-	]
-
-	return !unsupportedModels.includes(modelId)
+	return mapping[aspectRatio]
 }

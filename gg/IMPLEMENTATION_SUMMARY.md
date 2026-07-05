@@ -42,7 +42,9 @@ const parseImageInput = (
 ): { prompt: string; imageUrl: string | null }
 
 // Automatic model selection based on input type
-const modelToUse = inputImage ? "edit-img-model" : "first-img-model"
+const modelToUse = getRoutedImageModelId(selectedModelId, {
+	hasImageInput: Boolean(inputImage)
+})
 ```
 
 ### 2. Improved Image Editor Component (`components/image-editor.tsx`)
@@ -131,9 +133,9 @@ onStreamPart: ({ streamPart, setArtifact }) => {
    - Preserves user instructions when using file uploads
 
 2. **Model Selection:**
-   - `fal-ai/flux-pro/kontext/text-to-image` for text-only generation
-   - `fal-ai/flux-pro/kontext` for image-to-image generation
-   - Automatic selection based on input type
+   - Current text-to-image catalog entries for text-only generation
+   - Current image-edit catalog entries for image-to-image generation
+   - Automatic selection based on explicit catalog routes
 
 3. **Parameter Optimization:**
    - Strength: 0.8 for new input images, 0.6 for modifications

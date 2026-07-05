@@ -11,11 +11,15 @@ import { useChatVisibility } from "@/hooks/use-chat-visibility"
 import type { Vote } from "@/lib/db/schema"
 import { ChatSDKError } from "@/lib/errors"
 import { fetchWithErrorHandlers, fetcher, generateUUID } from "@/lib/utils"
+import { DefaultChatTransport } from "ai"
 import { useChat } from "@ai-sdk/react"
-import type { Attachment, UIMessage } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 import type { Session } from "next-auth"
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState, useRef } from "react"
+import { useCallback, useEffect, useMemo, useState, useRef } from "react"
 import useSWR, { useSWRConfig } from "swr"
 import { unstable_serialize } from "swr/infinite"
 import { useLocalStorage } from "usehooks-ts"
@@ -58,35 +62,59 @@ export function Chat({
 	const { updateHeaderState, clearHeaderState } = useChatHeader()
 	const { setArtifact } = useArtifact()
 	const previousChatIdRef = useRef<string | null>(null)
+	const [input, setInput] = useState("")
+	const transport = useMemo(
+		() =>
+			new DefaultChatTransport<UIMessage>({
+				fetch: fetchWithErrorHandlers,
+				prepareSendMessagesRequest: ({ messages }) => {
+					const message = messages.at(-1)
+
+					return {
+						body: {
+							id,
+							message: {
+								...message,
+								content:
+									message?.parts
+										?.filter((part) => part.type === "text")
+										.map((part) => part.text)
+										.join("") ?? ""
+							},
+							selectedChatModel: initialChatModel,
+							selectedImageModel: initialImageModel,
+							selectedVisibilityType: visibilityType,
+							selectedAspectRatio: initialAspectRatio,
+							selectedGuidanceScale:
+								parseInt(initialGuidanceScale)
+						}
+					}
+				}
+			}),
+		[
+			id,
+			initialAspectRatio,
+			initialChatModel,
+			initialGuidanceScale,
+			initialImageModel,
+			visibilityType
+		]
+	)
 
 	const {
 		messages,
 		setMessages,
-		handleSubmit,
-		input,
-		setInput,
-		append,
+		sendMessage,
 		status,
 		stop,
-		reload,
-		experimental_resume,
-		data
-	} = useChat({
+		regenerate,
+		resumeStream
+	} = useChat<UIMessage>({
 		id,
-		initialMessages,
+		messages: initialMessages,
+		transport,
 		experimental_throttle: 100,
-		sendExtraMessageFields: true,
 		generateId: generateUUID,
-		fetch: fetchWithErrorHandlers,
-		experimental_prepareRequestBody: (body) => ({
-			id,
-			message: body.messages.at(-1),
-			selectedChatModel: initialChatModel,
-			selectedImageModel: initialImageModel,
-			selectedVisibilityType: visibilityType,
-			selectedAspectRatio: initialAspectRatio,
-			selectedGuidanceScale: parseInt(initialGuidanceScale)
-		}),
 		onFinish: () => {
 			mutate(unstable_serialize(getChatHistoryPaginationKey))
 		},
@@ -99,6 +127,45 @@ export function Chat({
 			}
 		}
 	})
+	const append = useCallback(
+		async (message: {
+			role: "user"
+			content: string
+			experimental_attachments?: Array<Attachment>
+		}) => {
+			await sendMessage({
+				role: message.role,
+				parts: [{ type: "text", text: message.content }],
+				experimental_attachments: message.experimental_attachments
+			} as UIMessage)
+		},
+		[sendMessage]
+	)
+	const handleSubmit = useCallback(
+		(
+			event?: { preventDefault?: () => void },
+			options?: { experimental_attachments?: Array<Attachment> }
+		) => {
+			event?.preventDefault?.()
+			if (!input.trim() && !options?.experimental_attachments?.length) {
+				return
+			}
+
+			append({
+				role: "user",
+				content: input,
+				experimental_attachments: options?.experimental_attachments
+			})
+			setInput("")
+		},
+		[append, input]
+	)
+	const reload = useCallback(() => regenerate(), [regenerate])
+	const experimental_resume = useCallback(
+		() => resumeStream(),
+		[resumeStream]
+	)
+	const data: unknown[] = []
 
 	const searchParams = useSearchParams()
 	const query = searchParams.get("query")

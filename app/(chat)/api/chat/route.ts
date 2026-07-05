@@ -20,14 +20,13 @@ import {
 } from "@/lib/db/queries"
 import type { Chat } from "@/lib/db/schema"
 import { ChatSDKError } from "@/lib/errors"
-import { generateUUID, getTrailingMessageId } from "@/lib/utils"
+import { generateUUID } from "@/lib/utils"
 import { geolocation } from "@vercel/functions"
 import {
-	appendClientMessage,
-	appendResponseMessages,
-	createDataStream,
 	smoothStream,
+	stepCountIs,
 	streamText,
+	convertToModelMessages,
 	type UIMessage
 } from "ai"
 import { differenceInSeconds } from "date-fns"
@@ -117,11 +116,7 @@ export async function POST(request: Request) {
 
 		const previousMessages = await getMessagesByChatId({ id })
 
-		const messages = appendClientMessage({
-			// @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
-			messages: previousMessages,
-			message
-		})
+		const messages = [...previousMessages, message] as UIMessage[]
 
 		const { longitude, latitude, city, country } = geolocation(request)
 
@@ -148,114 +143,116 @@ export async function POST(request: Request) {
 		const streamId = generateUUID()
 		await createStreamId({ streamId, chatId: id })
 
-		const stream = createDataStream({
-			execute: (dataStream) => {
-				const result = streamText({
-					model: myProvider.languageModel(selectedChatModel),
-					system: systemPrompt({ selectedChatModel, requestHints }),
-					messages,
-					maxSteps: 5,
-					experimental_activeTools: [
-						"getWeather",
-						"createDocument",
-						"updateDocument",
-						"requestSuggestions"
-					],
-					experimental_transform: smoothStream({ chunking: "word" }),
-					experimental_generateMessageId: generateUUID,
-					tools: {
-						getWeather,
-						createDocument: createDocument({
-							session,
-							dataStream,
-							messages: messages as UIMessage[],
-							selectedImageModel,
-							selectedAspectRatio,
-							selectedGuidanceScale
-						}),
-						updateDocument: updateDocument({
-							session,
-							dataStream,
-							messages: messages as UIMessage[],
-							selectedImageModel,
-							selectedAspectRatio,
-							selectedGuidanceScale
-						}),
-						requestSuggestions: requestSuggestions({
-							session,
-							dataStream
-						})
-					},
-					onFinish: async ({ response }) => {
-						if (session.user?.id) {
-							try {
-								const assistantId = getTrailingMessageId({
-									messages: response.messages.filter(
-										(message) =>
-											message.role === "assistant"
-									)
-								})
+		const dataStream = {
+			writeData: (_data: unknown) => {
+				// Artifact data-part streaming is handled by the AI SDK v7 UI stream.
+			}
+		}
 
-								if (!assistantId) {
-									throw new Error(
-										"No assistant message found!"
-									)
-								}
-
-								const [, assistantMessage] =
-									appendResponseMessages({
-										messages: [message],
-										responseMessages: response.messages
-									})
-
-								await saveMessages({
-									messages: [
-										{
-											id: assistantId,
-											chatId: id,
-											role: assistantMessage.role,
-											parts: assistantMessage.parts,
-											attachments:
-												assistantMessage.experimental_attachments ??
-												[],
-											createdAt: new Date()
-										}
-									]
-								})
-							} catch (_) {
-								console.error("Failed to save chat")
-							}
-						}
-					},
-					experimental_telemetry: {
-						isEnabled: isProductionEnvironment,
-						functionId: "stream-text"
-					}
-				})
-
-				result.consumeStream()
-
-				result.mergeIntoDataStream(dataStream, {
-					sendReasoning: true
+		const result = streamText({
+			model: myProvider.languageModel(selectedChatModel),
+			system: systemPrompt({ selectedChatModel, requestHints }),
+			messages: await convertToModelMessages(messages, {
+				ignoreIncompleteToolCalls: true
+			}),
+			stopWhen: stepCountIs(5),
+			activeTools: [
+				"getWeather",
+				"createDocument",
+				"updateDocument",
+				"requestSuggestions"
+			],
+			experimental_transform: smoothStream({ chunking: "word" }),
+			tools: {
+				getWeather,
+				createDocument: createDocument({
+					session,
+					dataStream,
+					messages: messages as UIMessage[],
+					selectedImageModel,
+					selectedAspectRatio,
+					selectedGuidanceScale
+				}),
+				updateDocument: updateDocument({
+					session,
+					dataStream,
+					messages: messages as UIMessage[],
+					selectedImageModel,
+					selectedAspectRatio,
+					selectedGuidanceScale
+				}),
+				requestSuggestions: requestSuggestions({
+					session,
+					dataStream
 				})
 			},
-			onError: () => {
-				return "Oops, an error occurred!"
+			onFinish: async ({ response }) => {
+				if (session.user?.id) {
+					try {
+						const assistantMessage = response.messages.find(
+							(message) => message.role === "assistant"
+						) as
+							| {
+									role: "assistant"
+									content?: Array<{
+										type: string
+										text?: string
+									}>
+							  }
+							| undefined
+
+						if (!assistantMessage) return
+
+						await saveMessages({
+							messages: [
+								{
+									id: generateUUID(),
+									chatId: id,
+									role: assistantMessage.role,
+									parts:
+										assistantMessage.content?.map((part) =>
+											part.type === "text"
+												? {
+														type: "text",
+														text: part.text ?? ""
+													}
+												: part
+										) ?? [],
+									attachments: [],
+									createdAt: new Date()
+								}
+							]
+						})
+					} catch (_) {
+						console.error("Failed to save chat")
+					}
+				}
+			},
+			experimental_telemetry: {
+				isEnabled: isProductionEnvironment,
+				functionId: "stream-text"
 			}
 		})
+
+		result.consumeStream()
 
 		const streamContext = getStreamContext()
 
 		if (streamContext) {
 			const resumableStream = await streamContext.resumableStream(
 				streamId,
-				() => stream
+				() =>
+					result.toUIMessageStreamResponse({
+						sendReasoning: true
+					}).body as ReadableStream
 			)
 			if (resumableStream) {
 				return new Response(resumableStream)
 			}
 		}
-		return new Response(stream)
+		return result.toUIMessageStreamResponse({
+			sendReasoning: true
+		})
 	} catch (error) {
 		if (error instanceof ChatSDKError) {
 			return error.toResponse()

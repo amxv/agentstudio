@@ -132,6 +132,7 @@ function SlidesViewer({
 
 				<div className="flex items-center gap-2">
 					<button
+						type="button"
 						onClick={() =>
 							setMetadata({
 								...metadata,
@@ -190,6 +191,7 @@ function SlidesViewer({
 				<div className="flex gap-2 overflow-x-auto pb-2">
 					{slides.map((slide, index) => (
 						<button
+							type="button"
 							key={index}
 							onClick={() => goToSlide(index)}
 							className={`flex-shrink-0 w-20 h-14 rounded border-2 overflow-hidden ${
@@ -395,14 +397,15 @@ export const slidesArtifact = new Artifact<"slides", SlidesArtifactMetadata>({
 								navigator.clipboard &&
 								"write" in navigator.clipboard
 							) {
-								const ClipboardItem = (window as any)
-									.ClipboardItem
-								navigator.clipboard.write([
-									new ClipboardItem({
-										"image/png": blob
-									})
-								])
-								toast.success("Slide copied to clipboard!")
+								if ("ClipboardItem" in window) {
+									const clipboardItem = window.ClipboardItem
+									navigator.clipboard.write([
+										new clipboardItem({
+											"image/png": blob
+										})
+									])
+									toast.success("Slide copied to clipboard!")
+								}
 							}
 						}, "image/png")
 					}

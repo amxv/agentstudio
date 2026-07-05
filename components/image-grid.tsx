@@ -267,9 +267,9 @@ export function ImageGrid({ images }: ImageGridProps) {
 								{/* Details */}
 								<div className="space-y-4">
 									<div>
-										<label className="text-sm font-medium text-muted-foreground">
+										<p className="text-sm font-medium text-muted-foreground">
 											Prompt
-										</label>
+										</p>
 										<p className="mt-1 text-sm bg-muted p-3 rounded-2xl">
 											{selectedImage.prompt}
 										</p>
@@ -277,9 +277,9 @@ export function ImageGrid({ images }: ImageGridProps) {
 
 									{selectedImage.negativePrompt && (
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Negative Prompt
-											</label>
+											</p>
 											<p className="mt-1 text-sm bg-muted p-3 rounded-2xl">
 												{selectedImage.negativePrompt}
 											</p>
@@ -288,17 +288,17 @@ export function ImageGrid({ images }: ImageGridProps) {
 
 									<div className="grid grid-cols-2 gap-4">
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Model
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{selectedImage.model}
 											</p>
 										</div>
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Style
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{selectedImage.style}
 											</p>
@@ -307,18 +307,18 @@ export function ImageGrid({ images }: ImageGridProps) {
 
 									<div className="grid grid-cols-2 gap-4">
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Dimensions
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{selectedImage.width} ×{" "}
 												{selectedImage.height}
 											</p>
 										</div>
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Steps
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{selectedImage.steps}
 											</p>
@@ -327,18 +327,18 @@ export function ImageGrid({ images }: ImageGridProps) {
 
 									<div className="grid grid-cols-2 gap-4">
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Guidance Scale
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{selectedImage.guidanceScale}
 											</p>
 										</div>
 										{selectedImage.seed && (
 											<div>
-												<label className="text-sm font-medium text-muted-foreground">
+												<p className="text-sm font-medium text-muted-foreground">
 													Seed
-												</label>
+												</p>
 												<p className="mt-1 text-sm">
 													{selectedImage.seed}
 												</p>
@@ -347,9 +347,9 @@ export function ImageGrid({ images }: ImageGridProps) {
 									</div>
 
 									<div>
-										<label className="text-sm font-medium text-muted-foreground">
+										<p className="text-sm font-medium text-muted-foreground">
 											Created
-										</label>
+										</p>
 										<p className="mt-1 text-sm">
 											{new Date(
 												selectedImage.createdAt
@@ -359,9 +359,9 @@ export function ImageGrid({ images }: ImageGridProps) {
 
 									{selectedImage.completedAt && (
 										<div>
-											<label className="text-sm font-medium text-muted-foreground">
+											<p className="text-sm font-medium text-muted-foreground">
 												Completed
-											</label>
+											</p>
 											<p className="mt-1 text-sm">
 												{new Date(
 													selectedImage.completedAt

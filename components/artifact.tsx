@@ -4,8 +4,11 @@ import { textArtifact } from "@/artifacts/text/client"
 import { useArtifact } from "@/hooks/use-artifact"
 import type { Document, Vote } from "@/lib/db/schema"
 import { fetcher } from "@/lib/utils"
-import type { UseChatHelpers } from "@ai-sdk/react"
-import type { Attachment, UIMessage } from "ai"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 import { formatDistance } from "date-fns"
 import equal from "fast-deep-equal"
 import { AnimatePresence, motion } from "framer-motion"

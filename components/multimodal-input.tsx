@@ -1,6 +1,9 @@
 "use client"
 
-import type { Attachment, UIMessage } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 import cx from "classnames"
 import type React from "react"
 import {
@@ -17,7 +20,7 @@ import { toast } from "sonner"
 import { useLocalStorage, useWindowSize } from "usehooks-ts"
 
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom"
-import type { UseChatHelpers } from "@ai-sdk/react"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
 import equal from "fast-deep-equal"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowDown } from "lucide-react"

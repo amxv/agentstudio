@@ -5,7 +5,7 @@ The slides artifact creates professional presentation slide decks from markdown 
 ## Features
 
 - **Markdown-to-Slides Conversion**: Automatically parses markdown with slide separators (`---`) into individual slides
-- **AI Image Generation**: Uses FAL.AI models (FLUX, Ideogram, Recraft) to generate professional slide images
+- **AI Image Generation**: Uses the current FAL image catalog to generate professional slide images
 - **Interactive Viewer**: Navigate through slides with thumbnail previews and fullscreen mode
 - **Professional Styling**: Generates slides with clean, business-appropriate layouts
 - **Download & Share**: Export individual slides or copy to clipboard
@@ -83,9 +83,10 @@ Each slide is separated by `---` and can contain:
 
 Uses FAL.AI models optimized for professional presentations:
 
-- **FLUX Pro**: High-quality, fast generation
-- **Ideogram V3**: Excellent typography handling
-- **Recraft V3**: Vector-style graphics
+- **GPT Image 2**: Default high-quality slide image generation
+- **Ideogram v4**: Excellent typography handling
+- **Krea 2 Large**: Polished creative layouts
+- **FLUX.2 Pro**: Production-grade general generation
 - **Aspect Ratio**: 4:3 (1024x768) optimized for presentations
 
 ## Viewer Features
@@ -203,7 +204,7 @@ function Welcome({ name }) {
 
 This artifact leverages the Chat SDK's capabilities:
 
-- **AI SDK Integration**: Uses `experimental_generateImage` for slide generation
+- **AI SDK Integration**: Uses `generateImage` for slide generation
 - **Streaming Support**: Real-time progress updates during generation
 - **File Upload**: Support for markdown file uploads
 - **Version Control**: Maintains history of slide deck iterations

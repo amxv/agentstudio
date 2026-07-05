@@ -40,7 +40,11 @@ const spaceGrotesk = Space_Grotesk({
 
 const fadeUp = {
 	hidden: { opacity: 0, y: 24 },
-	visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: { duration: 0.5, ease: "easeOut" }
+	}
 }
 
 const staggerContainer = {
@@ -74,7 +78,9 @@ function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 			<div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
 				<div className="flex items-center gap-3">
 					<AgentStudioLogo size="8" />
-					<span className={`text-lg font-semibold ${spaceGrotesk.className}`}>
+					<span
+						className={`text-lg font-semibold ${spaceGrotesk.className}`}
+					>
 						AgentStudio
 					</span>
 				</div>
@@ -110,9 +116,10 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 					transition={{ delay: 0.15 }}
 					className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
 				>
-					Describe what you want to create. AgentStudio selects the right AI
-					model, crafts the prompt, and generates production-ready visuals — all
-					through a simple conversation.
+					Describe what you want to create. AgentStudio selects the
+					right AI model, crafts the prompt, and generates
+					production-ready visuals — all through a simple
+					conversation.
 				</motion.p>
 				<motion.div
 					variants={fadeUp}
@@ -154,15 +161,16 @@ function ProblemSection() {
 					className="mt-10 grid md:grid-cols-2 gap-8 text-muted-foreground"
 				>
 					<p className="text-base leading-relaxed">
-						You need images for your next campaign, your client deck, your
-						product launch. But the options aren&apos;t great. Hiring a designer
-						takes days and costs hundreds per asset. Stock photography looks
-						generic.
+						You need images for your next campaign, your client
+						deck, your product launch. But the options aren&apos;t
+						great. Hiring a designer takes days and costs hundreds
+						per asset. Stock photography looks generic.
 					</p>
 					<p className="text-base leading-relaxed">
-						And most AI tools drop you into a maze of sliders, parameters, and
-						technical settings you didn&apos;t ask for. You shouldn&apos;t need
-						to know what &ldquo;guidance scale&rdquo; or &ldquo;inference
+						And most AI tools drop you into a maze of sliders,
+						parameters, and technical settings you didn&apos;t ask
+						for. You shouldn&apos;t need to know what
+						&ldquo;guidance scale&rdquo; or &ldquo;inference
 						steps&rdquo; mean just to get a clean product shot.
 					</p>
 				</motion.div>
@@ -177,7 +185,7 @@ function HowItWorksSection() {
 			number: "1",
 			title: "Describe your vision",
 			description:
-				"Type what you need in the chat. \"Design a minimalist logo for a coffee shop called Brew & Bean.\" That's all it takes.",
+				'Type what you need in the chat. "Design a minimalist logo for a coffee shop called Brew & Bean." That\'s all it takes.',
 			icon: PenLine
 		},
 		{
@@ -191,7 +199,7 @@ function HowItWorksSection() {
 			number: "3",
 			title: "Refine with words",
 			description:
-				"Want changes? Say so. \"Make the font bolder and change the color to deep brown.\" The system switches to editing mode automatically.",
+				'Want changes? Say so. "Make the font bolder and change the color to deep brown." The system switches to editing mode automatically.',
 			icon: Wand2
 		},
 		{
@@ -219,9 +227,9 @@ function HowItWorksSection() {
 						Describe it. Generate it. Refine it.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						AgentStudio works through conversation. Describe what you need in
-						plain language, and an AI assistant handles the technical
-						decisions.
+						AgentStudio works through conversation. Describe what
+						you need in plain language, and an AI assistant handles
+						the technical decisions.
 					</p>
 				</motion.div>
 				<motion.div
@@ -240,7 +248,9 @@ function HowItWorksSection() {
 							<div className="flex items-center justify-center size-10 rounded-full bg-primary text-primary-foreground text-sm font-bold mb-4">
 								{step.number}
 							</div>
-							<h3 className="font-semibold text-lg mb-2">{step.title}</h3>
+							<h3 className="font-semibold text-lg mb-2">
+								{step.title}
+							</h3>
 							<p className="text-sm text-muted-foreground leading-relaxed">
 								{step.description}
 							</p>
@@ -306,7 +316,9 @@ function KeyBenefitsSection() {
 							className="rounded-2xl border border-border bg-card p-6"
 						>
 							<benefit.icon className="size-6 text-muted-foreground mb-4" />
-							<h3 className="font-semibold text-lg mb-2">{benefit.title}</h3>
+							<h3 className="font-semibold text-lg mb-2">
+								{benefit.title}
+							</h3>
 							<p className="text-sm text-muted-foreground leading-relaxed">
 								{benefit.description}
 							</p>
@@ -335,7 +347,7 @@ const imageModels = [
 		name: "HunyuanImage 3.0 Instruct",
 		provider: "Tencent",
 		description:
-			"World's largest open-source image model at 80B parameters. Excels at complex reasoning with a \"think first, then generate\" approach."
+			'World\'s largest open-source image model at 80B parameters. Excels at complex reasoning with a "think first, then generate" approach.'
 	},
 	{
 		name: "Seedream 4.5",
@@ -365,7 +377,7 @@ const imageModels = [
 		name: "Nano Banana",
 		provider: "Google",
 		description:
-			"Gemini 2.5 Flash-based model designed for iterative creative workflows, generating images 2-3x faster than comparable models."
+			"Fast Gemini image model designed for iterative creative workflows and responsive draft generation."
 	},
 	{
 		name: "Reve V1",
@@ -410,7 +422,8 @@ const providerColors: Record<string, string> = {
 	Google: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
 	Tencent: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
 	ByteDance: "bg-pink-500/10 text-pink-700 dark:text-pink-400",
-	"Black Forest Labs": "bg-violet-500/10 text-violet-700 dark:text-violet-400",
+	"Black Forest Labs":
+		"bg-violet-500/10 text-violet-700 dark:text-violet-400",
 	Alibaba: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
 	Reve: "bg-rose-500/10 text-rose-700 dark:text-rose-400",
 	"Eigen AI": "bg-amber-500/10 text-amber-700 dark:text-amber-400"
@@ -433,9 +446,10 @@ function AIImageModelsSection() {
 						14 top-ranked AI image models. One interface.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						Different images require different tools. AgentStudio gives you
-						access to the highest-ranked models from leading AI providers — and
-						selects the right one for each job.
+						Different images require different tools. AgentStudio
+						gives you access to the highest-ranked models from
+						leading AI providers — and selects the right one for
+						each job.
 					</p>
 				</motion.div>
 				<motion.div
@@ -454,13 +468,16 @@ function AIImageModelsSection() {
 							<div className="flex items-center gap-2 mb-2">
 								<span
 									className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-										providerColors[model.provider] || "bg-muted text-muted-foreground"
+										providerColors[model.provider] ||
+										"bg-muted text-muted-foreground"
 									}`}
 								>
 									{model.provider}
 								</span>
 							</div>
-							<h3 className="font-semibold text-sm mb-1">{model.name}</h3>
+							<h3 className="font-semibold text-sm mb-1">
+								{model.name}
+							</h3>
 							<p className="text-xs text-muted-foreground leading-relaxed">
 								{model.description}
 							</p>
@@ -482,27 +499,32 @@ function ChatAIModelsSection() {
 		{
 			name: "GPT 5.2",
 			provider: "OpenAI",
-			description: "OpenAI's latest flagship model for broad, reliable performance."
+			description:
+				"OpenAI's latest flagship model for broad, reliable performance."
 		},
 		{
 			name: "Gemini 3 Pro",
 			provider: "Google",
-			description: "Advanced multimodal model with deep context understanding."
+			description:
+				"Advanced multimodal model with deep context understanding."
 		},
 		{
 			name: "Gemini 3 Flash",
 			provider: "Google",
-			description: "Fast and responsive model for quick creative exchanges."
+			description:
+				"Fast and responsive model for quick creative exchanges."
 		},
 		{
 			name: "DeepSeek 3.2",
 			provider: "DeepSeek",
-			description: "Strong reasoning model tuned for efficient problem solving."
+			description:
+				"Strong reasoning model tuned for efficient problem solving."
 		},
 		{
 			name: "Kimi K2.5",
 			provider: "Kimi",
-			description: "Conversational model designed for fast, context-aware responses."
+			description:
+				"Conversational model designed for fast, context-aware responses."
 		}
 	]
 
@@ -530,9 +552,9 @@ function ChatAIModelsSection() {
 						Choose the AI that guides your creative process.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						The conversational assistant that interprets your requests is powered
-						by your choice of six language models. Switch between them at any
-						time.
+						The conversational assistant that interprets your
+						requests is powered by your choice of six language
+						models. Switch between them at any time.
 					</p>
 				</motion.div>
 				<motion.div
@@ -550,12 +572,15 @@ function ChatAIModelsSection() {
 						>
 							<span
 								className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-									chatProviderColors[model.provider] || "bg-muted text-muted-foreground"
+									chatProviderColors[model.provider] ||
+									"bg-muted text-muted-foreground"
 								}`}
 							>
 								{model.provider}
 							</span>
-							<h3 className="font-semibold text-sm mt-3 mb-1">{model.name}</h3>
+							<h3 className="font-semibold text-sm mt-3 mb-1">
+								{model.name}
+							</h3>
 							<p className="text-xs text-muted-foreground">
 								{model.description}
 							</p>
@@ -608,7 +633,8 @@ function BeyondSingleImagesSection() {
 					<h2
 						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
 					>
-						Generate presentations, spreadsheets, and written content too.
+						Generate presentations, spreadsheets, and written
+						content too.
 					</h2>
 				</motion.div>
 				<motion.div
@@ -625,7 +651,9 @@ function BeyondSingleImagesSection() {
 							className="rounded-2xl border border-border bg-card p-6 text-center"
 						>
 							<artifact.icon className="size-8 text-muted-foreground mx-auto mb-4" />
-							<h3 className="font-semibold text-lg mb-2">{artifact.title}</h3>
+							<h3 className="font-semibold text-lg mb-2">
+								{artifact.title}
+							</h3>
 							<p className="text-sm text-muted-foreground leading-relaxed">
 								{artifact.description}
 							</p>
@@ -642,22 +670,26 @@ function ImageInputSection() {
 		{
 			icon: Upload,
 			title: "Upload",
-			description: "Attach files directly through the chat (JPEG, PNG, GIF, WebP, BMP — up to 10MB)."
+			description:
+				"Attach files directly through the chat (JPEG, PNG, GIF, WebP, BMP — up to 10MB)."
 		},
 		{
 			icon: MousePointerClick,
 			title: "Drag and drop",
-			description: "Drag images onto the conversation from your desktop or file manager."
+			description:
+				"Drag images onto the conversation from your desktop or file manager."
 		},
 		{
 			icon: Clipboard,
 			title: "Paste",
-			description: "Paste screenshots and images directly from your clipboard."
+			description:
+				"Paste screenshots and images directly from your clipboard."
 		},
 		{
 			icon: LinkIcon,
 			title: "Link",
-			description: "Reference images via URL in your message for instant editing."
+			description:
+				"Reference images via URL in your message for instant editing."
 		}
 	]
 
@@ -677,7 +709,9 @@ function ImageInputSection() {
 						Every way to get images in.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						The platform detects your input and automatically switches to the right editing mode. No manual configuration needed.
+						The platform detects your input and automatically
+						switches to the right editing mode. No manual
+						configuration needed.
 					</p>
 				</motion.div>
 				<motion.div
@@ -694,7 +728,9 @@ function ImageInputSection() {
 							className="rounded-2xl border border-border bg-card p-6 text-center"
 						>
 							<method.icon className="size-6 text-muted-foreground mx-auto mb-3" />
-							<h3 className="font-semibold text-sm mb-1">{method.title}</h3>
+							<h3 className="font-semibold text-sm mb-1">
+								{method.title}
+							</h3>
 							<p className="text-xs text-muted-foreground leading-relaxed">
 								{method.description}
 							</p>
@@ -747,7 +783,8 @@ function WorkflowFeaturesSection() {
 		{
 			icon: Moon,
 			title: "Dark mode",
-			description: "Full dark and light mode support, following your system preference."
+			description:
+				"Full dark and light mode support, following your system preference."
 		},
 		{
 			icon: Smartphone,
@@ -784,7 +821,9 @@ function WorkflowFeaturesSection() {
 						>
 							<feature.icon className="size-5 text-muted-foreground" />
 							<div>
-								<h3 className="font-semibold text-sm">{feature.title}</h3>
+								<h3 className="font-semibold text-sm">
+									{feature.title}
+								</h3>
 								<p className="text-xs text-muted-foreground mt-1 leading-relaxed">
 									{feature.description}
 								</p>
@@ -817,8 +856,8 @@ function FinalCTASection({ isAuthenticated }: { isAuthenticated: boolean }) {
 					viewport={{ once: true, margin: "-100px" }}
 					className="mt-4 text-muted-foreground text-lg"
 				>
-					Describe what you need. The right AI model, the right parameters, the
-					right prompt — handled for you.
+					Describe what you need. The right AI model, the right
+					parameters, the right prompt — handled for you.
 				</motion.p>
 				<motion.div
 					variants={fadeUp}

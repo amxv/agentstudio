@@ -21,7 +21,7 @@ export type UserContext = {
 export async function createAuthenticatedContext({
 	browser,
 	name,
-	chatModel = MODEL_IDS.CLAUDE_SONNET_4
+	chatModel = MODEL_IDS.CLAUDE_SONNET_5
 }: {
 	browser: Browser
 	name: string
@@ -39,7 +39,7 @@ export async function createAuthenticatedContext({
 	const page = await context.newPage()
 
 	const email = `test-${name}@playwright.com`
-	const password = generateId(16)
+	const password = generateId()
 
 	await page.goto("http://localhost:3000/register")
 	await page.getByPlaceholder("user@acme.com").click()
@@ -54,9 +54,9 @@ export async function createAuthenticatedContext({
 
 	const chatPage = new ChatPage(page)
 	await chatPage.createNewChat()
-	await chatPage.chooseModelFromSelector(MODEL_IDS.O4_MINI)
+	await chatPage.chooseModelFromSelector(MODEL_IDS.GPT_5_5)
 	await expect(chatPage.getSelectedModel()).resolves.toEqual(
-		MODEL_IDS.O4_MINI
+		MODEL_IDS.GPT_5_5
 	)
 
 	await page.waitForTimeout(1000)
@@ -75,7 +75,7 @@ export async function createAuthenticatedContext({
 
 export function generateRandomTestUser() {
 	const email = `test-${getUnixTime(new Date())}@playwright.com`
-	const password = generateId(16)
+	const password = generateId()
 
 	return {
 		email,

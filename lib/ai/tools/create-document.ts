@@ -3,8 +3,9 @@ import {
 	documentHandlersByArtifactKind
 } from "@/lib/artifacts/server"
 import { generateUUID } from "@/lib/utils"
-import { type DataStreamWriter, tool } from "ai"
-import type { UIMessage } from "ai"
+import { tool } from "ai"
+import type { AppDataStreamWriter as DataStreamWriter } from "@/lib/ai/types"
+import type { AppUIMessage as UIMessage } from "@/lib/ai/types"
 import type { Session } from "next-auth"
 import { z } from "zod"
 
@@ -28,7 +29,7 @@ export const createDocument = ({
 	tool({
 		description:
 			"Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.",
-		parameters: z.object({
+		inputSchema: z.object({
 			title: z.string(),
 			kind: z.enum(artifactKinds as [string, ...string[]])
 		}),

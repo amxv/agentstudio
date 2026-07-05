@@ -1,4 +1,7 @@
-import { type UIMessage, appendResponseMessages, type Attachment } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 import { config } from "dotenv"
 import { inArray } from "drizzle-orm"
 import { drizzle } from "drizzle-orm/postgres-js"
@@ -164,15 +167,7 @@ async function migrateMessages() {
 				const [firstAssistantMessage] = assistantMessages
 
 				try {
-					const uiSection = appendResponseMessages({
-						messages: [userMessage],
-						// @ts-expect-error: message.content has different type
-						responseMessages: assistantMessages,
-						_internal: {
-							currentDate: () =>
-								firstAssistantMessage.createdAt ?? new Date()
-						}
-					})
+					const uiSection = [userMessage, ...assistantMessages]
 
 					const projectedUISection = uiSection
 						.map((message) => {
@@ -181,7 +176,16 @@ async function migrateMessages() {
 									id: message.id,
 									chatId: chat.id,
 									parts: [
-										{ type: "text", text: message.content }
+										{
+											type: "text",
+											text: String(
+												(
+													message as {
+														content?: unknown
+													}
+												).content ?? ""
+											)
+										}
 									],
 									role: message.role,
 									createdAt: message.createdAt,
@@ -190,7 +194,10 @@ async function migrateMessages() {
 							}
 							if (message.role === "assistant") {
 								const cleanParts = sanitizeParts(
-									dedupeParts(message.parts || [])
+									dedupeParts(
+										(message as { parts?: MessagePart[] })
+											.parts || []
+									)
 								)
 
 								return {

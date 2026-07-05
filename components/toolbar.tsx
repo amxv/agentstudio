@@ -6,7 +6,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger
 } from "@/components/ui/tooltip"
-import type { Message } from "ai"
+import type { AppUIMessage as Message } from "@/lib/ai/types"
 import cx from "classnames"
 import {
 	AnimatePresence,
@@ -25,7 +25,7 @@ import {
 	useState
 } from "react"
 
-import type { UseChatHelpers } from "@ai-sdk/react"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
 import { type ArtifactKind, artifactDefinitions } from "./artifact"
 import type { ArtifactToolbarItem } from "./create-artifact"
 import { ArrowUpIcon, StopIcon, SummarizeIcon } from "./icons"

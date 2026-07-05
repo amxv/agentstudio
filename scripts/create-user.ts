@@ -68,7 +68,7 @@ Examples:
 	}
 
 	const email = args[0]
-	const password = args[1] || generateId(12)
+	const password = args[1] || generateId()
 
 	if (!email) {
 		console.error("❌ Error: Email is required")

@@ -4,7 +4,12 @@ import { redirect } from "next/navigation"
 import { auth } from "@/app/(auth)/auth"
 import { Chat } from "@/components/chat"
 import { DataStreamHandler } from "@/components/data-stream-handler"
-import { DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL } from "@/lib/ai/models"
+import {
+	DEFAULT_CHAT_MODEL,
+	DEFAULT_IMAGE_MODEL,
+	isChatModelId,
+	isImageModelId
+} from "@/lib/ai/models"
 import { generateUUID } from "@/lib/utils"
 
 export default async function Page() {
@@ -21,6 +26,14 @@ export default async function Page() {
 	const imageModelIdFromCookie = cookieStore.get("image-model")
 	const aspectRatioFromCookie = cookieStore.get("aspect-ratio")
 	const guidanceScaleFromCookie = cookieStore.get("guidance-scale")
+	const initialChatModel =
+		modelIdFromCookie && isChatModelId(modelIdFromCookie.value)
+			? modelIdFromCookie.value
+			: DEFAULT_CHAT_MODEL
+	const initialImageModel =
+		imageModelIdFromCookie && isImageModelId(imageModelIdFromCookie.value)
+			? imageModelIdFromCookie.value
+			: DEFAULT_IMAGE_MODEL
 
 	if (!modelIdFromCookie || !imageModelIdFromCookie) {
 		return (
@@ -29,12 +42,8 @@ export default async function Page() {
 					key={id}
 					id={id}
 					initialMessages={[]}
-					initialChatModel={
-						modelIdFromCookie?.value || DEFAULT_CHAT_MODEL
-					}
-					initialImageModel={
-						imageModelIdFromCookie?.value || DEFAULT_IMAGE_MODEL
-					}
+					initialChatModel={initialChatModel}
+					initialImageModel={initialImageModel}
 					initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
 					initialGuidanceScale={
 						guidanceScaleFromCookie?.value || "10"
@@ -55,8 +64,8 @@ export default async function Page() {
 				key={id}
 				id={id}
 				initialMessages={[]}
-				initialChatModel={modelIdFromCookie.value}
-				initialImageModel={imageModelIdFromCookie.value}
+				initialChatModel={initialChatModel}
+				initialImageModel={initialImageModel}
 				initialAspectRatio={aspectRatioFromCookie?.value || "1:1"}
 				initialGuidanceScale={guidanceScaleFromCookie?.value || "10"}
 				initialVisibilityType="private"

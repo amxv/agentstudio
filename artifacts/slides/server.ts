@@ -1,13 +1,16 @@
 import { createDocumentHandler } from "@/lib/artifacts/server"
 import { myProvider } from "@/lib/ai/providers"
 import {
-	imageModels,
 	DEFAULT_IMAGE_MODEL,
-	IMAGE_MODEL_IDS,
-	type ImageModelId
+	getImageModelConfig,
+	getRoutedImageModelId,
+	isImageModelId
 } from "@/lib/ai/models"
-import { experimental_generateImage } from "ai"
-import type { Attachment, UIMessage } from "ai"
+import { generateImage } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
 
 interface SlideData {
 	title: string
@@ -70,16 +73,25 @@ const generateSlideImage = async (
 	selectedImageModel?: string
 ): Promise<string> => {
 	const prompt = generateSlidePrompt(slide)
-	const modelId = selectedImageModel || DEFAULT_IMAGE_MODEL
+	const selectedModelId =
+		selectedImageModel && isImageModelId(selectedImageModel)
+			? selectedImageModel
+			: DEFAULT_IMAGE_MODEL
+	const modelId = getRoutedImageModelId({
+		selectedModelId,
+		hasInputImages: false
+	})
+	const model = getImageModelConfig(modelId)
 
 	try {
-		const { image } = await experimental_generateImage({
+		const { image } = await generateImage({
 			model: myProvider.imageModel(modelId),
 			prompt,
-			size: "1024x768", // 4:3 aspect ratio for slides
 			providerOptions: {
 				fal: {
-					sync_mode: true
+					syncMode: true,
+					outputFormat: model.defaults.outputFormat,
+					aspectRatio: "4:3"
 				}
 			}
 		})

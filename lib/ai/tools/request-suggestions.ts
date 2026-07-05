@@ -1,7 +1,8 @@
 import { getDocumentById, saveSuggestions } from "@/lib/db/queries"
 import type { Suggestion } from "@/lib/db/schema"
 import { generateUUID } from "@/lib/utils"
-import { type DataStreamWriter, streamObject, tool } from "ai"
+import type { AppDataStreamWriter as DataStreamWriter } from "@/lib/ai/types"
+import { streamObject, tool } from "ai"
 import type { Session } from "next-auth"
 import { z } from "zod"
 import { myProvider } from "../providers"
@@ -17,7 +18,7 @@ export const requestSuggestions = ({
 }: RequestSuggestionsProps) =>
 	tool({
 		description: "Request suggestions for a document",
-		parameters: z.object({
+		inputSchema: z.object({
 			documentId: z
 				.string()
 				.describe("The ID of the document to request edits")

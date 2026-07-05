@@ -30,80 +30,85 @@ AgentStudio integrates a comprehensive roster of image generation models, organi
 
 These models create images from scratch based on text descriptions.
 
-**FLUX Kontext**
-High-quality text-to-image generation with excellent prompt adherence. Part of the FLUX family by Black Forest Labs, this model excels at understanding and faithfully rendering detailed text descriptions. Supports resolutions up to 1024x1024 with all five aspect ratios (1:1, 16:9, 9:16, 4:3, 3:4). Configurable guidance scale (1-20) and 50 inference steps for balanced quality.
+**GPT Image 2**
+The default image model, selected for strong prompt adherence, typography, product-quality detail, and general-purpose creative work.
 
-**FLUX Kontext Max**
-The premium tier of FLUX Kontext, offering improved prompt adherence and notably superior typography rendering. Ideal for images that include text elements like signs, labels, or branding. Same resolution and aspect ratio support as standard Kontext but with enhanced quality output. This is a restricted-access model available to premium users.
+**GPT Image 1.5**
+A high-quality OpenAI image model retained as a selectable premium generator for users who want a different OpenAI image style.
 
-**FLUX Pro Ultra**
-Professional-grade image generation capable of producing images at up to 2K resolution (2048x2048). The highest-resolution model in the platform, designed for use cases that demand print-quality output or large-format visuals. Features a higher guidance scale default of 12 and 60 inference steps for maximum detail. This is a restricted-access model.
+**Nano Banana Pro**
+Google's Gemini 3 Pro image model on FAL, suited for high-resolution creative generation and complex visual instructions.
 
-**FLUX Pro v1.1**
-An enhanced version of FLUX Pro that balances improved quality with faster generation speed. Produces images at 1024x1024 with strong prompt adherence. A good general-purpose choice when high quality matters but ultra-resolution is not needed.
+**Seedream 4.5**
+A modern ByteDance generator with strong material rendering, layout quality, and visual consistency.
 
-**Imagen 4 (Preview)**
-Google's latest image generation model, renowned for producing photorealistic results. Imagen 4 excels at natural-looking photography, realistic portraits, and scenes with complex lighting. It operates with a lower guidance scale of 8 and 40 inference steps, reflecting its inherent strength at interpreting prompts without heavy guidance.
+**Seedream 5 Lite**
+A fast, cost-efficient model for high-volume drafts and high-resolution general generation.
 
-**Recraft V3**
-A state-of-the-art model specifically designed for vector art, brand assets, and style-consistent generation. Recraft V3 is the go-to choice for logos, icons, illustrations, and brand collateral. It uses a distinct aspect ratio format internally (square_hd, landscape_4_3, portrait_16_9, etc.) but the platform abstracts this behind a universal ratio selector. Does not support guidance scale adjustment, as its internal optimization handles style consistency automatically.
+**FLUX.2 Pro**
+Black Forest Labs' production FLUX.2 endpoint for professional text-to-image work.
 
-**Ideogram V3**
-Specialized for high-quality posters, marketing materials, and designs that feature prominent typography. Ideogram V3 is uniquely capable of rendering text within images with exceptional accuracy and aesthetic quality -- a historically difficult challenge for AI image generators. Ideal for event flyers, social media graphics, signage, and any visual that combines imagery with readable text. Like Recraft, it uses its own aspect ratio format internally. This is the default image model for the platform.
+**Ideogram v4**
+Specialized for posters, logos, signage, social graphics, and designs that include readable text.
+
+**Krea 2 Large**
+A high-fidelity creative model for polished visual exploration and style-driven generation.
+
+**Nano Banana Lite**
+A fast Gemini image model for drafts and responsive iteration.
+
+**FLUX.2 Klein 9B**
+A lightweight FLUX.2 model for lower-cost experimentation.
 
 ### Image-to-Image Models
 
 These models transform or edit existing images based on text instructions.
 
-**FLUX Kontext (Image-to-Image)**
-Takes an existing image and transforms it based on text instructions. Enables sophisticated editing like changing lighting, modifying elements, adjusting style, or adding new components while preserving the overall composition and structure of the original.
+**GPT Image 2 Edit**
+The default OpenAI editing route for preserving and transforming existing image artifacts or uploaded references.
 
-**FLUX Kontext Max (Image-to-Image)**
-The premium image editing variant with enhanced consistency and quality. Produces more coherent edits with better preservation of the original image's key elements. Restricted-access model.
+**Nano Banana Pro Edit**
+A multi-reference editor for combining or modifying several images with strong character and subject consistency.
 
-**Recraft V3 (Image-to-Image)**
-Applies Recraft's vector art and brand style capabilities to existing images. Useful for converting photographs or sketches into polished vector-style illustrations or brand-consistent artwork.
+**Seedream 5 Lite Edit**
+A cost-efficient multi-reference editor for quick visual iteration.
 
-**Ideogram V3 Remix**
-Creative image remixing and style transfer powered by Ideogram's engine. Takes an existing image and reimagines it with new stylistic elements while maintaining the core subject matter and composition.
+**FLUX.2 Pro Edit**
+A production multi-reference editor for reliable transformation workflows.
 
 ### Multi-Image Models
 
-These advanced models can process multiple input images simultaneously for more sophisticated compositions and transformations.
-
-**FLUX Kontext Max (Multi-Image)**
-The most advanced multi-image processing model, capable of understanding context across multiple input images simultaneously. Users can upload several reference images, and this model synthesizes elements from all of them into a cohesive new creation. Supports all aspect ratios and both text-to-image and image-to-image workflows. Restricted-access model.
-
-**Ideogram V3 (Multi-Image)**
-Processes up to 4 input images simultaneously with Ideogram's exceptional typography and poster generation capabilities. Perfect for creating composite designs that reference multiple visual sources while maintaining clean text rendering. Available to all users.
+Multi-image support is provided by edit-capable catalog entries that declare multi-reference support. The server routes only through explicit text/edit pairs in `lib/ai/models.ts`.
 
 ### Intelligent Model Selection
 
 The platform features an automatic model routing system that ensures the optimal model is always used:
 
-- When a user selects a text-to-image model but uploads an image, the system automatically switches to the corresponding image-to-image variant (e.g., FLUX Kontext T2I becomes FLUX Kontext I2I).
+- When a user selects a text-to-image model but uploads an image, the system automatically switches to the configured image-editing variant for that model family.
 - When editing an existing image artifact in the conversation, the system detects the context and routes to the appropriate I2I model even without an explicit upload.
-- When an I2I model is selected but no image is provided, the system falls back to the corresponding T2I model.
+- When an I2I model is selected but no image is provided, the system routes to the corresponding T2I model.
 - Multi-image models are used when explicitly selected by the user, respecting their intent.
-- Models without a direct I2I counterpart (FLUX Pro Ultra, FLUX Pro v1.1, Imagen 4) gracefully fall back to FLUX Kontext I2I for editing workflows.
+- Models without a configured editing route are rejected for editing workflows instead of silently switching providers or endpoints.
 
 ---
 
 ## Chat AI Models (Conversational Intelligence)
 
-The conversational layer that interprets user requests and manages the creative workflow is powered by six selectable language models from three leading AI providers:
+The conversational layer that interprets user requests and manages the creative workflow is powered by the current model catalog from Anthropic, OpenAI, and Google:
 
 **Anthropic**
-- Claude Sonnet 4 -- The latest balanced model with superior coding and reasoning capabilities
-- Claude Sonnet 4 (Reasoning) -- Enhanced with step-by-step reasoning for complex creative direction
+- Claude Fable 5 -- Long-running agentic and creative work
+- Claude Opus 4.8 -- Premium deep reasoning and complex workflows
+- Claude Sonnet 5 -- Default balanced model for high-quality creative direction
+- Claude Haiku 4.5 -- Fast current Claude model for responsive interactions
 
 **OpenAI**
-- GPT-4.1 -- The flagship model with enhanced capabilities (default chat model)
-- o4-mini -- An efficient reasoning model for everyday tasks and quick interactions
+- GPT-5.5 -- OpenAI's latest model for coding, tool-heavy agents, grounded assistants, and complex workflows
 
 **Google**
-- Gemini 2.5 Pro -- An advanced multimodal model with extensive context understanding
-- Gemini 2.5 Flash -- Fast and efficient for quick, responsive interactions
+- Gemini 3.5 Flash -- Stable frontier Gemini model for fast, capable responses
+- Gemini 3.1 Pro Preview -- Advanced preview Gemini model for multimodal and reasoning-heavy work
+- Gemini 3.1 Flash-Lite -- Cost-efficient Gemini model for fast high-volume tasks
 
 Users can switch between these models at any time via the model selector in the chat header, allowing them to choose the best conversational partner for their creative process.
 
@@ -195,10 +200,10 @@ Five aspect ratio presets are available across all models:
 - Landscape (4:3) -- Classic format for presentations and traditional displays
 - Portrait (3:4) -- Slightly tall format for posters and portrait photography
 
-The platform automatically translates these universal ratios to model-specific formats (FLUX models use direct ratios like "16:9", while Recraft and Ideogram models use named formats like "landscape_16_9").
+The platform automatically translates these universal ratios to model-specific formats in the server-side catalog.
 
-### Guidance Scale
-An adjustable parameter (range 1-20, default 10) that controls how closely the generation adheres to the text prompt. Higher values produce images more faithful to the prompt at the cost of some creative diversity. This control is intelligently hidden for models that do not support it (Recraft V3, Ideogram V3, and Imagen 4).
+### Model Parameters
+The server sends only the options supported by the selected catalog entry, such as quality, resolution, output format, image size, or aspect ratio. Unsupported controls are omitted instead of being sent globally.
 
 ### Model-Specific Parameters
 Each model has tuned default parameters for inference steps and maximum output size, ensuring optimal results without requiring manual configuration.
@@ -271,7 +276,7 @@ The system defines two user tiers with different quotas:
 - **Regular users**: Up to 100 messages per day, access to all non-restricted models
 - An enterprise tier is planned but not yet implemented (1,000 messages per day)
 
-Certain premium models (FLUX Pro Ultra, FLUX Kontext Max variants) are restricted to specific authorized accounts, with the system filtering available models based on user identity.
+Image and chat model availability is controlled through the centralized entitlement layer, with stale cookie values normalized to current defaults.
 
 ---
 

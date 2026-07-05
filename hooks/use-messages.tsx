@@ -1,4 +1,4 @@
-import type { UseChatHelpers } from "@ai-sdk/react"
+import type { AppUseChatHelpers as UseChatHelpers } from "@/lib/ai/types"
 import { useEffect, useState } from "react"
 import { useScrollToBottom } from "./use-scroll-to-bottom"
 

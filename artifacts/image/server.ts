@@ -1,38 +1,34 @@
-import { imagePrompt, updateDocumentPrompt } from "@/lib/ai/prompts"
-import { myProvider } from "@/lib/ai/providers"
 import { createDocumentHandler } from "@/lib/artifacts/server"
 import {
-	imageModels,
 	DEFAULT_IMAGE_MODEL,
-	IMAGE_MODEL_IDS,
-	getAspectRatioParameterForModel,
-	modelSupportsGuidanceScale,
-	type UniversalAspectRatio,
-	type ImageModelId
+	getImageModelConfig,
+	getRoutedImageModelId,
+	isImageModelId,
+	mapUniversalRatioToImageSize,
+	type ImageModel,
+	type ImageModelId,
+	type UniversalAspectRatio
 } from "@/lib/ai/models"
-import { experimental_generateImage } from "ai"
-import type { Attachment, UIMessage } from "ai"
+import { myProvider } from "@/lib/ai/providers"
+import { generateImage } from "ai"
+import type {
+	AppAttachment as Attachment,
+	AppUIMessage as UIMessage
+} from "@/lib/ai/types"
+
+const DEFAULT_ASPECT_RATIO: UniversalAspectRatio = "1:1"
 
 const enhanceImagePrompt = (userPrompt: string): string => {
-	// Modern text-to-image models work better with natural language descriptions
-	// rather than generic quality modifiers. We'll only enhance if the prompt
-	// is very basic or lacks visual grounding.
-
-	// Check if the prompt is too short or lacks descriptive elements
 	const wordCount = userPrompt.trim().split(/\s+/).length
 
-	// If the prompt is already descriptive (more than 5 words), return as-is
 	if (wordCount > 5) {
 		return userPrompt
 	}
 
-	// For very short prompts, add some natural language structure
-	// but avoid generic quality terms
 	return `A ${userPrompt}, captured in natural lighting with clear details`
 }
 
 const extractImageUrlFromText = (text: string): string | null => {
-	// Look for image URLs in the text (http/https URLs ending with image extensions)
 	const imageUrlRegex =
 		/https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|bmp)(\?[^\s]*)?/i
 	const match = text.match(imageUrlRegex)
@@ -40,7 +36,6 @@ const extractImageUrlFromText = (text: string): string | null => {
 }
 
 const extractBase64ImageFromText = (text: string): string | null => {
-	// Look for base64 image data in the text
 	const base64Regex = /data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/
 	const match = text.match(base64Regex)
 	return match ? match[0] : null
@@ -50,318 +45,251 @@ const parseImageInput = (
 	input: string,
 	attachments?: Array<Attachment>
 ): { prompt: string; imageUrls: string[] } => {
-	// Collect all image URLs from attachments and text
-	let imageUrls: string[] = []
+	const imageUrls =
+		attachments
+			?.filter((attachment) =>
+				attachment.contentType?.startsWith("image/")
+			)
+			.map((attachment) => attachment.url) ?? []
 
-	// First, check for image attachments (prioritize over text-embedded URLs)
-	if (attachments && attachments.length > 0) {
-		// Find all image attachments
-		const imageAttachments = attachments.filter((attachment) =>
-			attachment.contentType?.startsWith("image/")
-		)
-		imageUrls.push(...imageAttachments.map((attachment) => attachment.url))
-	}
-
-	// If no attachments found, look for URLs or base64 data in text
 	if (imageUrls.length === 0) {
 		const imageUrl =
 			extractImageUrlFromText(input) || extractBase64ImageFromText(input)
+
 		if (imageUrl) {
 			imageUrls.push(imageUrl)
 		}
 	}
 
-	// Remove the image URL/data from the prompt to get clean text (only if it was embedded in text)
 	let prompt = input
 	if (
 		imageUrls.length === 1 &&
 		(extractImageUrlFromText(input) || extractBase64ImageFromText(input))
 	) {
-		prompt = input.replace(imageUrls[0], "").trim()
-		// Clean up any leftover formatting
-		prompt = prompt.replace(/^\s*[-•*]\s*/, "").trim()
-		prompt = prompt.replace(/^(image|img|picture|photo):\s*/i, "").trim()
+		prompt = input
+			.replace(imageUrls[0], "")
+			.trim()
+			.replace(/^\s*[-*]\s*/, "")
+			.replace(/^(image|img|picture|photo):\s*/i, "")
+			.trim()
 	}
 
 	return { prompt, imageUrls }
 }
 
-const getOptimalImageModel = (
-	selectedImageModelId: string,
-	hasInputImages: boolean,
-	isFirstGeneration: boolean = false,
-	hasExistingImageArtifact: boolean = false,
-	inputImageCount: number = 0
-): string => {
-	// For the new model structure, users explicitly select T2I or I2I models
-	// We should respect their choice and only fall back if there's a capability mismatch
-	// OR if there's an existing image artifact in the conversation (indicating editing intent)
-
-	// Find the selected image model
-	const selectedModel = imageModels.find(
-		(model) => model.id === selectedImageModelId
-	)
-
-	if (!selectedModel) {
-		// Fallback to default model
-		return DEFAULT_IMAGE_MODEL
-	}
-
-	// PRIORITY 0: Respect user's explicit multi-image model selection
-	// Only use multi-image models when explicitly selected by the user
-	if (selectedModel.capabilities.multiImage) {
-		return selectedImageModelId
-	}
-
-	// PRIORITY 1: Handle input image cases (including first-time generations with uploaded images)
-	// If user has an input image but selected a T2I-only model, map to I2I equivalent
-	if (hasInputImages && !selectedModel.capabilities.imageToImage) {
-		// User selected a T2I model but has an input image (including first-time with upload)
-		// Map to the corresponding I2I model
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_T2I) {
-			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			// For Ideogram V3, prefer the multi-image model for better multi-image support
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
-		}
-		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
-		if (
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_ULTRA ||
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_V11 ||
-			selectedImageModelId === IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
-		) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-
-		// Fallback to first available I2I model
-		const imageToImageModel = imageModels.find(
-			(model) => model.capabilities.imageToImage
-		)
-		return imageToImageModel?.id || IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-	}
-
-	// PRIORITY 2: Handle existing image artifact editing (when no direct input image)
-	// If there's an existing image artifact in the conversation and no direct input image,
-	// but user selected a T2I model, map to the corresponding I2I model for editing
-	if (
-		hasExistingImageArtifact &&
-		!hasInputImages &&
-		selectedModel.capabilities.textToImage &&
-		!selectedModel.capabilities.imageToImage
-	) {
-		// Map T2I models to their I2I counterparts for editing existing artifacts
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_T2I) {
-			return IMAGE_MODEL_IDS.RECRAFT_V3_I2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-			// For editing existing artifacts, use the multi-image model for consistency
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
-		}
-		// For models without direct I2I counterparts, map to FLUX_KONTEXT_I2I
-		if (
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_ULTRA ||
-			selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_V11 ||
-			selectedImageModelId === IMAGE_MODEL_IDS.IMAGEN4_PREVIEW
-		) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-		}
-	}
-
-	// PRIORITY 3: Handle I2I model selected but no input image
-	if (!hasInputImages && !selectedModel.capabilities.textToImage) {
-		// User selected an I2I model but has no input image
-		// Find a similar T2I model or fallback to a default T2I model
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I) {
-			return IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.RECRAFT_V3_I2I) {
-			return IMAGE_MODEL_IDS.RECRAFT_V3_T2I
-		}
-		if (selectedImageModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX) {
-			return IMAGE_MODEL_IDS.IDEOGRAM_V3
-		}
-
-		// Fallback to first available T2I model
-		const textToImageModel = imageModels.find(
-			(model) => model.capabilities.textToImage
-		)
-		return textToImageModel?.id || IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
-	}
-
-	// Legacy support for old model IDs
-	if (selectedImageModelId === IMAGE_MODEL_IDS.FLUX_PRO_FIRST_TIME) {
-		return hasInputImages
-			? IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I
-			: IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I
-	}
-
-	// If we reach here, the selected model is compatible with the input type
-	return selectedImageModelId
-}
-
-const getModelParameters = (modelId: string) => {
-	const model = imageModels.find((m) => m.id === modelId)
-	return (
-		model?.parameters || {
-			guidanceScale: 10,
-			inferenceSteps: 50,
-			maxSize: "1024x1024"
-		}
-	)
-}
-
-const isFirstImageGenerationInConversation = (
-	messages: Array<UIMessage>
-): boolean => {
-	// Check if any previous messages contain image artifacts
-	// Look for assistant messages that mention image creation or contain image-related tool calls
-	for (const message of messages) {
-		if (message.role === "assistant" && message.parts) {
-			for (const part of message.parts) {
-				if (part.type === "tool-invocation") {
-					const { toolInvocation } = part
-					if (
-						toolInvocation.toolName === "createDocument" &&
-						toolInvocation.state === "call"
-					) {
-						const args = toolInvocation.args as { kind?: string }
-						if (args.kind === "image") {
-							return false // Found a previous image generation
-						}
-					}
-				}
-			}
-		}
-	}
-	return true // No previous image generations found
-}
-
-const getFalModelName = (modelId: string): string => {
-	// Handle the new model IDs
-	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_T2I) {
-		return "fal-ai/flux-pro/kontext/text-to-image"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_T2I) {
-		return "fal-ai/flux-pro/kontext/max/text-to-image"
-	}
-	if (modelId === IMAGE_MODEL_IDS.IMAGEN4_PREVIEW) {
-		return "fal-ai/imagen4/preview"
-	}
-	if (modelId === IMAGE_MODEL_IDS.RECRAFT_V3_T2I) {
-		return "fal-ai/recraft/v3/text-to-image"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_PRO_ULTRA) {
-		return "fal-ai/flux-pro/v1.1-ultra"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_PRO_V11) {
-		return "fal-ai/flux-pro/v1.1"
-	}
-	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3) {
-		return "fal-ai/ideogram/v3"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_I2I) {
-		return "fal-ai/flux-pro/kontext"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_I2I) {
-		return "fal-ai/flux-pro/kontext/max"
-	}
-	if (modelId === IMAGE_MODEL_IDS.RECRAFT_V3_I2I) {
-		return "fal-ai/recraft/v3/image-to-image"
-	}
-	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_REMIX) {
-		return "fal-ai/ideogram/v3/remix"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI) {
-		return "fal-ai/flux-pro/kontext/max/multi"
-	}
-	if (modelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI) {
-		return "fal-ai/ideogram/v3"
-	}
-
-	// Legacy model handling
-	if (modelId === IMAGE_MODEL_IDS.FLUX_PRO_TEXT_TO_IMAGE) {
-		return "fal-ai/flux-pro/kontext/text-to-image"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_PRO_IMAGE_TO_IMAGE) {
-		return "fal-ai/flux-pro/kontext"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_SCHNELL) {
-		return "fal-ai/flux/schnell"
-	}
-	if (modelId === IMAGE_MODEL_IDS.FLUX_DEV) {
-		return "fal-ai/flux/dev"
-	}
-
-	// Fallback to the model ID if no mapping found
-	return modelId
-}
-
 const getLatestImageArtifactFromConversation = (
 	messages: Array<UIMessage>
 ): string | null => {
-	// Look for the most recent image artifact in the conversation
-	// Search backwards through messages to find the latest one
 	for (let i = messages.length - 1; i >= 0; i--) {
 		const message = messages[i]
-		if (message.role === "assistant" && message.parts) {
-			for (const part of message.parts) {
-				if (part.type === "tool-invocation") {
-					const { toolInvocation } = part
-					if (
-						toolInvocation.state === "result" &&
-						(toolInvocation.toolName === "createDocument" ||
-							toolInvocation.toolName === "updateDocument")
-					) {
-						try {
-							const result = toolInvocation.result as {
-								kind?: string
-								content?: string
-							}
-							if (result.kind === "image" && result.content) {
-								return `data:image/png;base64,${result.content}`
-							}
-						} catch {
-							// Continue searching if parsing fails
-						}
-					}
+		if (message.role !== "assistant") {
+			continue
+		}
+
+		for (const part of message.parts ?? []) {
+			if (part.type !== "tool-invocation") {
+				continue
+			}
+
+			const { toolInvocation } = part as unknown as {
+				toolInvocation: {
+					state: string
+					toolName: string
+					result?: unknown
 				}
+			}
+			if (
+				toolInvocation.state !== "result" ||
+				(toolInvocation.toolName !== "createDocument" &&
+					toolInvocation.toolName !== "updateDocument")
+			) {
+				continue
+			}
+
+			const result = toolInvocation.result as {
+				kind?: string
+				content?: string
+			}
+
+			if (result.kind === "image" && result.content) {
+				return `data:image/png;base64,${result.content}`
 			}
 		}
 	}
+
 	return null
 }
 
-const filterImagesForModel = (
-	allImages: string[],
-	selectedModel: { capabilities?: { multiImage?: boolean } } | undefined
+const normalizeAspectRatio = (
+	aspectRatio: string | undefined
+): UniversalAspectRatio => {
+	if (
+		aspectRatio === "1:1" ||
+		aspectRatio === "16:9" ||
+		aspectRatio === "9:16" ||
+		aspectRatio === "4:3" ||
+		aspectRatio === "3:4"
+	) {
+		return aspectRatio
+	}
+
+	return DEFAULT_ASPECT_RATIO
+}
+
+const normalizeSelectedImageModel = (
+	selectedImageModel: string | undefined
+): ImageModelId => {
+	if (!selectedImageModel) {
+		return DEFAULT_IMAGE_MODEL
+	}
+
+	if (!isImageModelId(selectedImageModel)) {
+		throw new Error(`Unsupported image model: ${selectedImageModel}`)
+	}
+
+	return selectedImageModel
+}
+
+const getImagesForModel = (
+	imageUrls: string[],
+	model: ImageModel
 ): string[] => {
-	// If it's a multi-image model, return all images
-	if (selectedModel?.capabilities?.multiImage) {
-		return allImages
+	if (imageUrls.length === 0) {
+		return []
 	}
 
-	// For regular I2I models, return only the last image
-	if (allImages.length > 1) {
-		return [allImages[allImages.length - 1]]
+	if (model.capabilities.multiImage) {
+		return imageUrls
 	}
 
-	return allImages
+	return [imageUrls[imageUrls.length - 1]]
+}
+
+const buildFalProviderOptions = ({
+	model,
+	aspectRatio
+}: {
+	model: ImageModel
+	aspectRatio: UniversalAspectRatio
+}): Record<string, string | number | boolean> => {
+	const options: Record<string, string | number | boolean> = {}
+
+	if (model.accepts.syncMode) {
+		options.syncMode = true
+	}
+
+	if (model.accepts.outputFormat) {
+		options.outputFormat = model.defaults.outputFormat
+	}
+
+	if (model.accepts.quality && model.defaults.quality) {
+		options.quality = model.defaults.quality
+	}
+
+	if (model.accepts.resolution && model.defaults.resolution) {
+		options.resolution = model.defaults.resolution
+	}
+
+	if (model.accepts.numImages) {
+		options.numImages = 1
+	}
+
+	if (model.accepts.imageSize) {
+		options.imageSize = mapUniversalRatioToImageSize(aspectRatio)
+	}
+
+	if (model.accepts.aspectRatio) {
+		options.aspectRatio = aspectRatio
+	}
+
+	return options
+}
+
+const createGenerationDetails = ({
+	originalPrompt,
+	enhancedPrompt,
+	model,
+	inputImageCount,
+	aspectRatio,
+	warnings
+}: {
+	originalPrompt: string
+	enhancedPrompt: string
+	model: ImageModel
+	inputImageCount: number
+	aspectRatio: UniversalAspectRatio
+	warnings?: unknown[]
+}) => ({
+	originalPrompt,
+	enhancedPrompt,
+	modelUsed: model.id,
+	modelName: model.name,
+	modelDescription: model.description,
+	provider: model.provider,
+	falEndpoint: model.falEndpoint,
+	modelFamily: model.modelFamily,
+	endpointKind: model.endpointKind,
+	parameters: {
+		aspectRatio,
+		quality: model.defaults.quality,
+		resolution: model.defaults.resolution,
+		outputFormat: model.defaults.outputFormat,
+		hasInputImages: inputImageCount > 0,
+		inputImageCount,
+		hasMask: false
+	},
+	generationType: model.endpointKind,
+	warnings: warnings ?? [],
+	timestamp: new Date().toISOString()
+})
+
+const generateArtifactImage = async ({
+	prompt,
+	imageUrls,
+	selectedImageModel,
+	selectedAspectRatio
+}: {
+	prompt: string
+	imageUrls: string[]
+	selectedImageModel?: string
+	selectedAspectRatio?: string
+}) => {
+	const selectedModelId = normalizeSelectedImageModel(selectedImageModel)
+	const routedModelId = getRoutedImageModelId({
+		selectedModelId,
+		hasInputImages: imageUrls.length > 0
+	})
+	const model = getImageModelConfig(routedModelId)
+	const aspectRatio = normalizeAspectRatio(selectedAspectRatio)
+	const imagesToUse = getImagesForModel(imageUrls, model)
+	const enhancedPrompt = enhanceImagePrompt(prompt)
+	const providerOptions = buildFalProviderOptions({ model, aspectRatio })
+	const generationPrompt =
+		imagesToUse.length > 0
+			? {
+					text: enhancedPrompt,
+					images: imagesToUse
+				}
+			: enhancedPrompt
+
+	const { image, warnings } = await generateImage({
+		model: myProvider.imageModel(model.id),
+		prompt: generationPrompt,
+		n: 1,
+		providerOptions: { fal: providerOptions }
+	})
+
+	return {
+		base64: image.base64,
+		details: createGenerationDetails({
+			originalPrompt: prompt,
+			enhancedPrompt,
+			model,
+			inputImageCount: imagesToUse.length,
+			aspectRatio,
+			warnings
+		})
+	}
 }
 
 export const imageDocumentHandler = createDocumentHandler<"image">({
@@ -369,342 +297,82 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
 	onCreateDocument: async ({
 		title,
 		dataStream,
-		messages,
+		messages = [],
 		selectedImageModel,
-		selectedAspectRatio,
-		selectedGuidanceScale
+		selectedAspectRatio
 	}) => {
-		let draftContent = ""
+		const latestMessage = messages[messages.length - 1]
+		const attachments = latestMessage?.experimental_attachments || []
+		const { prompt: parsedPrompt, imageUrls } = parseImageInput(
+			title,
+			attachments
+		)
+		const existingArtifact =
+			getLatestImageArtifactFromConversation(messages)
+		const imagesForGeneration =
+			imageUrls.length > 0
+				? imageUrls
+				: existingArtifact
+					? [existingArtifact]
+					: []
+		const prompt = parsedPrompt || title
 
-		try {
-			// Check if this is the first image generation in the conversation
-			const isFirstGeneration = isFirstImageGenerationInConversation(
-				messages || []
-			)
+		const { base64, details } = await generateArtifactImage({
+			prompt,
+			imageUrls: imagesForGeneration,
+			selectedImageModel,
+			selectedAspectRatio
+		})
 
-			// Check if there's an existing image artifact in the conversation
-			// This indicates the user might want to edit/modify an existing image
-			const hasExistingImageArtifact = !isFirstGeneration
+		dataStream.writeData({
+			type: "generation-details",
+			content: JSON.stringify(details)
+		})
 
-			// Get the latest user message to extract attachments
-			const latestMessage =
-				messages && messages.length > 0
-					? messages[messages.length - 1]
-					: null
-			const attachments = latestMessage?.experimental_attachments || []
+		dataStream.writeData({
+			type: "image-delta",
+			content: base64
+		})
 
-			// Parse the title to extract image URLs and text prompt
-			const { prompt: textPrompt, imageUrls: inputImages } =
-				parseImageInput(title, attachments)
-
-			// If there's no direct input images but there's an existing image artifact,
-			// use the latest image artifact as the base image for editing
-			let baseImageForEditing: string | null = null
-			if (inputImages.length === 0 && hasExistingImageArtifact) {
-				baseImageForEditing = getLatestImageArtifactFromConversation(
-					messages || []
-				)
-			}
-
-			// Use the extracted text prompt, fallback to original title if no image found
-			const promptToUse = textPrompt || title
-			const enhancedPrompt = enhanceImagePrompt(promptToUse)
-
-			// Choose optimal model based on selected model and input type
-			// Priority order:
-			// 1. If user has uploaded/provided an image (including first-time), use I2I model
-			// 2. If editing existing artifact without new image, use I2I model
-			// 3. If pure text-to-image, use T2I model
-			const modelToUse = selectedImageModel || DEFAULT_IMAGE_MODEL
-
-			const optimalModelId = getOptimalImageModel(
-				modelToUse,
-				!!(inputImages.length > 0 || baseImageForEditing),
-				isFirstGeneration,
-				hasExistingImageArtifact,
-				inputImages.length + (baseImageForEditing ? 1 : 0)
-			)
-			const modelParams = getModelParameters(optimalModelId)
-
-			// Use user-selected parameters with fallback to model defaults
-			const guidanceScale =
-				selectedGuidanceScale || modelParams.guidanceScale
-			const aspectRatio =
-				(selectedAspectRatio as UniversalAspectRatio) || "1:1"
-
-			// Get the model-specific aspect ratio parameter (only for T2I models)
-			const aspectRatioConfig = getAspectRatioParameterForModel(
-				optimalModelId as (typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS],
-				aspectRatio
-			)
-
-			const generateParams: Parameters<
-				typeof experimental_generateImage
-			>[0] = {
-				model: myProvider.imageModel(optimalModelId),
-				prompt: enhancedPrompt,
-				n: 1,
-				size: modelParams.maxSize as "1024x1024"
-			}
-
-			// Add image-to-image specific parameters if we have input images or base image for editing
-			const allImages = [
-				...inputImages,
-				...(baseImageForEditing ? [baseImageForEditing] : [])
-			]
-
-			// Filter images based on model capabilities
-			const selectedModel = imageModels.find(
-				(m) => m.id === optimalModelId
-			)
-			const imagesToUse = filterImagesForModel(allImages, selectedModel)
-
-			if (imagesToUse.length > 0) {
-				const falOptions: Record<
-					string,
-					string | number | boolean | string[]
-				> = {
-					// Special handling for multi-image models that always require image_urls
-					// IMPORTANT: Multi-image models like FLUX Kontext Max Multi and Ideogram V3 Multi
-					// ALWAYS require the 'image_urls' parameter (plural) as an array, even for single images.
-					// This is a requirement of the FAL API for these specific models.
-					// Regular I2I models can use either 'image_url' (single) or 'image_urls' (multiple).
-					...(optimalModelId ===
-						IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI ||
-					optimalModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
-						? { image_urls: imagesToUse }
-						: imagesToUse.length > 1
-							? { image_urls: imagesToUse }
-							: { image_url: imagesToUse[0] }),
-					num_inference_steps: modelParams.inferenceSteps,
-					sync_mode: true,
-					// Adjust strength based on whether we have a new input images
-					// Higher strength for new images, lower for modifications
-					strength: 0.8
-				}
-
-				// Only add guidance scale for models that support it
-				if (
-					modelSupportsGuidanceScale(optimalModelId as ImageModelId)
-				) {
-					falOptions.guidance_scale = guidanceScale
-				}
-
-				// Only add aspect ratio for T2I models
-				if (aspectRatioConfig) {
-					falOptions[aspectRatioConfig.parameterName] =
-						aspectRatioConfig.value
-				}
-
-				generateParams.providerOptions = { fal: falOptions }
-			} else {
-				const falOptions: Record<
-					string,
-					string | number | boolean | string[]
-				> = {
-					num_inference_steps: modelParams.inferenceSteps,
-					sync_mode: true
-				}
-
-				// Only add guidance scale for models that support it
-				if (
-					modelSupportsGuidanceScale(optimalModelId as ImageModelId)
-				) {
-					falOptions.guidance_scale = guidanceScale
-				}
-
-				// Only add aspect ratio for T2I models
-				if (aspectRatioConfig) {
-					falOptions[aspectRatioConfig.parameterName] =
-						aspectRatioConfig.value
-				}
-
-				generateParams.providerOptions = { fal: falOptions }
-			}
-
-			const { image } = await experimental_generateImage(generateParams)
-
-			draftContent = image.base64
-
-			// Stream the generation details for debugging
-			const generationDetails = {
-				originalPrompt: promptToUse,
-				enhancedPrompt: enhancedPrompt,
-				modelUsed: optimalModelId,
-				modelName: selectedModel?.name || "Unknown",
-				modelDescription: selectedModel?.description || "",
-				parameters: {
-					guidanceScale: guidanceScale,
-					inferenceSteps: modelParams.inferenceSteps,
-					aspectRatio: aspectRatio,
-					size: modelParams.maxSize,
-					...(imagesToUse.length > 0 && { strength: 0.8 }),
-					hasInputImages: imagesToUse.length > 0,
-					inputImageCount: imagesToUse.length
-				},
-				generationType:
-					imagesToUse.length > 0 ? "image-to-image" : "text-to-image",
-				timestamp: new Date().toISOString()
-			}
-
-			dataStream.writeData({
-				type: "generation-details",
-				content: JSON.stringify(generationDetails)
-			})
-
-			// Stream the generated image data
-			dataStream.writeData({
-				type: "image-delta",
-				content: image.base64
-			})
-		} catch (error) {
-			console.error("Image generation failed:", error)
-			throw error
-		}
-
-		return draftContent
+		return base64
 	},
 	onUpdateDocument: async ({
 		document,
 		description,
 		dataStream,
-		messages,
+		messages = [],
 		selectedImageModel,
-		selectedAspectRatio,
-		selectedGuidanceScale
+		selectedAspectRatio
 	}) => {
-		let draftContent = ""
+		const latestMessage = messages[messages.length - 1]
+		const attachments = latestMessage?.experimental_attachments || []
+		const { prompt: parsedPrompt, imageUrls } = parseImageInput(
+			description,
+			attachments
+		)
+		const imagesForGeneration =
+			imageUrls.length > 0
+				? imageUrls
+				: [`data:image/png;base64,${document.content}`]
+		const prompt = parsedPrompt || description
 
-		try {
-			// Get the latest user message to extract attachments
-			const latestMessage =
-				messages && messages.length > 0
-					? messages[messages.length - 1]
-					: null
-			const attachments = latestMessage?.experimental_attachments || []
+		const { base64, details } = await generateArtifactImage({
+			prompt,
+			imageUrls: imagesForGeneration,
+			selectedImageModel,
+			selectedAspectRatio
+		})
 
-			// Parse the description to extract any new image URLs and text prompt
-			const { prompt: textPrompt, imageUrls: newInputImages } =
-				parseImageInput(description, attachments)
+		dataStream.writeData({
+			type: "generation-details",
+			content: JSON.stringify(details)
+		})
 
-			// Use the new input images if provided, otherwise use the existing document content as base
-			const allImages =
-				newInputImages.length > 0
-					? newInputImages
-					: [`data:image/png;base64,${document.content}`]
-			const promptToUse = textPrompt || description
-			const enhancedPrompt = enhanceImagePrompt(promptToUse)
+		dataStream.writeData({
+			type: "image-delta",
+			content: base64
+		})
 
-			// For updates, we always have a base image, so use image-to-image capable model
-			// Don't use first-time logic for updates - use the user's selected model
-			const modelToUse = selectedImageModel || DEFAULT_IMAGE_MODEL
-
-			const optimalModelId = getOptimalImageModel(
-				modelToUse,
-				true, // Always true for updates since we have a base image
-				false, // Never first generation for updates
-				true, // Always true for updates since we're updating an existing image artifact
-				allImages.length
-			)
-			const modelParams = getModelParameters(optimalModelId)
-
-			// Filter images based on model capabilities
-			const selectedModel = imageModels.find(
-				(m) => m.id === optimalModelId
-			)
-			const imagesToUse = filterImagesForModel(allImages, selectedModel)
-
-			// Use user-selected parameters with fallback to model defaults
-			const guidanceScale =
-				selectedGuidanceScale || modelParams.guidanceScale
-			const aspectRatio =
-				(selectedAspectRatio as UniversalAspectRatio) || "1:1"
-
-			// Get the model-specific aspect ratio parameter (only for T2I models)
-			const aspectRatioConfig = getAspectRatioParameterForModel(
-				optimalModelId as (typeof IMAGE_MODEL_IDS)[keyof typeof IMAGE_MODEL_IDS],
-				aspectRatio
-			)
-
-			const falOptions: Record<
-				string,
-				string | number | boolean | string[]
-			> = {
-				// Special handling for multi-image models that always require image_urls
-				// IMPORTANT: Multi-image models like FLUX Kontext Max Multi and Ideogram V3 Multi
-				// ALWAYS require the 'image_urls' parameter (plural) as an array, even for single images.
-				// This is a requirement of the FAL API for these specific models.
-				// Regular I2I models can use either 'image_url' (single) or 'image_urls' (multiple).
-				...(optimalModelId === IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI ||
-				optimalModelId === IMAGE_MODEL_IDS.IDEOGRAM_V3_MULTI
-					? { image_urls: imagesToUse }
-					: imagesToUse.length > 1
-						? { image_urls: imagesToUse }
-						: { image_url: imagesToUse[0] }),
-				num_inference_steps: modelParams.inferenceSteps,
-				sync_mode: true,
-				// Adjust strength based on whether we have a new input images
-				// Higher strength for new images, lower for modifications
-				strength: 0.8
-			}
-
-			// Only add guidance scale for models that support it
-			if (modelSupportsGuidanceScale(optimalModelId as ImageModelId)) {
-				falOptions.guidance_scale = guidanceScale
-			}
-
-			// Only add aspect ratio for T2I models
-			if (aspectRatioConfig) {
-				falOptions[aspectRatioConfig.parameterName] =
-					aspectRatioConfig.value
-			}
-
-			const { image } = await experimental_generateImage({
-				model: myProvider.imageModel(optimalModelId),
-				prompt: enhancedPrompt,
-				n: 1,
-				size: modelParams.maxSize as "1024x1024",
-				providerOptions: { fal: falOptions }
-			})
-
-			draftContent = image.base64
-
-			// Stream the generation details for debugging
-			const generationDetails = {
-				originalPrompt: promptToUse,
-				enhancedPrompt: enhancedPrompt,
-				modelUsed: optimalModelId,
-				modelName: selectedModel?.name || "Unknown",
-				modelDescription: selectedModel?.description || "",
-				parameters: {
-					guidanceScale: guidanceScale,
-					inferenceSteps: modelParams.inferenceSteps,
-					aspectRatio: aspectRatio,
-					size: modelParams.maxSize,
-					...(imagesToUse.length > 0 && { strength: 0.8 }),
-					hasInputImages: imagesToUse.length > 0,
-					inputImageCount: imagesToUse.length
-				},
-				generationType:
-					imagesToUse.length > 0 ? "image-to-image" : "text-to-image",
-				timestamp: new Date().toISOString()
-			}
-
-			dataStream.writeData({
-				type: "generation-details",
-				content: JSON.stringify(generationDetails)
-			})
-
-			// Stream the updated image data
-			dataStream.writeData({
-				type: "image-delta",
-				content: image.base64
-			})
-		} catch (error) {
-			console.error("Image update failed:", error)
-			throw error
-		}
-
-		return draftContent
+		return base64
 	}
 })
