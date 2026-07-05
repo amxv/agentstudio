@@ -107,57 +107,57 @@ Save your best prompts to a personal library, categorize them, and reuse them wi
 
 ### Section Header
 
-> 14 top-ranked AI image models. One interface.
+> 14 current FAL image models. One interface.
 
 ### Body
 
-Different images require different tools. A photorealistic headshot needs a different model than a vector logo or a poster with bold typography. AgentStudio gives you access to the highest-ranked image models from OpenAI, Google, Tencent, ByteDance, Black Forest Labs, Alibaba, Reve, and Eigen AI -- and selects the right one for each job.
+Different images require different tools. A photorealistic headshot needs a different model than a vector logo or a poster with bold typography. AgentStudio gives you access to the shipped FAL catalog from OpenAI, Google, ByteDance, Black Forest Labs, Ideogram, and Krea -- and routes requests through explicit text and edit endpoints.
 
 ---
 
 ### The Models
 
-**GPT Image 1.5 (High)** -- *OpenAI*
-OpenAI's native multimodal image model with exceptional text rendering and instruction following. Generates images up to 4x faster than previous versions, with precise editing that preserves composition, lighting, and fine details like faces and logos.
+**GPT Image 2** -- *OpenAI*
+The default high-quality generator with strong prompt adherence, typography, product detail, and commercial polish.
 
-**Nano Banana Pro (Gemini 3 Pro Image)** -- *Google*
-Google's flagship image model built on Gemini 3 Pro, featuring industry-leading text rendering across multiple languages and real-time web grounding. Produces up to 4K resolution with multi-image blending and precise identity preservation across up to 5 subjects.
+**GPT Image 2 Edit** -- *OpenAI*
+Image editing route for preserving, transforming, and refining uploaded references or previous generations.
 
-**HunyuanImage 3.0 Instruct** -- *Tencent*
-The world's largest open-source image model at 80 billion parameters, unifying image understanding and generation in an autoregressive framework. Excels at complex reasoning, world knowledge integration, and instruction-following with a "think first, then generate" approach.
+**GPT Image 1.5** -- *OpenAI*
+Premium OpenAI image model retained as a selectable alternative for high-quality generation.
+
+**Nano Banana Pro** -- *Google*
+Gemini 3 Pro image model for high-resolution creative generation and complex visual instructions.
+
+**Nano Banana Pro Edit** -- *Google*
+Multi-reference editor for combining, preserving, and modifying several images with subject consistency.
 
 **Seedream 4.5** -- *ByteDance*
-ByteDance's latest model delivering comprehensive improvements in editing consistency, dense text rendering, and material accuracy for glass, metal, and cloth. Maintains excellent subject detail and color tone preservation across edits with support for up to 14-image character consistency.
+Modern generator with strong material rendering, layout quality, and visual consistency.
 
-**FLUX.2 [max]** -- *Black Forest Labs*
-The highest-quality model in the FLUX.2 family, pushing image quality, prompt understanding, and editing consistency to frontier levels. Delivers maximum performance for professional workflows while maintaining nearly the same speed as FLUX.2 [pro].
+**Seedream 5 Lite** -- *ByteDance*
+Fast, cost-efficient model for high-volume drafts and high-resolution general generation.
 
-**Wan 2.6 Image** -- *Alibaba*
-Alibaba's all-round diffusion-based image generation and editing model with enhanced consistency, controllability, and commercial-grade reliability. Offers fine-grained control over resolution, composition, and brand-compliant content generation.
+**Seedream 5 Lite Edit** -- *ByteDance*
+Cost-efficient multi-reference editor for quick visual iteration and reference-based changes.
 
-**Seedream 4.0** -- *ByteDance*
-A unified multimodal architecture integrating text-to-image generation and editing with 10x faster inference than its predecessor. Strong at high-resolution 2K outputs, structured layouts, readable text generation, and infographics.
+**FLUX.2 Pro** -- *Black Forest Labs*
+Production-grade Black Forest Labs endpoint for professional text-to-image work.
 
-**Nano Banana** -- *Google*
-Google's fast, conversational image model designed for iterative creative workflows, generating images 2-3x faster than comparable models. Specializes in intelligent modifications of existing photos with natural language instructions and character consistency.
+**FLUX.2 Pro Edit** -- *Black Forest Labs*
+Production multi-reference editor for reliable transformation and composition workflows.
 
-**Reve V1 (December)** -- *Reve*
-A 12B parameter model that debuted at #1 on the Artificial Analysis Image Arena, surpassing established competitors. Combines natural-language editing with exceptional photorealistic detail, cinematic lighting, and material handling.
+**Ideogram v4** -- *Ideogram*
+Specialist model for posters, logos, signage, social graphics, and readable text in images.
 
-**FLUX.2 [pro]** -- *Black Forest Labs*
-The production-grade model balancing speed and quality for professional workloads, supporting text-to-image and editing up to 4MP resolution. Strong prompt following with reliable, consistent results.
+**Krea 2 Large** -- *Krea*
+High-fidelity creative model for polished visual exploration and style-driven generation.
 
-**FLUX.2 [flex]** -- *Black Forest Labs*
-An open-weights model excelling at complex text rendering, typography, and fine details with multi-reference editing in a unified architecture. Strikes an optimal balance between quality and creative control with configurable parameters.
+**Nano Banana Lite** -- *Google*
+Fast Gemini image model for responsive drafts and lightweight iteration.
 
-**FLUX.2 [klein] 9B** -- *Black Forest Labs*
-The fastest FLUX.2 model delivering sub-second inference with open Apache 2.0 licensing. Defines the quality-to-latency frontier -- ideal for real-time, high-volume generation workflows.
-
-**Eigen Image** -- *Eigen AI*
-A competitive image generation model tracked on Artificial Analysis benchmarks for quality, speed, and pricing. Delivers clean, precise output with strong structural coherence.
-
-**Qwen Image Edit Max 2601** -- *Alibaba*
-An advanced image editing model that feeds inputs through visual language understanding for semantics and VAE encoding for appearance. Features layer-based editing, precise object manipulation, and strong capabilities in industrial design and geometric reasoning.
+**FLUX.2 Klein 9B** -- *Black Forest Labs*
+Lightweight FLUX.2 model for lower-cost experimentation and fast generation.
 
 ---
 

@@ -3,43 +3,58 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Space_Grotesk } from "next/font/google"
+import { Archivo_Black, IBM_Plex_Mono } from "next/font/google"
 import {
-	Sparkles,
-	Image as ImageIcon,
-	Wand2,
-	History,
-	Brain,
-	FileImage,
-	Eye,
-	FolderOpen,
-	RatioIcon,
-	PenLine,
-	Clock,
-	Images,
-	Bookmark,
-	Moon,
-	Smartphone,
-	Presentation,
-	FileText,
-	Table2,
 	ArrowRight,
-	Upload,
-	MousePointerClick,
+	Bookmark,
+	Bot,
+	Brain,
+	Braces,
 	Clipboard,
-	LinkIcon
+	Clock,
+	Download,
+	Eye,
+	FileImage,
+	FileText,
+	FolderOpen,
+	History,
+	Image as ImageIcon,
+	Images,
+	LinkIcon,
+	Moon,
+	MousePointerClick,
+	Palette,
+	PenLine,
+	Presentation,
+	RatioIcon,
+	Search,
+	ShieldCheck,
+	Smartphone,
+	Sparkles,
+	Table2,
+	Upload,
+	Wand2,
+	Zap
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AgentStudioLogo } from "@/components/agentstudio-logo"
 
-const spaceGrotesk = Space_Grotesk({
+const displayFont = Archivo_Black({
 	subsets: ["latin"],
+	weight: "400",
 	display: "swap",
-	variable: "--font-space-grotesk"
+	variable: "--font-display"
+})
+
+const monoFont = IBM_Plex_Mono({
+	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
+	display: "swap",
+	variable: "--font-mono"
 })
 
 const fadeUp = {
-	hidden: { opacity: 0, y: 24 },
+	hidden: { opacity: 0, y: 28 },
 	visible: {
 		opacity: 1,
 		y: 0,
@@ -49,14 +64,276 @@ const fadeUp = {
 
 const staggerContainer = {
 	hidden: {},
-	visible: { transition: { staggerChildren: 0.1 } }
+	visible: { transition: { staggerChildren: 0.07 } }
 }
 
 interface LandingPageProps {
 	isAuthenticated: boolean
 }
 
-// --- Section Components ---
+type ModelCard = {
+	name: string
+	provider: string
+	description: string
+	tone: string
+}
+
+const imageModels: ModelCard[] = [
+	{
+		name: "GPT Image 2",
+		provider: "OpenAI",
+		description:
+			"Default generator for prompt adherence, typography, product detail, and polished commercial output.",
+		tone: "bg-[#b8ff4d]"
+	},
+	{
+		name: "GPT Image 2 Edit",
+		provider: "OpenAI",
+		description:
+			"Preserve, transform, and refine uploaded references or previous generations with a dedicated edit route.",
+		tone: "bg-[#69e7ff]"
+	},
+	{
+		name: "GPT Image 1.5",
+		provider: "OpenAI",
+		description:
+			"Premium OpenAI alternative for high-quality generation with a different visual character.",
+		tone: "bg-[#ffd447]"
+	},
+	{
+		name: "Nano Banana Pro",
+		provider: "Google",
+		description:
+			"Gemini 3 Pro image model for high-resolution creative generation and complex visual instructions.",
+		tone: "bg-[#ff6bcb]"
+	},
+	{
+		name: "Nano Banana Pro Edit",
+		provider: "Google",
+		description:
+			"Multi-reference editor for combining, preserving, and modifying several images with subject consistency.",
+		tone: "bg-[#b8ff4d]"
+	},
+	{
+		name: "Seedream 4.5",
+		provider: "ByteDance",
+		description:
+			"Modern generator with strong material rendering, layout quality, and visual consistency.",
+		tone: "bg-[#ff8a4c]"
+	},
+	{
+		name: "Seedream 5 Lite",
+		provider: "ByteDance",
+		description:
+			"Fast, cost-efficient model for high-volume drafts and high-resolution general generation.",
+		tone: "bg-[#69e7ff]"
+	},
+	{
+		name: "Seedream 5 Lite Edit",
+		provider: "ByteDance",
+		description:
+			"Cost-efficient multi-reference editor for quick visual iteration and reference-based changes.",
+		tone: "bg-[#ffd447]"
+	},
+	{
+		name: "FLUX.2 Pro",
+		provider: "Black Forest Labs",
+		description:
+			"Production-grade endpoint for professional text-to-image work through the FAL catalog.",
+		tone: "bg-[#ff6bcb]"
+	},
+	{
+		name: "FLUX.2 Pro Edit",
+		provider: "Black Forest Labs",
+		description:
+			"Production multi-reference editor for reliable transformation and composition workflows.",
+		tone: "bg-[#b8ff4d]"
+	},
+	{
+		name: "Ideogram v4",
+		provider: "Ideogram",
+		description:
+			"Specialist model for posters, logos, signage, social graphics, and readable text in images.",
+		tone: "bg-[#69e7ff]"
+	},
+	{
+		name: "Krea 2 Large",
+		provider: "Krea",
+		description:
+			"High-fidelity creative model for polished visual exploration and style-driven generation.",
+		tone: "bg-[#ff8a4c]"
+	},
+	{
+		name: "Nano Banana Lite",
+		provider: "Google",
+		description:
+			"Fast Gemini image model for responsive drafts and lightweight iteration.",
+		tone: "bg-[#ffd447]"
+	},
+	{
+		name: "FLUX.2 Klein 9B",
+		provider: "Black Forest Labs",
+		description:
+			"Lightweight FLUX.2 model for lower-cost experimentation and fast generation.",
+		tone: "bg-[#ff6bcb]"
+	}
+]
+
+const chatModels: ModelCard[] = [
+	{
+		name: "Claude Fable 5",
+		provider: "Anthropic",
+		description: "Long-running agentic and creative work.",
+		tone: "bg-[#ffd447]"
+	},
+	{
+		name: "Claude Opus 4.8",
+		provider: "Anthropic",
+		description: "Premium deep reasoning for complex workflows.",
+		tone: "bg-[#ff8a4c]"
+	},
+	{
+		name: "Claude Sonnet 5",
+		provider: "Anthropic",
+		description: "Default balanced model for high-quality direction.",
+		tone: "bg-[#b8ff4d]"
+	},
+	{
+		name: "Claude Haiku 4.5",
+		provider: "Anthropic",
+		description: "Fast current Claude model for responsive interactions.",
+		tone: "bg-[#69e7ff]"
+	},
+	{
+		name: "GPT-5.5",
+		provider: "OpenAI",
+		description: "OpenAI's current model for tool-heavy work.",
+		tone: "bg-[#ff6bcb]"
+	},
+	{
+		name: "Gemini 3.5 Flash",
+		provider: "Google",
+		description: "Stable frontier Gemini model for capable responses.",
+		tone: "bg-[#b8ff4d]"
+	},
+	{
+		name: "Gemini 3.1 Pro Preview",
+		provider: "Google",
+		description: "Preview model for multimodal and reasoning-heavy work.",
+		tone: "bg-[#ffd447]"
+	},
+	{
+		name: "Gemini 3.1 Flash-Lite",
+		provider: "Google",
+		description: "Cost-efficient Gemini for high-volume interactions.",
+		tone: "bg-[#69e7ff]"
+	}
+]
+
+const features = [
+	{
+		icon: Brain,
+		title: "Strict model routing",
+		description:
+			"Text requests and edit requests move through explicit catalog routes. No hidden swaps to retired models."
+	},
+	{
+		icon: Wand2,
+		title: "Prompt enhancement",
+		description:
+			"Short prompts get richer visual detail; detailed prompts stay intact so your intent is preserved."
+	},
+	{
+		icon: FileImage,
+		title: "Generation inspector",
+		description:
+			"See the original prompt, enhanced prompt, selected model, endpoint, parameters, and timestamp."
+	},
+	{
+		icon: History,
+		title: "Version history",
+		description:
+			"Every edit becomes a new version. Step through iterations and download the one that landed."
+	},
+	{
+		icon: Upload,
+		title: "Image inputs",
+		description:
+			"Upload, drag, paste, or link images for edits and multi-reference workflows."
+	},
+	{
+		icon: RatioIcon,
+		title: "Aspect ratios",
+		description:
+			"Square, widescreen, portrait, classic landscape, and classic portrait are mapped per model."
+	},
+	{
+		icon: Images,
+		title: "Gallery",
+		description:
+			"Browse generated images with thumbnails, metadata, download controls, and prompt copy."
+	},
+	{
+		icon: FolderOpen,
+		title: "Collections",
+		description:
+			"Organize output by campaign, client, project, moodboard, or internal review."
+	},
+	{
+		icon: Bookmark,
+		title: "Prompt library",
+		description:
+			"Save reusable prompts, categorize them, tag them, and track what works."
+	},
+	{
+		icon: Presentation,
+		title: "Slides",
+		description:
+			"Turn markdown into presentation slide images with the same image catalog."
+	},
+	{
+		icon: FileText,
+		title: "Text artifacts",
+		description:
+			"Draft written content with streaming display and editable artifact panels."
+	},
+	{
+		icon: Table2,
+		title: "Sheets",
+		description:
+			"Create structured CSV-style tables and spreadsheet content from natural language."
+	}
+]
+
+const inputMethods = [
+	{ icon: Upload, label: "Upload", detail: "JPEG, PNG, GIF, WebP, BMP" },
+	{ icon: MousePointerClick, label: "Drag", detail: "Drop files into chat" },
+	{ icon: Clipboard, label: "Paste", detail: "Screenshots from clipboard" },
+	{ icon: LinkIcon, label: "Link", detail: "Reference image URLs" }
+]
+
+function BrutalButton({
+	href,
+	children,
+	variant = "primary"
+}: {
+	href: string
+	children: React.ReactNode
+	variant?: "primary" | "secondary"
+}) {
+	return (
+		<Link
+			href={href}
+			className={`inline-flex items-center justify-center gap-2 border-4 border-black px-6 py-4 font-black uppercase tracking-wide transition-transform hover:-translate-y-1 active:translate-y-0 ${
+				variant === "primary"
+					? "bg-[#b8ff4d] text-black shadow-[8px_8px_0_#000]"
+					: "bg-white text-black shadow-[8px_8px_0_#ff6bcb]"
+			}`}
+		>
+			{children}
+		</Link>
+	)
+}
 
 function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 	const [scrolled, setScrolled] = useState(false)
@@ -69,22 +346,35 @@ function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 
 	return (
 		<nav
-			className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-				scrolled
-					? "bg-background/80 backdrop-blur-lg border-b border-border"
-					: "bg-transparent"
+			className={`fixed inset-x-0 top-0 z-50 border-b-4 border-black transition-all ${
+				scrolled ? "bg-[#fff7d6]/95 backdrop-blur" : "bg-[#fff7d6]"
 			}`}
 		>
-			<div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-				<div className="flex items-center gap-3">
-					<AgentStudioLogo size="8" />
+			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
+				<Link href="/" className="flex items-center gap-3">
+					<div className="border-4 border-black bg-[#ff6bcb] p-1 shadow-[4px_4px_0_#000]">
+						<AgentStudioLogo size="8" />
+					</div>
 					<span
-						className={`text-lg font-semibold ${spaceGrotesk.className}`}
+						className={`text-lg font-black uppercase tracking-tight text-black ${displayFont.className}`}
 					>
 						AgentStudio
 					</span>
+				</Link>
+				<div
+					className={`hidden items-center gap-2 text-xs font-bold uppercase text-black md:flex ${monoFont.className}`}
+				>
+					<span className="border-2 border-black bg-white px-3 py-1">
+						AI SDK 7
+					</span>
+					<span className="border-2 border-black bg-[#69e7ff] px-3 py-1">
+						FAL Catalog
+					</span>
 				</div>
-				<Button asChild size="sm">
+				<Button
+					asChild
+					className="rounded-none border-4 border-black bg-black text-white shadow-[5px_5px_0_#ff6bcb] hover:bg-black"
+				>
 					<Link href={isAuthenticated ? "/generate" : "/login"}>
 						{isAuthenticated ? "Go to App" : "Sign In"}
 					</Link>
@@ -94,392 +384,326 @@ function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 	)
 }
 
+function HeroMockup() {
+	const miniCards = [
+		["logo poster", "Ideogram v4", "bg-[#ffd447]"],
+		["product shot", "GPT Image 2", "bg-[#69e7ff]"],
+		["style edit", "Nano Banana Pro Edit", "bg-[#ff6bcb]"]
+	]
+
+	return (
+		<div className="relative mx-auto max-w-xl">
+			<div className="absolute -left-5 -top-5 h-28 w-28 rotate-6 border-4 border-black bg-[#b8ff4d]" />
+			<div className="absolute -right-5 bottom-8 h-32 w-32 -rotate-12 border-4 border-black bg-[#ff6bcb]" />
+			<div className="relative border-4 border-black bg-white p-4 shadow-[14px_14px_0_#000]">
+				<div className="mb-4 flex items-center justify-between border-4 border-black bg-[#ffd447] p-3">
+					<div className="flex items-center gap-2">
+						<Bot className="size-5 text-black" />
+						<span
+							className={`text-xs font-black uppercase text-black ${monoFont.className}`}
+						>
+							creative console
+						</span>
+					</div>
+					<span
+						className={`border-2 border-black bg-white px-2 py-1 text-[10px] font-bold uppercase text-black ${monoFont.className}`}
+					>
+						live catalog
+					</span>
+				</div>
+				<div className="grid gap-4 md:grid-cols-[1fr_1.1fr]">
+					<div className="space-y-3">
+						<div className="border-4 border-black bg-[#111] p-4 text-white">
+							<p
+								className={`text-[11px] font-bold uppercase text-[#b8ff4d] ${monoFont.className}`}
+							>
+								user prompt
+							</p>
+							<p className="mt-3 text-sm font-black leading-snug">
+								Make a loud launch poster for a sparkling yuzu
+								drink. Big type. Product in hand.
+							</p>
+						</div>
+						{miniCards.map(([title, model, color]) => (
+							<div
+								key={title}
+								className={`border-4 border-black p-3 ${color}`}
+							>
+								<p
+									className={`text-[10px] font-black uppercase text-black ${monoFont.className}`}
+								>
+									{title}
+								</p>
+								<p className="mt-1 text-sm font-black text-black">
+									{model}
+								</p>
+							</div>
+						))}
+					</div>
+					<div className="border-4 border-black bg-[#69e7ff] p-3">
+						<div className="relative min-h-[310px] overflow-hidden border-4 border-black bg-[#fff7d6]">
+							<div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.08)_1px,transparent_1px),linear-gradient(rgba(0,0,0,.08)_1px,transparent_1px)] bg-[size:22px_22px]" />
+							<div className="absolute left-5 top-5 w-36 -rotate-6 border-4 border-black bg-[#ff6bcb] p-3 shadow-[6px_6px_0_#000]">
+								<p
+									className={`text-3xl leading-none text-black ${displayFont.className}`}
+								>
+									YUZU!
+								</p>
+							</div>
+							<div className="absolute right-5 top-24 h-40 w-24 rotate-6 rounded-b-full rounded-t-3xl border-4 border-black bg-[#b8ff4d] shadow-[6px_6px_0_#000]" />
+							<div className="absolute bottom-6 left-7 right-7 border-4 border-black bg-white p-3 shadow-[6px_6px_0_#000]">
+								<p
+									className={`text-[10px] font-bold uppercase text-black ${monoFont.className}`}
+								>
+									generation details
+								</p>
+								<div className="mt-2 grid grid-cols-2 gap-2 text-[10px] font-bold uppercase text-black">
+									<span className="bg-[#ffd447] p-1">
+										model: GPT Image 2
+									</span>
+									<span className="bg-[#69e7ff] p-1">
+										ratio: 4:3
+									</span>
+									<span className="bg-[#ff6bcb] p-1">
+										format: PNG
+									</span>
+									<span className="bg-[#b8ff4d] p-1">
+										route: text
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
 function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 	return (
-		<section className="relative pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden">
-			<div className="absolute inset-0 bg-gradient-to-b from-muted/50 via-background to-background" />
-			<div className="relative max-w-4xl mx-auto px-6 text-center">
-				<motion.h1
+		<section className="relative overflow-hidden border-b-4 border-black bg-[#fff7d6] pt-28 pb-20 md:pt-36 md:pb-24">
+			<div className="absolute inset-0 bg-[radial-gradient(#000_1.5px,transparent_1.5px)] bg-[size:24px_24px] opacity-15" />
+			<div className="relative mx-auto grid max-w-7xl gap-12 px-4 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+				<motion.div
 					variants={fadeUp}
 					initial="hidden"
 					animate="visible"
-					className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight ${spaceGrotesk.className}`}
 				>
-					Turn words into
-					<br />
-					professional images.
-				</motion.h1>
-				<motion.p
+					<div
+						className={`mb-6 inline-flex rotate-[-2deg] border-4 border-black bg-[#69e7ff] px-4 py-2 text-xs font-black uppercase text-black shadow-[5px_5px_0_#000] ${monoFont.className}`}
+					>
+						AI image studio with a new model brain
+					</div>
+					<h1
+						className={`max-w-5xl text-5xl leading-[0.88] tracking-[-0.04em] text-black sm:text-7xl lg:text-8xl ${displayFont.className}`}
+					>
+						MAKE THE IMAGE. BREAK THE TEMPLATE.
+					</h1>
+					<p
+						className={`mt-8 max-w-2xl border-l-4 border-black pl-5 text-lg font-semibold leading-relaxed text-black md:text-xl ${monoFont.className}`}
+					>
+						AgentStudio turns plain-language requests into
+						production visuals, edits, slide images, text artifacts,
+						and structured sheets. The assistant plans the work; the
+						catalog picks the exact current model route.
+					</p>
+					<div className="mt-9 flex flex-col gap-4 sm:flex-row">
+						<BrutalButton
+							href={isAuthenticated ? "/generate" : "/login"}
+						>
+							{isAuthenticated ? "Open Studio" : "Start Creating"}
+							<ArrowRight className="size-5" />
+						</BrutalButton>
+						<BrutalButton
+							href={isAuthenticated ? "/chat" : "/login"}
+							variant="secondary"
+						>
+							Chat Workflow
+						</BrutalButton>
+					</div>
+					<div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
+						{[
+							["14", "FAL image models"],
+							["8", "chat models"],
+							["0", "hidden fallbacks"]
+						].map(([value, label]) => (
+							<div
+								key={label}
+								className="border-4 border-black bg-white p-3 shadow-[5px_5px_0_#000]"
+							>
+								<p
+									className={`text-3xl text-black ${displayFont.className}`}
+								>
+									{value}
+								</p>
+								<p
+									className={`text-[10px] font-bold uppercase text-black ${monoFont.className}`}
+								>
+									{label}
+								</p>
+							</div>
+						))}
+					</div>
+				</motion.div>
+				<motion.div
 					variants={fadeUp}
 					initial="hidden"
 					animate="visible"
 					transition={{ delay: 0.15 }}
-					className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
 				>
-					Describe what you want to create. AgentStudio selects the
-					right AI model, crafts the prompt, and generates
-					production-ready visuals — all through a simple
-					conversation.
-				</motion.p>
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					animate="visible"
-					transition={{ delay: 0.3 }}
-					className="mt-10"
-				>
-					<Button asChild size="lg" className="text-base px-8 h-12">
-						<Link href={isAuthenticated ? "/generate" : "/login"}>
-							{isAuthenticated ? "Go to App" : "Sign In"}
-							<ArrowRight className="ml-2 size-4" />
-						</Link>
-					</Button>
+					<HeroMockup />
 				</motion.div>
 			</div>
 		</section>
 	)
 }
 
-function ProblemSection() {
+function FeatureMarquee() {
+	const chips = [
+		"Generate",
+		"Edit",
+		"Inspect",
+		"Version",
+		"Upload",
+		"Paste",
+		"Link",
+		"Slide decks",
+		"Sheets",
+		"Prompt library"
+	]
+
 	return (
-		<section className="py-20 md:py-28">
-			<div className="max-w-4xl mx-auto px-6">
-				<motion.h2
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className={`text-3xl md:text-4xl font-bold tracking-tight text-center ${spaceGrotesk.className}`}
-				>
-					Creating visual content should not require a design degree.
-				</motion.h2>
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-10 grid md:grid-cols-2 gap-8 text-muted-foreground"
-				>
-					<p className="text-base leading-relaxed">
-						You need images for your next campaign, your client
-						deck, your product launch. But the options aren&apos;t
-						great. Hiring a designer takes days and costs hundreds
-						per asset. Stock photography looks generic.
-					</p>
-					<p className="text-base leading-relaxed">
-						And most AI tools drop you into a maze of sliders,
-						parameters, and technical settings you didn&apos;t ask
-						for. You shouldn&apos;t need to know what
-						&ldquo;guidance scale&rdquo; or &ldquo;inference
-						steps&rdquo; mean just to get a clean product shot.
-					</p>
-				</motion.div>
+		<div className="overflow-hidden border-b-4 border-black bg-black py-3">
+			<div
+				className={`flex w-max animate-[marquee_24s_linear_infinite] gap-3 text-sm font-black uppercase text-black ${monoFont.className}`}
+			>
+				{[...chips, ...chips].map((chip, index) => (
+					<span
+						key={`${chip}-${index}`}
+						className="border-2 border-black bg-[#ffd447] px-4 py-2"
+					>
+						{chip}
+					</span>
+				))}
 			</div>
-		</section>
+			<style jsx>{`
+				@keyframes marquee {
+					from {
+						transform: translateX(0);
+					}
+					to {
+						transform: translateX(-50%);
+					}
+				}
+			`}</style>
+		</div>
 	)
 }
 
-function HowItWorksSection() {
+function SectionHeader({
+	kicker,
+	title,
+	description,
+	color = "bg-[#b8ff4d]"
+}: {
+	kicker: string
+	title: string
+	description: string
+	color?: string
+}) {
+	return (
+		<motion.div
+			variants={fadeUp}
+			initial="hidden"
+			whileInView="visible"
+			viewport={{ once: true, margin: "-100px" }}
+			className="mx-auto max-w-4xl text-center"
+		>
+			<p
+				className={`mx-auto mb-5 inline-block rotate-[-1deg] border-4 border-black ${color} px-4 py-2 text-xs font-black uppercase text-black shadow-[5px_5px_0_#000] ${monoFont.className}`}
+			>
+				{kicker}
+			</p>
+			<h2
+				className={`text-4xl leading-[0.95] tracking-[-0.04em] text-black md:text-6xl ${displayFont.className}`}
+			>
+				{title}
+			</h2>
+			<p
+				className={`mx-auto mt-5 max-w-2xl text-base font-semibold leading-relaxed text-black md:text-lg ${monoFont.className}`}
+			>
+				{description}
+			</p>
+		</motion.div>
+	)
+}
+
+function WorkflowSection() {
 	const steps = [
 		{
-			number: "1",
-			title: "Describe your vision",
-			description:
-				'Type what you need in the chat. "Design a minimalist logo for a coffee shop called Brew & Bean." That\'s all it takes.',
-			icon: PenLine
+			icon: PenLine,
+			title: "Say what you want",
+			body: "Ask for a launch poster, logo exploration, product scene, edit, slide deck, article, or sheet."
 		},
-		{
-			number: "2",
-			title: "Get your image",
-			description:
-				"The AI selects the right model, crafts the prompt, and generates your image in a dedicated workspace alongside the conversation.",
-			icon: ImageIcon
-		},
-		{
-			number: "3",
-			title: "Refine with words",
-			description:
-				'Want changes? Say so. "Make the font bolder and change the color to deep brown." The system switches to editing mode automatically.',
-			icon: Wand2
-		},
-		{
-			number: "4",
-			title: "Browse every version",
-			description:
-				"Every iteration is saved. Navigate back through previous versions, compare changes side by side, and download any version you want.",
-			icon: History
-		}
-	]
-
-	return (
-		<section className="py-20 md:py-28 bg-muted/30">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="text-center"
-				>
-					<h2
-						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
-					>
-						Describe it. Generate it. Refine it.
-					</h2>
-					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						AgentStudio works through conversation. Describe what
-						you need in plain language, and an AI assistant handles
-						the technical decisions.
-					</p>
-				</motion.div>
-				<motion.div
-					variants={staggerContainer}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-				>
-					{steps.map((step) => (
-						<motion.div
-							key={step.number}
-							variants={fadeUp}
-							className="relative rounded-2xl border border-border bg-card p-6"
-						>
-							<div className="flex items-center justify-center size-10 rounded-full bg-primary text-primary-foreground text-sm font-bold mb-4">
-								{step.number}
-							</div>
-							<h3 className="font-semibold text-lg mb-2">
-								{step.title}
-							</h3>
-							<p className="text-sm text-muted-foreground leading-relaxed">
-								{step.description}
-							</p>
-						</motion.div>
-					))}
-				</motion.div>
-			</div>
-		</section>
-	)
-}
-
-function KeyBenefitsSection() {
-	const benefits = [
 		{
 			icon: Brain,
-			title: "Intelligent Model Selection",
-			description:
-				"You don't need to know which AI model is best for logos, typography, or photorealistic portraits. The platform detects your intent and routes to the right model automatically."
+			title: "Assistant plans",
+			body: "The chat model turns your request into a grounded prompt and chooses the right artifact action."
 		},
 		{
-			icon: FileImage,
-			title: "Production-Ready Output",
-			description:
-				"Generate images at up to 2K resolution across five aspect ratios. Every image is downloadable as PNG, copyable to clipboard, and viewable at up to 3x zoom."
+			icon: Braces,
+			title: "Catalog routes",
+			body: "Text and edit requests use explicit model pairs from the current FAL catalog."
 		},
 		{
-			icon: Eye,
-			title: "Full Creative Transparency",
-			description:
-				"After every generation, an inspector panel shows exactly what happened: the original prompt, enhanced prompt, model selected, and every parameter involved."
-		},
-		{
-			icon: FolderOpen,
-			title: "Organize and Reuse Your Work",
-			description:
-				"Save your best prompts to a personal library. Organize generated images into collections by project, theme, or client. Browse everything in a searchable gallery."
+			icon: Download,
+			title: "Export the winner",
+			body: "Inspect details, browse versions, copy, download, and organize everything in the gallery."
 		}
 	]
 
 	return (
-		<section className="py-20 md:py-28">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.h2
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className={`text-3xl md:text-4xl font-bold tracking-tight text-center ${spaceGrotesk.className}`}
-				>
-					Built for the work you actually do.
-				</motion.h2>
+		<section className="border-b-4 border-black bg-[#69e7ff] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-4 md:px-8">
+				<SectionHeader
+					kicker="How it works"
+					title="A chat that drives a production machine."
+					description="The interface stays conversational while the backend stays strict: current models, explicit routes, and visible generation details."
+					color="bg-[#ffd447]"
+				/>
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					whileInView="visible"
 					viewport={{ once: true, margin: "-100px" }}
-					className="mt-16 grid sm:grid-cols-2 gap-8"
+					className="mt-14 grid gap-5 md:grid-cols-4"
 				>
-					{benefits.map((benefit) => (
+					{steps.map((step, index) => (
 						<motion.div
-							key={benefit.title}
+							key={step.title}
 							variants={fadeUp}
-							className="rounded-2xl border border-border bg-card p-6"
+							className="relative border-4 border-black bg-white p-5 shadow-[8px_8px_0_#000]"
 						>
-							<benefit.icon className="size-6 text-muted-foreground mb-4" />
-							<h3 className="font-semibold text-lg mb-2">
-								{benefit.title}
-							</h3>
-							<p className="text-sm text-muted-foreground leading-relaxed">
-								{benefit.description}
-							</p>
-						</motion.div>
-					))}
-				</motion.div>
-			</div>
-		</section>
-	)
-}
-
-const imageModels = [
-	{
-		name: "GPT Image 1.5 (High)",
-		provider: "OpenAI",
-		description:
-			"Native multimodal image model with exceptional text rendering and instruction following. Generates images up to 4x faster with precise editing."
-	},
-	{
-		name: "Nano Banana Pro",
-		provider: "Google",
-		description:
-			"Gemini 3 Pro-based model with industry-leading text rendering, real-time web grounding, and up to 4K resolution."
-	},
-	{
-		name: "HunyuanImage 3.0 Instruct",
-		provider: "Tencent",
-		description:
-			'World\'s largest open-source image model at 80B parameters. Excels at complex reasoning with a "think first, then generate" approach.'
-	},
-	{
-		name: "Seedream 4.5",
-		provider: "ByteDance",
-		description:
-			"Comprehensive improvements in editing consistency, dense text rendering, and material accuracy for glass, metal, and cloth."
-	},
-	{
-		name: "FLUX.2 [max]",
-		provider: "Black Forest Labs",
-		description:
-			"Highest-quality FLUX.2 model, pushing image quality and editing consistency to frontier levels for professional workflows."
-	},
-	{
-		name: "Wan 2.6 Image",
-		provider: "Alibaba",
-		description:
-			"All-round diffusion-based model with enhanced consistency, controllability, and commercial-grade reliability."
-	},
-	{
-		name: "Seedream 4.0",
-		provider: "ByteDance",
-		description:
-			"Unified multimodal architecture with 10x faster inference. Strong at 2K outputs, structured layouts, and infographics."
-	},
-	{
-		name: "Nano Banana",
-		provider: "Google",
-		description:
-			"Fast Gemini image model designed for iterative creative workflows and responsive draft generation."
-	},
-	{
-		name: "Reve V1",
-		provider: "Reve",
-		description:
-			"12B parameter model that debuted at #1 on the Artificial Analysis Image Arena with exceptional photorealistic detail."
-	},
-	{
-		name: "FLUX.2 [pro]",
-		provider: "Black Forest Labs",
-		description:
-			"Production-grade model balancing speed and quality for professional workloads, supporting up to 4MP resolution."
-	},
-	{
-		name: "FLUX.2 [flex]",
-		provider: "Black Forest Labs",
-		description:
-			"Open-weights model excelling at complex text rendering and typography with multi-reference editing."
-	},
-	{
-		name: "FLUX.2 [klein] 9B",
-		provider: "Black Forest Labs",
-		description:
-			"Fastest FLUX.2 model delivering sub-second inference with open Apache 2.0 licensing."
-	},
-	{
-		name: "Eigen Image",
-		provider: "Eigen AI",
-		description:
-			"Competitive model delivering clean, precise output with strong structural coherence."
-	},
-	{
-		name: "Qwen Image Edit Max",
-		provider: "Alibaba",
-		description:
-			"Advanced editing model with layer-based editing, precise object manipulation, and geometric reasoning."
-	}
-]
-
-const providerColors: Record<string, string> = {
-	OpenAI: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-	Google: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-	Tencent: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
-	ByteDance: "bg-pink-500/10 text-pink-700 dark:text-pink-400",
-	"Black Forest Labs":
-		"bg-violet-500/10 text-violet-700 dark:text-violet-400",
-	Alibaba: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
-	Reve: "bg-rose-500/10 text-rose-700 dark:text-rose-400",
-	"Eigen AI": "bg-amber-500/10 text-amber-700 dark:text-amber-400"
-}
-
-function AIImageModelsSection() {
-	return (
-		<section className="py-20 md:py-28 bg-muted/30">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="text-center"
-				>
-					<h2
-						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
-					>
-						14 top-ranked AI image models. One interface.
-					</h2>
-					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						Different images require different tools. AgentStudio
-						gives you access to the highest-ranked models from
-						leading AI providers — and selects the right one for
-						each job.
-					</p>
-				</motion.div>
-				<motion.div
-					variants={staggerContainer}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-50px" }}
-					className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
-				>
-					{imageModels.map((model) => (
-						<motion.div
-							key={model.name}
-							variants={fadeUp}
-							className="rounded-xl border border-border bg-card p-5"
-						>
-							<div className="flex items-center gap-2 mb-2">
+							<div className="mb-6 flex items-center justify-between">
+								<div className="border-4 border-black bg-[#ff6bcb] p-3">
+									<step.icon className="size-6 text-black" />
+								</div>
 								<span
-									className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-										providerColors[model.provider] ||
-										"bg-muted text-muted-foreground"
-									}`}
+									className={`text-5xl text-black ${displayFont.className}`}
 								>
-									{model.provider}
+									0{index + 1}
 								</span>
 							</div>
-							<h3 className="font-semibold text-sm mb-1">
-								{model.name}
+							<h3
+								className={`text-xl text-black ${displayFont.className}`}
+							>
+								{step.title}
 							</h3>
-							<p className="text-xs text-muted-foreground leading-relaxed">
-								{model.description}
+							<p
+								className={`mt-3 text-sm font-semibold leading-relaxed text-black ${monoFont.className}`}
+							>
+								{step.body}
 							</p>
 						</motion.div>
 					))}
@@ -489,102 +713,47 @@ function AIImageModelsSection() {
 	)
 }
 
-function ChatAIModelsSection() {
-	const chatModels = [
-		{
-			name: "Claude Opus 4.6",
-			provider: "Anthropic",
-			description: "High-capability reasoning and creative direction."
-		},
-		{
-			name: "GPT 5.2",
-			provider: "OpenAI",
-			description:
-				"OpenAI's latest flagship model for broad, reliable performance."
-		},
-		{
-			name: "Gemini 3 Pro",
-			provider: "Google",
-			description:
-				"Advanced multimodal model with deep context understanding."
-		},
-		{
-			name: "Gemini 3 Flash",
-			provider: "Google",
-			description:
-				"Fast and responsive model for quick creative exchanges."
-		},
-		{
-			name: "DeepSeek 3.2",
-			provider: "DeepSeek",
-			description:
-				"Strong reasoning model tuned for efficient problem solving."
-		},
-		{
-			name: "Kimi K2.5",
-			provider: "Kimi",
-			description:
-				"Conversational model designed for fast, context-aware responses."
-		}
-	]
-
-	const chatProviderColors: Record<string, string> = {
-		Anthropic: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
-		OpenAI: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-		Google: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-		DeepSeek: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
-		Kimi: "bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-400"
-	}
-
+function ImageModelsSection() {
 	return (
-		<section className="py-20 md:py-28">
-			<div className="max-w-4xl mx-auto px-6">
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="text-center"
-				>
-					<h2
-						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
-					>
-						Choose the AI that guides your creative process.
-					</h2>
-					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						The conversational assistant that interprets your
-						requests is powered by your choice of six language
-						models. Switch between them at any time.
-					</p>
-				</motion.div>
+		<section className="border-b-4 border-black bg-[#fff7d6] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-4 md:px-8">
+				<SectionHeader
+					kicker="Image catalog"
+					title="14 current FAL image routes. No old model ghosts."
+					description="OpenAI, Google, ByteDance, Black Forest Labs, Ideogram, and Krea are exposed through the shipped catalog. Text and edit variants are explicit."
+					color="bg-[#ff6bcb]"
+				/>
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+					viewport={{ once: true, margin: "-80px" }}
+					className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
 				>
-					{chatModels.map((model) => (
-						<motion.div
+					{imageModels.map((model) => (
+						<motion.article
 							key={model.name}
 							variants={fadeUp}
-							className="rounded-xl border border-border bg-card p-5"
+							className={`${model.tone} flex min-h-52 flex-col justify-between border-4 border-black p-4 shadow-[6px_6px_0_#000] transition-transform hover:-translate-y-1`}
 						>
-							<span
-								className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-									chatProviderColors[model.provider] ||
-									"bg-muted text-muted-foreground"
-								}`}
+							<div>
+								<p
+									className={`mb-3 inline-block border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase text-black ${monoFont.className}`}
+								>
+									{model.provider}
+								</p>
+								<h3
+									className={`text-2xl leading-none text-black ${displayFont.className}`}
+								>
+									{model.name}
+								</h3>
+							</div>
+							<p
+								className={`mt-5 text-sm font-semibold leading-relaxed text-black ${monoFont.className}`}
 							>
-								{model.provider}
-							</span>
-							<h3 className="font-semibold text-sm mt-3 mb-1">
-								{model.name}
-							</h3>
-							<p className="text-xs text-muted-foreground">
 								{model.description}
 							</p>
-						</motion.div>
+						</motion.article>
 					))}
 				</motion.div>
 			</div>
@@ -592,72 +761,45 @@ function ChatAIModelsSection() {
 	)
 }
 
-function BeyondSingleImagesSection() {
-	const artifacts = [
-		{
-			icon: ImageIcon,
-			title: "Images",
-			description:
-				"The core experience. Generate, edit, version, and download production-ready visuals."
-		},
-		{
-			icon: Presentation,
-			title: "Slides",
-			description:
-				"Provide markdown content, and the platform generates a complete slide deck with professional visuals."
-		},
-		{
-			icon: FileText,
-			title: "Text",
-			description:
-				"Generate written content — emails, articles, essays — with real-time streaming and inline editing."
-		},
-		{
-			icon: Table2,
-			title: "Sheets",
-			description:
-				"Create structured tabular data and spreadsheets from natural language descriptions."
-		}
-	]
-
+function ChatModelsSection() {
 	return (
-		<section className="py-20 md:py-28 bg-muted/30">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="text-center"
-				>
-					<h2
-						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
-					>
-						Generate presentations, spreadsheets, and written
-						content too.
-					</h2>
-				</motion.div>
+		<section className="border-b-4 border-black bg-[#ff6bcb] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-4 md:px-8">
+				<SectionHeader
+					kicker="LLM layer"
+					title="8 current chat models guide the creative workflow."
+					description="Claude Fable, Opus, Sonnet, Haiku, GPT-5.5, and Gemini 3 variants handle creative direction, prompt planning, tool calls, and artifact work."
+					color="bg-[#b8ff4d]"
+				/>
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+					viewport={{ once: true, margin: "-80px" }}
+					className="mt-14 grid gap-4 md:grid-cols-4"
 				>
-					{artifacts.map((artifact) => (
-						<motion.div
-							key={artifact.title}
+					{chatModels.map((model) => (
+						<motion.article
+							key={model.name}
 							variants={fadeUp}
-							className="rounded-2xl border border-border bg-card p-6 text-center"
+							className={`${model.tone} border-4 border-black p-4 shadow-[6px_6px_0_#000]`}
 						>
-							<artifact.icon className="size-8 text-muted-foreground mx-auto mb-4" />
-							<h3 className="font-semibold text-lg mb-2">
-								{artifact.title}
-							</h3>
-							<p className="text-sm text-muted-foreground leading-relaxed">
-								{artifact.description}
+							<p
+								className={`mb-4 inline-block border-2 border-black bg-white px-2 py-1 text-[10px] font-black uppercase text-black ${monoFont.className}`}
+							>
+								{model.provider}
 							</p>
-						</motion.div>
+							<h3
+								className={`text-xl leading-none text-black ${displayFont.className}`}
+							>
+								{model.name}
+							</h3>
+							<p
+								className={`mt-4 text-xs font-semibold leading-relaxed text-black ${monoFont.className}`}
+							>
+								{model.description}
+							</p>
+						</motion.article>
 					))}
 				</motion.div>
 			</div>
@@ -665,172 +807,192 @@ function BeyondSingleImagesSection() {
 	)
 }
 
-function ImageInputSection() {
-	const methods = [
-		{
-			icon: Upload,
-			title: "Upload",
-			description:
-				"Attach files directly through the chat (JPEG, PNG, GIF, WebP, BMP — up to 10MB)."
-		},
-		{
-			icon: MousePointerClick,
-			title: "Drag and drop",
-			description:
-				"Drag images onto the conversation from your desktop or file manager."
-		},
-		{
-			icon: Clipboard,
-			title: "Paste",
-			description:
-				"Paste screenshots and images directly from your clipboard."
-		},
-		{
-			icon: LinkIcon,
-			title: "Link",
-			description:
-				"Reference images via URL in your message for instant editing."
-		}
-	]
-
+function FeatureGridSection() {
 	return (
-		<section className="py-20 md:py-28">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="text-center"
-				>
-					<h2
-						className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
-					>
-						Every way to get images in.
-					</h2>
-					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						The platform detects your input and automatically
-						switches to the right editing mode. No manual
-						configuration needed.
-					</p>
-				</motion.div>
+		<section className="border-b-4 border-black bg-[#b8ff4d] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-4 md:px-8">
+				<SectionHeader
+					kicker="Feature stack"
+					title="All the useful stuff, not just a prompt box."
+					description="AgentStudio is a full workspace: image generation, edits, uploads, details, artifacts, organization, and export tools."
+					color="bg-[#69e7ff]"
+				/>
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+					viewport={{ once: true, margin: "-80px" }}
+					className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
 				>
-					{methods.map((method) => (
-						<motion.div
-							key={method.title}
-							variants={fadeUp}
-							className="rounded-2xl border border-border bg-card p-6 text-center"
-						>
-							<method.icon className="size-6 text-muted-foreground mx-auto mb-3" />
-							<h3 className="font-semibold text-sm mb-1">
-								{method.title}
-							</h3>
-							<p className="text-xs text-muted-foreground leading-relaxed">
-								{method.description}
-							</p>
-						</motion.div>
-					))}
-				</motion.div>
-			</div>
-		</section>
-	)
-}
-
-function WorkflowFeaturesSection() {
-	const features = [
-		{
-			icon: RatioIcon,
-			title: "Five aspect ratios",
-			description:
-				"Square, widescreen, portrait, landscape, and classic portrait. Every model, every format."
-		},
-		{
-			icon: Sparkles,
-			title: "Prompt enhancement",
-			description:
-				"Short prompts are automatically enriched. Detailed prompts pass through unchanged."
-		},
-		{
-			icon: Clock,
-			title: "Version history",
-			description:
-				"Every edit creates a new version. Browse, compare, and download any iteration."
-		},
-		{
-			icon: Images,
-			title: "Gallery",
-			description:
-				"A searchable grid of every image you've generated, with filters and full details."
-		},
-		{
-			icon: FolderOpen,
-			title: "Collections",
-			description:
-				"Group images by project, client, or theme. Set visibility to public or private."
-		},
-		{
-			icon: Bookmark,
-			title: "Saved prompts",
-			description:
-				"Build a personal prompt library. Categorize, tag, and track usage."
-		},
-		{
-			icon: Moon,
-			title: "Dark mode",
-			description:
-				"Full dark and light mode support, following your system preference."
-		},
-		{
-			icon: Smartphone,
-			title: "Responsive",
-			description:
-				"Works on desktop, tablet, and mobile with touch-friendly controls."
-		}
-	]
-
-	return (
-		<section className="py-20 md:py-28 bg-muted/30">
-			<div className="max-w-5xl mx-auto px-6">
-				<motion.h2
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className={`text-3xl md:text-4xl font-bold tracking-tight text-center ${spaceGrotesk.className}`}
-				>
-					Features that respect how you work.
-				</motion.h2>
-				<motion.div
-					variants={staggerContainer}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
-				>
-					{features.map((feature) => (
+					{features.map((feature, index) => (
 						<motion.div
 							key={feature.title}
 							variants={fadeUp}
-							className="flex flex-col items-start gap-3 rounded-xl border border-border bg-card p-5"
+							className={`border-4 border-black bg-white p-5 shadow-[7px_7px_0_#000] ${
+								index % 3 === 1
+									? "lg:translate-y-6"
+									: index % 3 === 2
+										? "lg:-translate-y-3"
+										: ""
+							}`}
 						>
-							<feature.icon className="size-5 text-muted-foreground" />
-							<div>
-								<h3 className="font-semibold text-sm">
+							<div className="mb-5 flex items-center gap-3">
+								<div className="border-4 border-black bg-[#ffd447] p-3">
+									<feature.icon className="size-5 text-black" />
+								</div>
+								<h3
+									className={`text-xl text-black ${displayFont.className}`}
+								>
 									{feature.title}
 								</h3>
-								<p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-									{feature.description}
-								</p>
 							</div>
+							<p
+								className={`text-sm font-semibold leading-relaxed text-black ${monoFont.className}`}
+							>
+								{feature.description}
+							</p>
 						</motion.div>
 					))}
 				</motion.div>
+			</div>
+		</section>
+	)
+}
+
+function InputAndArtifactsSection() {
+	const artifacts = [
+		["Images", "Generate, edit, version, inspect, and download visuals."],
+		["Slides", "Turn markdown into presentation slide images."],
+		["Text", "Draft written artifacts with streaming and editing."],
+		["Sheets", "Create structured tabular data from language."]
+	]
+
+	return (
+		<section className="border-b-4 border-black bg-[#111] py-20 text-white md:py-28">
+			<div className="mx-auto grid max-w-7xl gap-8 px-4 md:px-8 lg:grid-cols-2">
+				<motion.div
+					variants={fadeUp}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, margin: "-100px" }}
+					className="border-4 border-white bg-[#69e7ff] p-6 text-black shadow-[10px_10px_0_#ff6bcb]"
+				>
+					<h2
+						className={`text-4xl leading-none md:text-5xl ${displayFont.className}`}
+					>
+						Bring images in however you work.
+					</h2>
+					<div className="mt-8 grid gap-4 sm:grid-cols-2">
+						{inputMethods.map((method) => (
+							<div
+								key={method.label}
+								className="border-4 border-black bg-white p-4"
+							>
+								<method.icon className="size-6 text-black" />
+								<p
+									className={`mt-3 text-xl text-black ${displayFont.className}`}
+								>
+									{method.label}
+								</p>
+								<p
+									className={`mt-1 text-xs font-bold uppercase text-black ${monoFont.className}`}
+								>
+									{method.detail}
+								</p>
+							</div>
+						))}
+					</div>
+				</motion.div>
+				<motion.div
+					variants={fadeUp}
+					initial="hidden"
+					whileInView="visible"
+					viewport={{ once: true, margin: "-100px" }}
+					className="border-4 border-white bg-[#ffd447] p-6 text-black shadow-[10px_10px_0_#b8ff4d]"
+				>
+					<h2
+						className={`text-4xl leading-none md:text-5xl ${displayFont.className}`}
+					>
+						More than single images.
+					</h2>
+					<div className="mt-8 space-y-4">
+						{artifacts.map(([name, description]) => (
+							<div
+								key={name}
+								className="flex items-start justify-between gap-4 border-4 border-black bg-white p-4"
+							>
+								<div>
+									<p
+										className={`text-2xl text-black ${displayFont.className}`}
+									>
+										{name}
+									</p>
+									<p
+										className={`mt-1 text-sm font-semibold text-black ${monoFont.className}`}
+									>
+										{description}
+									</p>
+								</div>
+								<Sparkles className="size-6 shrink-0 text-black" />
+							</div>
+						))}
+					</div>
+				</motion.div>
+			</div>
+		</section>
+	)
+}
+
+function ControlRoomSection() {
+	const controls = [
+		{
+			icon: ShieldCheck,
+			label: "Stale cookies normalize to current defaults"
+		},
+		{ icon: Eye, label: "Generation details expose model and endpoint" },
+		{ icon: Search, label: "Gallery keeps output discoverable" },
+		{ icon: Palette, label: "Model-specific options are allowlisted" },
+		{ icon: Clock, label: "Every version stays browsable" },
+		{ icon: Moon, label: "Dark and light modes are supported" },
+		{ icon: Smartphone, label: "Responsive controls work on mobile" },
+		{ icon: Zap, label: "Fast draft and premium routes coexist" }
+	]
+
+	return (
+		<section className="border-b-4 border-black bg-[#fff7d6] py-20 md:py-28">
+			<div className="mx-auto max-w-7xl px-4 md:px-8">
+				<div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
+					<SectionHeader
+						kicker="Control room"
+						title="Transparent when it matters. Loud when it should be."
+						description="The page is bold; the runtime is disciplined. Users get a creative interface while the server keeps model behavior explicit."
+						color="bg-[#ff8a4c]"
+					/>
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: "-100px" }}
+						className="grid gap-3 sm:grid-cols-2"
+					>
+						{controls.map((control) => (
+							<motion.div
+								key={control.label}
+								variants={fadeUp}
+								className="flex items-center gap-3 border-4 border-black bg-white p-4 shadow-[5px_5px_0_#000]"
+							>
+								<div className="border-2 border-black bg-[#b8ff4d] p-2">
+									<control.icon className="size-5 text-black" />
+								</div>
+								<p
+									className={`text-sm font-black uppercase leading-tight text-black ${monoFont.className}`}
+								>
+									{control.label}
+								</p>
+							</motion.div>
+						))}
+					</motion.div>
+				</div>
 			</div>
 		</section>
 	)
@@ -838,41 +1000,33 @@ function WorkflowFeaturesSection() {
 
 function FinalCTASection({ isAuthenticated }: { isAuthenticated: boolean }) {
 	return (
-		<section className="py-24 md:py-32">
-			<div className="max-w-3xl mx-auto px-6 text-center">
-				<motion.h2
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className={`text-3xl md:text-4xl font-bold tracking-tight ${spaceGrotesk.className}`}
+		<section className="bg-[#ff6bcb] px-4 py-20 md:px-8 md:py-28">
+			<div className="mx-auto max-w-6xl border-4 border-black bg-[#fff7d6] p-8 text-center shadow-[14px_14px_0_#000] md:p-12">
+				<p
+					className={`mx-auto mb-5 inline-block border-4 border-black bg-[#69e7ff] px-4 py-2 text-xs font-black uppercase text-black ${monoFont.className}`}
 				>
-					Your next image is a conversation away.
-				</motion.h2>
-				<motion.p
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-4 text-muted-foreground text-lg"
+					ready when you are
+				</p>
+				<h2
+					className={`mx-auto max-w-4xl text-5xl leading-[0.9] tracking-[-0.04em] text-black md:text-7xl ${displayFont.className}`}
 				>
-					Describe what you need. The right AI model, the right
-					parameters, the right prompt — handled for you.
-				</motion.p>
-				<motion.div
-					variants={fadeUp}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: "-100px" }}
-					className="mt-8"
+					Tell it what to make. Let the catalog do the routing.
+				</h2>
+				<p
+					className={`mx-auto mt-6 max-w-2xl text-base font-semibold leading-relaxed text-black md:text-lg ${monoFont.className}`}
 				>
-					<Button asChild size="lg" className="text-base px-8 h-12">
-						<Link href={isAuthenticated ? "/generate" : "/login"}>
-							{isAuthenticated ? "Go to App" : "Sign In"}
-							<ArrowRight className="ml-2 size-4" />
-						</Link>
-					</Button>
-				</motion.div>
+					Generate images, edit with references, inspect the exact
+					model path, save versions, organize results, and keep
+					creating without touching a maze of settings.
+				</p>
+				<div className="mt-10 flex justify-center">
+					<BrutalButton
+						href={isAuthenticated ? "/generate" : "/login"}
+					>
+						{isAuthenticated ? "Launch AgentStudio" : "Sign In"}
+						<ArrowRight className="size-5" />
+					</BrutalButton>
+				</div>
 			</div>
 		</section>
 	)
@@ -880,34 +1034,43 @@ function FinalCTASection({ isAuthenticated }: { isAuthenticated: boolean }) {
 
 function Footer() {
 	return (
-		<footer className="border-t border-border py-8">
-			<div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-muted-foreground">
-				<div className="flex items-center gap-2">
-					<AgentStudioLogo size="8" />
-					<span>AgentStudio</span>
+		<footer className="border-t-4 border-black bg-black py-8 text-white">
+			<div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 md:flex-row md:items-center md:justify-between md:px-8">
+				<div className="flex items-center gap-3">
+					<div className="border-4 border-white bg-[#ff6bcb] p-1">
+						<AgentStudioLogo size="8" />
+					</div>
+					<span
+						className={`font-black uppercase ${displayFont.className}`}
+					>
+						AgentStudio
+					</span>
 				</div>
-				<span>&copy; {new Date().getFullYear()} AgentStudio</span>
+				<span
+					className={`text-xs font-bold uppercase text-white/80 ${monoFont.className}`}
+				>
+					Current models. Explicit routes. Built for visual work.
+				</span>
 			</div>
 		</footer>
 	)
 }
 
-// --- Main Component ---
-
 export function LandingPage({ isAuthenticated }: LandingPageProps) {
 	return (
-		<div className="min-h-dvh bg-background text-foreground">
+		<div
+			className={`min-h-dvh bg-[#fff7d6] text-black ${displayFont.variable} ${monoFont.variable}`}
+		>
 			<StickyNav isAuthenticated={isAuthenticated} />
 			<main>
 				<HeroSection isAuthenticated={isAuthenticated} />
-				<ProblemSection />
-				<HowItWorksSection />
-				<KeyBenefitsSection />
-				<AIImageModelsSection />
-				<ChatAIModelsSection />
-				<BeyondSingleImagesSection />
-				<ImageInputSection />
-				<WorkflowFeaturesSection />
+				<FeatureMarquee />
+				<WorkflowSection />
+				<ImageModelsSection />
+				<ChatModelsSection />
+				<FeatureGridSection />
+				<InputAndArtifactsSection />
+				<ControlRoomSection />
 				<FinalCTASection isAuthenticated={isAuthenticated} />
 			</main>
 			<Footer />
