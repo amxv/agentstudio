@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -316,10 +317,13 @@ export function GenerateForm() {
 					) : generatedImage ? (
 						<div className="space-y-4">
 							<div className="aspect-square relative overflow-hidden rounded-2xl bg-muted">
-								<img
+								<Image
 									src={generatedImage}
 									alt="AI generated artwork"
-									className="w-full h-full object-cover"
+									fill
+									unoptimized
+									sizes="(min-width: 1024px) 50vw, 100vw"
+									className="object-cover"
 								/>
 							</div>
 							<div className="flex gap-2">

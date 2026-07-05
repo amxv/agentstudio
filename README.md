@@ -1,14 +1,14 @@
-# ZUE Images -- Comprehensive Feature Overview
+# AgentStudio -- Comprehensive Feature Overview
 
 ## Platform Summary
 
-ZUE Images is a professional AI image generation platform available at **design.zue.ai**. It combines a conversational AI chat interface with a powerful artifact-based creation workflow, enabling users to generate, edit, iterate on, and manage AI-generated images using multiple state-of-the-art image models. The platform is built on Next.js 15 with a React 19 frontend, backed by PostgreSQL, and integrates with leading AI providers including Anthropic, OpenAI, Google, and FAL.
+AgentStudio is a professional AI image generation platform available at **agentstudio.ashray.xyz**. It combines a conversational AI chat interface with a powerful artifact-based creation workflow, enabling users to generate, edit, iterate on, and manage AI-generated images using multiple state-of-the-art image models. The platform is built on Next.js 15 with a React 19 frontend, backed by PostgreSQL, and integrates with leading AI providers including Anthropic, OpenAI, Google, and FAL.
 
 ---
 
 ## Core Experience: Chat-Based Image Creation
 
-At the heart of ZUE Images is a conversational interface where users describe what they want to create in natural language. An AI assistant -- powered by a choice of large language models -- interprets the request, crafts an optimized prompt, selects the appropriate image generation model, and produces the result in a dedicated artifact panel alongside the conversation.
+At the heart of AgentStudio is a conversational interface where users describe what they want to create in natural language. An AI assistant -- powered by a choice of large language models -- interprets the request, crafts an optimized prompt, selects the appropriate image generation model, and produces the result in a dedicated artifact panel alongside the conversation.
 
 This chat-driven approach means users never need to learn complex parameter configurations or prompt engineering syntax. They simply describe their vision, and the system handles everything: prompt enhancement, model selection, aspect ratio formatting, and parameter tuning.
 
@@ -24,7 +24,7 @@ This chat-driven approach means users never need to learn complex parameter conf
 
 ## Supported AI Image Generation Models
 
-ZUE Images integrates a comprehensive roster of image generation models, organized into three categories: Text-to-Image, Image-to-Image, and Multi-Image models. All models are accessed through the FAL inference platform.
+AgentStudio integrates a comprehensive roster of image generation models, organized into three categories: Text-to-Image, Image-to-Image, and Multi-Image models. All models are accessed through the FAL inference platform.
 
 ### Text-to-Image Models
 

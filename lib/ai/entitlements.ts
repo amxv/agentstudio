@@ -73,11 +73,11 @@ export function getAvailableImageModelsForUser(
 		IMAGE_MODEL_IDS.FLUX_KONTEXT_MAX_MULTI
 	] as const
 
-	// Allow access to restricted models only for a@zue.ai
-	const hasRestrictedAccess = session.user.email === "a@zue.ai"
+	// Allow access to restricted models only for a@ashray.xyz
+	const hasRestrictedAccess = session.user.email === "a@ashray.xyz"
 
 	if (hasRestrictedAccess) {
-		// a@zue.ai gets access to all models
+		// a@ashray.xyz gets access to all models
 		return baseEntitlements
 	}
 

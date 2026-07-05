@@ -5,7 +5,10 @@ import globals from "globals"
 import tseslint from "typescript-eslint"
 
 export default [
+	nextEslint.flatConfig.recommended,
+	nextEslint.flatConfig.coreWebVitals,
 	{
+		name: "project/custom",
 		files: [
 			"app/**/*.{js,jsx,ts,tsx}",
 			"components/**/*.{js,jsx,ts,tsx}",
@@ -37,8 +40,7 @@ export default [
 		},
 		plugins: {
 			"react-hooks": pluginReactHooks,
-			"react-compiler": reactCompiler,
-			"@next/next": nextEslint
+			"react-compiler": reactCompiler
 		},
 		rules: {
 			// React Hooks rules
@@ -46,10 +48,7 @@ export default [
 			"react-hooks/exhaustive-deps": "warn",
 
 			// React Compiler rule
-			"react-compiler/react-compiler": "error",
-
-			// Next.js rules
-			"@next/next/no-img-element": "warn"
+			"react-compiler/react-compiler": "error"
 		}
 	}
 ]

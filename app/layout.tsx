@@ -11,8 +11,8 @@ import { SessionProvider } from "next-auth/react"
 import { auth } from "./(auth)/auth"
 
 export const metadata: Metadata = {
-	metadataBase: new URL("https://design.zue.ai"),
-	title: "ZUE Images - AI Image Generator",
+	metadataBase: new URL("https://agentstudio.ashray.xyz"),
+	title: "AgentStudio - AI Image Generator",
 	description:
 		"Generate stunning AI images with advanced models and styles. Create, edit, and manage your AI-generated artwork with professional tools."
 }

@@ -1,7 +1,7 @@
 {
-	"name": "ai-image-generator",
+	"name": "agentstudio",
 	"version": "1.0.0",
-	"description": "AI-powered image generation tool with multiple models and styles",
+	"description": "AgentStudio AI-powered image generation tool with multiple models and styles",
 	"private": true,
 	"scripts": {
 		"dev": "~/logdev next dev --turbo",

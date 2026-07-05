@@ -2,7 +2,7 @@
 
 ## Context
 
-ZUE Images needs a public landing page at the root `/` route. Currently, `/` redirects to `/generate` (which requires auth). The landing page should be standalone — no sidebar, no app chrome — and link to `/login` as the primary CTA.
+AgentStudio needs a public landing page at the root `/` route. Currently, `/` redirects to `/generate` (which requires auth). The landing page should be standalone — no sidebar, no app chrome — and link to `/login` as the primary CTA.
 
 Two source documents are ready:
 - Feature overview: `gg/agent-outputs/codebase-researcher/feature-overview.md`
@@ -59,7 +59,7 @@ if (["/", "/login", "/register"].includes(pathname))
 
 **Sections (in order):**
 
-1. **Sticky Nav** — ZueLogo (left), "Sign In" button (right). Transparent background, adds backdrop-blur on scroll. Dark/light mode aware.
+1. **Sticky Nav** — AgentStudioLogo (left), "Sign In" button (right). Transparent background, adds backdrop-blur on scroll. Dark/light mode aware.
 
 2. **Hero** — Large headline ("Turn words into professional images."), subheadline, "Sign In" CTA button. Subtle gradient background.
 

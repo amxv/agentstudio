@@ -30,7 +30,7 @@ import {
 	LinkIcon
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ZueLogo } from "@/components/zue-logo"
+import { AgentStudioLogo } from "@/components/agentstudio-logo"
 
 const spaceGrotesk = Space_Grotesk({
 	subsets: ["latin"],
@@ -73,9 +73,9 @@ function StickyNav({ isAuthenticated }: { isAuthenticated: boolean }) {
 		>
 			<div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
 				<div className="flex items-center gap-3">
-					<ZueLogo size="8" />
+					<AgentStudioLogo size="8" />
 					<span className={`text-lg font-semibold ${spaceGrotesk.className}`}>
-						ZUE Images
+						AgentStudio
 					</span>
 				</div>
 				<Button asChild size="sm">
@@ -110,7 +110,7 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 					transition={{ delay: 0.15 }}
 					className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
 				>
-					Describe what you want to create. ZUE Images selects the right AI
+					Describe what you want to create. AgentStudio selects the right AI
 					model, crafts the prompt, and generates production-ready visuals — all
 					through a simple conversation.
 				</motion.p>
@@ -219,7 +219,7 @@ function HowItWorksSection() {
 						Describe it. Generate it. Refine it.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						ZUE Images works through conversation. Describe what you need in
+						AgentStudio works through conversation. Describe what you need in
 						plain language, and an AI assistant handles the technical
 						decisions.
 					</p>
@@ -433,7 +433,7 @@ function AIImageModelsSection() {
 						14 top-ranked AI image models. One interface.
 					</h2>
 					<p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-						Different images require different tools. ZUE Images gives you
+						Different images require different tools. AgentStudio gives you
 						access to the highest-ranked models from leading AI providers — and
 						selects the right one for each job.
 					</p>
@@ -844,10 +844,10 @@ function Footer() {
 		<footer className="border-t border-border py-8">
 			<div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-muted-foreground">
 				<div className="flex items-center gap-2">
-					<ZueLogo size="8" />
-					<span>ZUE Images</span>
+					<AgentStudioLogo size="8" />
+					<span>AgentStudio</span>
 				</div>
-				<span>&copy; {new Date().getFullYear()} ZUE</span>
+				<span>&copy; {new Date().getFullYear()} AgentStudio</span>
 			</div>
 		</footer>
 	)

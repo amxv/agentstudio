@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import {
 	Wand2,
 	Images,
@@ -18,7 +19,6 @@ import { toast } from "sonner"
 import useSWR from "swr"
 import { motion } from "framer-motion"
 
-import { ZueLogo } from "@/components/zue-logo"
 import { getUserImages } from "@/lib/actions/generate"
 import type { Chat, DBImage } from "@/lib/db/schema"
 import { fetcher } from "@/lib/utils"
@@ -121,7 +121,7 @@ export function AppSidebar({
 							className="flex flex-row gap-3 items-center"
 						>
 							<span className="text-lg font-semibold px-2 hover:bg-muted rounded-2xl cursor-pointer">
-								ZUE Images
+								AgentStudio
 							</span>
 						</div>
 						<Button
@@ -308,13 +308,16 @@ function ImageItem({
 			>
 				<div className="flex items-center gap-3 w-full">
 					<div className="size-8 rounded bg-muted flex-shrink-0 overflow-hidden">
-						{image.imageUrl && image.status === "completed" ? (
-							<img
-								src={image.imageUrl}
-								alt="Generated artwork"
-								className="w-full h-full object-cover"
-							/>
-						) : (
+							{image.imageUrl && image.status === "completed" ? (
+								<Image
+									src={image.imageUrl}
+									alt="Generated artwork"
+									fill
+									unoptimized
+									sizes="32px"
+									className="object-cover"
+								/>
+							) : (
 							<div className="w-full h-full flex items-center justify-center">
 								<Wand2 className="h-3 w-3 text-muted-foreground" />
 							</div>

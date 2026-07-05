@@ -11,7 +11,7 @@ import { memo, useState } from "react"
 import { DocumentToolCall, DocumentToolResult } from "./document"
 import { DocumentPreview } from "./document-preview"
 import { Markdown } from "./markdown"
-import { ZueLogo } from "./zue-logo"
+import { AgentStudioLogo } from "./agentstudio-logo"
 import { MessageActions } from "./message-actions"
 import { MessageEditor } from "./message-editor"
 import { MessageReasoning } from "./message-reasoning"
@@ -63,7 +63,7 @@ const PurePreviewMessage = ({
 				>
 					{message.role === "assistant" && (
 						<div className="size-8 flex items-center rounded-full justify-center shrink-0 bg-background">
-							<ZueLogo size="16" variant="black" />
+							<AgentStudioLogo size="16" variant="black" />
 						</div>
 					)}
 
@@ -320,7 +320,7 @@ export const ThinkingMessage = () => {
 				)}
 			>
 				<div className="size-8 flex items-center rounded-full justify-center shrink-0 bg-background">
-					<ZueLogo size="16" variant="black" />
+					<AgentStudioLogo size="16" variant="black" />
 				</div>
 
 				<div className="flex flex-col gap-2 w-full">

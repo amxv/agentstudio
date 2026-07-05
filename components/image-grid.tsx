@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -79,10 +80,13 @@ export function ImageGrid({ images }: ImageGridProps) {
 							<div className="relative aspect-square bg-muted">
 								{image.imageUrl &&
 								image.status === "completed" ? (
-									<img
+									<Image
 										src={image.imageUrl}
 										alt="AI generated artwork"
-										className="w-full h-full object-cover"
+										fill
+										unoptimized
+										sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+										className="object-cover"
 									/>
 								) : (
 									<div className="w-full h-full flex items-center justify-center">
@@ -210,9 +214,13 @@ export function ImageGrid({ images }: ImageGridProps) {
 								<div className="space-y-4">
 									{selectedImage.imageUrl ? (
 										<div className="aspect-square rounded-2xl overflow-hidden bg-muted">
-											<img
+											<Image
 												src={selectedImage.imageUrl}
 												alt="AI generated artwork"
+												width={selectedImage.width}
+												height={selectedImage.height}
+												unoptimized
+												sizes="(min-width: 1024px) 50vw, 100vw"
 												className="w-full h-full object-cover"
 											/>
 										</div>

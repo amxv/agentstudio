@@ -1,4 +1,4 @@
-import { DUMMY_PASSWORD } from "@/lib/constants"
+import { DUMMY_PASSWORD } from "@/lib/auth/constants"
 import { createGuestUser, getUser } from "@/lib/db/queries"
 import { compare } from "bcrypt-ts"
 import NextAuth, { type DefaultSession } from "next-auth"

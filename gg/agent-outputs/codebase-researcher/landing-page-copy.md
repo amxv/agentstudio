@@ -1,11 +1,11 @@
-# ZUE Images -- Landing Page Copy
+# AgentStudio -- Landing Page Copy
 
 ---
 
 ## Meta Content
 
-**Page Title:** ZUE Images -- Professional AI Image Generation
-**Meta Description:** Generate professional images, logos, posters, and presentations with 10+ AI models. Describe your vision, and ZUE Images handles the rest -- from prompt crafting to model selection.
+**Page Title:** AgentStudio -- Professional AI Image Generation
+**Meta Description:** Generate professional images, logos, posters, and presentations with 10+ AI models. Describe your vision, and AgentStudio handles the rest -- from prompt crafting to model selection.
 
 ---
 
@@ -17,7 +17,7 @@
 
 ### Subheadline
 
-> Describe what you want to create. ZUE Images selects the right AI model, crafts the prompt, and generates production-ready visuals -- all through a simple conversation.
+> Describe what you want to create. AgentStudio selects the right AI model, crafts the prompt, and generates production-ready visuals -- all through a simple conversation.
 
 ### Primary CTA
 
@@ -53,7 +53,7 @@ You should not need to know what "guidance scale" or "inference steps" mean just
 
 ### Body
 
-ZUE Images works through conversation. You describe what you need in plain language, and an AI assistant handles the technical decisions -- selecting the best model for your request, writing an optimized prompt, and setting the right parameters automatically.
+AgentStudio works through conversation. You describe what you need in plain language, and an AI assistant handles the technical decisions -- selecting the best model for your request, writing an optimized prompt, and setting the right parameters automatically.
 
 ### Steps
 
@@ -111,7 +111,7 @@ Save your best prompts to a personal library, categorize them, and reuse them wi
 
 ### Body
 
-Different images require different tools. A photorealistic headshot needs a different model than a vector logo or a poster with bold typography. ZUE Images gives you access to the highest-ranked image models from OpenAI, Google, Tencent, ByteDance, Black Forest Labs, Alibaba, Reve, and Eigen AI -- and selects the right one for each job.
+Different images require different tools. A photorealistic headshot needs a different model than a vector logo or a poster with bold typography. AgentStudio gives you access to the highest-ranked image models from OpenAI, Google, Tencent, ByteDance, Black Forest Labs, Alibaba, Reve, and Eigen AI -- and selects the right one for each job.
 
 ---
 
@@ -188,7 +188,7 @@ The conversational assistant that interprets your requests and manages your crea
 
 ### Body
 
-ZUE Images is not limited to single images. The artifact system supports four creation types:
+AgentStudio is not limited to single images. The artifact system supports four creation types:
 
 **Images** -- The core experience. Generate, edit, version, and download production-ready visuals.
 
